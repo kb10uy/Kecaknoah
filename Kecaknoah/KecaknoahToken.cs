@@ -184,7 +184,7 @@ namespace Kecaknoah
         PlusAssign,
         MinusAssign,
         MultiplyAssign,
-        DevideAssign,
+        DivideAssign,
         AndAssign,
         OrAssign,
         XorAssign,
@@ -192,6 +192,7 @@ namespace Kecaknoah
         LeftBitShiftAssign,
         RightBitShiftAssign,
         ConditionalQuestion,
+        ConditionalElse,
         NilAssign,
 
         Comma,
