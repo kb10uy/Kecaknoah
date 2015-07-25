@@ -22,6 +22,7 @@ namespace Kecaknoah
             new Tuple<string, KecaknoahTokenType>("endfunc",KecaknoahTokenType.EndFuncKeyword),
             new Tuple<string, KecaknoahTokenType>("if",KecaknoahTokenType.IfKeyword),
             new Tuple<string, KecaknoahTokenType>("elif",KecaknoahTokenType.ElifKeyword),
+            new Tuple<string, KecaknoahTokenType>("then",KecaknoahTokenType.ElifKeyword),
             new Tuple<string, KecaknoahTokenType>("else",KecaknoahTokenType.ElseKeyword),
             new Tuple<string, KecaknoahTokenType>("endif",KecaknoahTokenType.EndifKeyword),
             new Tuple<string, KecaknoahTokenType>("case",KecaknoahTokenType.CaseKeyword),

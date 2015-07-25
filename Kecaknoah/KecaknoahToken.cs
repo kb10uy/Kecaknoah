@@ -88,6 +88,10 @@ namespace Kecaknoah
         /// </summary>
         ElifKeyword,
         /// <summary>
+        /// then
+        /// </summary>
+        ThenKeyword,
+        /// <summary>
         /// else
         /// </summary>
         ElseKeyword,
