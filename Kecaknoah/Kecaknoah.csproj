@@ -40,7 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Kecaknoah.cs" />
     <Compile Include="KecaknoahLexer.cs" />
+    <Compile Include="KecaknoahLexResult.cs" />
     <Compile Include="KecaknoahToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
