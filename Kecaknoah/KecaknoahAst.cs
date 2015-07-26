@@ -34,7 +34,7 @@ namespace Kecaknoah
         /// <summary>
         /// インスタンスを初期化します。
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">ソース名</param>
         public KecaknoahAst(string name)
         {
             SourceName = name;
@@ -51,13 +51,13 @@ namespace Kecaknoah
         /// <summary>
         /// このノードの種類を取得します。
         /// </summary>
-        public KecaknoahAstNodeType Type { get; protected set; } = KecaknoahAstNodeType.Undefined;
+        public KecaknoahAstNodeType Type { get; protected internal set; } = KecaknoahAstNodeType.Undefined;
 
         private List<KecaknoahAstNode> children = new List<KecaknoahAstNode>();
         /// <summary>
         /// 子ノードを取得します。
         /// </summary>
-        public IReadOnlyList<KecaknoahAstNode> Children { get; protected set; }
+        public IReadOnlyList<KecaknoahAstNode> Children { get; protected internal set; }
 
         /// <summary>
         /// このノードが文脈上完全な胴体の場合trueになります。
@@ -129,6 +129,10 @@ namespace Kecaknoah
         /// local文
         /// </summary>
         LocalStatement,
+        /// <summary>
+        /// 式
+        /// </summary>
+        Expression,
 
     }
 

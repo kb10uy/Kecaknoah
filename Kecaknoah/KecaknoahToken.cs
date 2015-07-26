@@ -144,6 +144,10 @@ namespace Kecaknoah
         /// </summary>
         LocalKeyword,
         /// <summary>
+        /// self
+        /// </summary>
+        SelfKeyword,
+        /// <summary>
         /// true
         /// </summary>
         TrueKeyword,
@@ -306,6 +310,14 @@ namespace Kecaknoah
         /// </summary>
         RightBitShiftAssign,
         /// <summary>
+        /// ++
+        /// </summary>
+        Increment,
+        /// <summary>
+        /// --
+        /// </summary>
+        Decrement,
+        /// <summary>
         /// ?
         /// </summary>
         ConditionalQuestion,
@@ -335,5 +347,10 @@ namespace Kecaknoah
         /// ;
         /// </summary>
         Semicolon,
+
+        /// <summary>
+        /// ...
+        /// </summary>
+        VariableArguments,
     }
 }

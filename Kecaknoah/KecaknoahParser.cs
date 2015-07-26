@@ -11,6 +11,11 @@ namespace Kecaknoah
     /// </summary>
     public sealed class KecaknoahParser
     {
+        private static Dictionary<KecaknoahTokenType, int> OperatorPriorities = new Dictionary<KecaknoahTokenType, int>
+        {
+            [KecaknoahTokenType.Plus] = 1
+        };
+
         /// <summary>
         /// インスタンスを初期化します。
         /// </summary>
@@ -77,6 +82,7 @@ namespace Kecaknoah
         private KecaknoahClassAstNode ParseClass(Queue<KecaknoahToken> tokens)
         {
             var result = new KecaknoahClassAstNode();
+            result.Type = KecaknoahAstNodeType.Class;
             var nt = tokens.Dequeue();
             if (nt.Type != KecaknoahTokenType.Identifer) throw new KecaknoahParseException(nt.CreateErrorAt("クラス名にはキーワードではない識別子を指定してください。"));
             result.Name = nt.TokenString;
@@ -87,7 +93,7 @@ namespace Kecaknoah
                 tokens.SkipLogicalLineBreak();
                 var t = tokens.Dequeue();
                 if (t.Type == KecaknoahTokenType.EndclassKeyword) break;
-                switch(t.Type)
+                switch (t.Type)
                 {
                     case KecaknoahTokenType.FuncKeyword:
                         result.AddFunctionNode(ParseFunction(tokens));
@@ -105,12 +111,60 @@ namespace Kecaknoah
         private KecaknoahFunctionAstNode ParseFunction(Queue<KecaknoahToken> tokens)
         {
             var result = new KecaknoahFunctionAstNode();
+            result.Type = KecaknoahAstNodeType.Function;
+            var nt = tokens.Dequeue();
+            if (nt.Type != KecaknoahTokenType.Identifer) throw new KecaknoahParseException(nt.CreateErrorAt("メソッド名にはキーワードではない識別子を指定してください。"));
+            result.Name = nt.TokenString;
+            ParseFunctionArgumentsList(tokens, result);
+            if (!tokens.SkipLogicalLineBreak()) throw new KecaknoahParseException(nt.CreateErrorAt("func宣言の後ろに改行が必要です。"));
             return result;
+        }
+
+        private static void ParseFunctionArgumentsList(Queue<KecaknoahToken> tokens, KecaknoahFunctionAstNode result)
+        {
+            var nt = tokens.Dequeue();
+            switch (nt.Type)
+            {
+                case KecaknoahTokenType.NewLine:
+                case KecaknoahTokenType.Semicolon:
+                    break;
+                case KecaknoahTokenType.ParenStart:
+                    while (true)
+                    {
+                        nt = tokens.Dequeue();
+                        switch (nt.Type)
+                        {
+                            case KecaknoahTokenType.Identifer:
+                                result.Parameters.Add(nt.TokenString);
+                                tokens.CheckSkipToken(KecaknoahTokenType.Comma);
+                                break;
+                            case KecaknoahTokenType.VariableArguments:
+                                result.AllowsVariableArguments = true;
+                                if (!tokens.CheckToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(nt.CreateErrorAt("可変長引数は最後に配置してください"));
+                                break;
+                            case KecaknoahTokenType.ParenEnd:
+                                goto EndArgsList;
+                            default:
+                                throw new KecaknoahParseException(nt.CreateErrorAt("仮引数リストに識別子・可変長引数以外を指定しないでください。"));
+                        }
+
+                    }
+                EndArgsList:;
+                    break;
+            }
         }
 
         private KecaknoahLocalAstNode ParseLocal(Queue<KecaknoahToken> tokens)
         {
             var result = new KecaknoahLocalAstNode();
+            result.Type = KecaknoahAstNodeType.LocalStatement;
+            return result;
+        }
+
+        private KecaknoahExpressionAstNode ParseExpression(Queue<KecaknoahToken> tokens)
+        {
+            var result = new KecaknoahExpressionAstNode();
+            result.Type = KecaknoahAstNodeType.Expression;
             return result;
         }
     }

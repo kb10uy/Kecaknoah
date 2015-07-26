@@ -38,6 +38,11 @@ namespace Kecaknoah
             => new KecaknoahError { Column = token.Position.Item1, Line = token.Position.Item2, Message = message };
 
 
+        /// <summary>
+        /// 飛ばせるなら飛ばせるだけ飛ばす
+        /// </summary>
+        /// <param name="tokens">リスト</param>
+        /// <returns>1つ以上飛ばせたらtrue</returns>
         public static bool SkipLogicalLineBreak(this Queue<KecaknoahToken> tokens)
         {
             if (!logicallines.Any(p => p == tokens.Peek().Type)) return false;
@@ -47,5 +52,26 @@ namespace Kecaknoah
             } while (logicallines.Any(p => p == tokens.Peek().Type));
             return true;
         }
+
+        /// <summary>
+        /// チェックして飛ばせたら飛ばす
+        /// </summary>
+        /// <param name="tokens">きゅう</param>
+        /// <param name="tt">チェック対象</param>
+        /// <returns>結果</returns>
+        public static bool CheckSkipToken(this Queue<KecaknoahToken> tokens, params KecaknoahTokenType[] tt)
+        {
+            if (!tt.Any(p => p == tokens.Peek().Type)) return false;
+            tokens.Dequeue();
+            return true;
+        }
+
+        /// <summary>
+        /// チェックする
+        /// </summary>
+        /// <param name="tokens">きゅう</param>
+        /// <param name="tt">チェック対象</param>
+        /// <returns>結果</returns>
+        public static bool CheckToken(this Queue<KecaknoahToken> tokens, params KecaknoahTokenType[] tt) => tt.Any(p => p == tokens.Peek().Type);
     }
 }
