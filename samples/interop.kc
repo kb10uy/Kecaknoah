@@ -1,0 +1,7 @@
+//.NETと連携するサンプル
+//using文実装しないとね
+//あと論理行の最後には;が付けられる
+//Luaと同じスタンス
+func do
+  Console.WriteLine("Hello, World!");
+endfunc
