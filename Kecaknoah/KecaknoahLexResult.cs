@@ -15,7 +15,7 @@ namespace Kecaknoah
         /// 解析元のソースコードの名前を取得します。
         /// ファイルから解析した場合はデフォルトでファイル名になります。
         /// </summary>
-        public string SourceName { get; private set; }
+        public string SourceName { get; }
 
         /// <summary>
         /// 字句解析が成功した場合はtrueになります。

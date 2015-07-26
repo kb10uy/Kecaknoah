@@ -14,7 +14,7 @@ namespace Kecaknoah
         /// <summary>
         /// <see cref="KecaknoahLexResult.SourceName"/>から継承されたソース名を取得します。
         /// </summary>
-        public string SourceName { get; private set; }
+        public string SourceName { get; }
 
         /// <summary>
         /// 構文解析が成功した場合はtrueになります。
