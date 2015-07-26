@@ -156,53 +156,184 @@ namespace Kecaknoah
         /// </summary>
         NilKeyword,
 
-
+        /// <summary>
+        /// (
+        /// </summary>
         ParenStart,
+        /// <summary>
+        /// )
+        /// </summary>
         ParenEnd,
+        /// <summary>
+        /// {
+        /// </summary>
         BraceStart,
+        /// <summary>
+        /// }
+        /// </summary>
         BraceEnd,
+        /// <summary>
+        /// [
+        /// </summary>
         BracketStart,
+        /// <summary>
+        /// ]
+        /// </summary>
         BracketEnd,
 
+        /// <summary>
+        /// +
+        /// </summary>
         Plus,
+        /// <summary>
+        /// -
+        /// </summary>
         Minus,
+        /// <summary>
+        /// *
+        /// </summary>
         Multiply,
+        /// <summary>
+        /// /
+        /// </summary>
         Divide,
+        /// <summary>
+        /// &amp;
+        /// </summary>
         And,
+        /// <summary>
+        /// |
+        /// </summary>
         Or,
+        /// <summary>
+        /// !
+        /// </summary>
         Not,
+        /// <summary>
+        /// ^
+        /// </summary>
         Xor,
+        /// <summary>
+        /// %
+        /// </summary>
         Modular,
+        /// <summary>
+        /// =
+        /// </summary>
         Assign,
+        /// <summary>
+        /// &lt;&lt;
+        /// </summary>
         LeftBitShift,
+        /// <summary>
+        /// &gt;&gt;
+        /// </summary>
         RightBitShift,
+        /// <summary>
+        /// ==
+        /// </summary>
         Equal,
+        /// <summary>
+        /// !=
+        /// </summary>
         NotEqual,
+        /// <summary>
+        /// &gt;
+        /// </summary>
         Greater,
+        /// <summary>
+        /// &lt;
+        /// </summary>
         Lesser,
+        /// <summary>
+        /// &gt;=
+        /// </summary>
         GreaterEqual,
+        /// <summary>
+        /// &lt;=
+        /// </summary>
         LesserEqual,
+        /// <summary>
+        /// ~=
+        /// </summary>
         SpecialEqual,
+        /// <summary>
+        /// &amp;&amp;
+        /// </summary>
         AndAlso,
+        /// <summary>
+        /// ||
+        /// </summary>
         OrElse,
+        /// <summary>
+        /// +=
+        /// </summary>
         PlusAssign,
+        /// <summary>
+        /// -=
+        /// </summary>
         MinusAssign,
+        /// <summary>
+        /// *=
+        /// </summary>
         MultiplyAssign,
+        /// <summary>
+        /// /=
+        /// </summary>
         DivideAssign,
+        /// <summary>
+        /// &amp;=
+        /// </summary>
         AndAssign,
+        /// <summary>
+        /// |=
+        /// </summary>
         OrAssign,
+        /// <summary>
+        /// ^=
+        /// </summary>
         XorAssign,
+        /// <summary>
+        /// %=
+        /// </summary>
         ModularAssign,
+        /// <summary>
+        /// &lt;&lt;=
+        /// </summary>
         LeftBitShiftAssign,
+        /// <summary>
+        /// &gt;&gt;=
+        /// </summary>
         RightBitShiftAssign,
+        /// <summary>
+        /// ?
+        /// </summary>
         ConditionalQuestion,
+        /// <summary>
+        /// :
+        /// </summary>
         ConditionalElse,
+        /// <summary>
+        /// ||=
+        /// </summary>
         NilAssign,
 
+        /// <summary>
+        /// ,
+        /// </summary>
         Comma,
+        /// <summary>
+        /// .
+        /// </summary>
         Period,
 
+        /// <summary>
+        /// 改行
+        /// </summary>
         NewLine,
+        /// <summary>
+        /// ;
+        /// </summary>
         Semicolon,
     }
 }

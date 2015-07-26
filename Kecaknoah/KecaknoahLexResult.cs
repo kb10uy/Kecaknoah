@@ -25,7 +25,7 @@ namespace Kecaknoah
         /// <summary>
         /// 解析が失敗した場合のエラー情報を取得します。
         /// </summary>
-        public KecaknoahLexError Error { get; internal set; } = null;
+        public KecaknoahError Error { get; internal set; } = null;
 
         private List<KecaknoahToken> tokens = new List<KecaknoahToken>();
         /// <summary>
@@ -54,7 +54,7 @@ namespace Kecaknoah
     /// <summary>
     /// 字句解析のエラーを定義します。
     /// </summary>
-    public sealed class KecaknoahLexError
+    public sealed class KecaknoahError
     {
         /// <summary>
         /// 列位置を取得します。

@@ -7,6 +7,9 @@ using System.Threading;
 
 namespace Kecaknoah
 {
+    /// <summary>
+    /// Kecaknoah Langugageを解析し、実行する環境を定義します。
+    /// </summary>
     public class Kecaknoah
     {
         static Kecaknoah()

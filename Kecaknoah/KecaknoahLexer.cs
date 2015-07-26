@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Kecaknoah
 {
@@ -16,29 +15,29 @@ namespace Kecaknoah
         #region static fields
         private static IOrderedEnumerable<Tuple<string, KecaknoahTokenType>> Keywords = new List<Tuple<string, KecaknoahTokenType>>
         {
-            new Tuple<string, KecaknoahTokenType>("class",KecaknoahTokenType.ClassKeyword),
-            new Tuple<string, KecaknoahTokenType>("endclass",KecaknoahTokenType.EndclassKeyword),
-            new Tuple<string, KecaknoahTokenType>("func",KecaknoahTokenType.FuncKeyword),
-            new Tuple<string, KecaknoahTokenType>("endfunc",KecaknoahTokenType.EndFuncKeyword),
-            new Tuple<string, KecaknoahTokenType>("if",KecaknoahTokenType.IfKeyword),
-            new Tuple<string, KecaknoahTokenType>("elif",KecaknoahTokenType.ElifKeyword),
-            new Tuple<string, KecaknoahTokenType>("then",KecaknoahTokenType.ElifKeyword),
-            new Tuple<string, KecaknoahTokenType>("else",KecaknoahTokenType.ElseKeyword),
-            new Tuple<string, KecaknoahTokenType>("endif",KecaknoahTokenType.EndifKeyword),
-            new Tuple<string, KecaknoahTokenType>("case",KecaknoahTokenType.CaseKeyword),
-            new Tuple<string, KecaknoahTokenType>("when",KecaknoahTokenType.WhenKeyword),
-            new Tuple<string, KecaknoahTokenType>("default",KecaknoahTokenType.DefaultKeyword),
-            new Tuple<string, KecaknoahTokenType>("endcase",KecaknoahTokenType.EndcaseKeyword),
-            new Tuple<string, KecaknoahTokenType>("for",KecaknoahTokenType.ForKeyword),
-            new Tuple<string, KecaknoahTokenType>("continue",KecaknoahTokenType.ContinueKeyword),
-            new Tuple<string, KecaknoahTokenType>("break",KecaknoahTokenType.BreakKeyword),
-            new Tuple<string, KecaknoahTokenType>("next",KecaknoahTokenType.NextKeyword),
-            new Tuple<string, KecaknoahTokenType>("while",KecaknoahTokenType.WhileKeyword),
-            new Tuple<string, KecaknoahTokenType>("do",KecaknoahTokenType.DoKeyword),
-            new Tuple<string, KecaknoahTokenType>("local",KecaknoahTokenType.LocalKeyword),
-            new Tuple<string, KecaknoahTokenType>("true",KecaknoahTokenType.TrueKeyword),
-            new Tuple<string, KecaknoahTokenType>("false",KecaknoahTokenType.FalseKeyword),
-            new Tuple<string, KecaknoahTokenType>("nil",KecaknoahTokenType.NilKeyword),
+            new Tuple<string, KecaknoahTokenType>("class", KecaknoahTokenType.ClassKeyword),
+            new Tuple<string, KecaknoahTokenType>("endclass", KecaknoahTokenType.EndclassKeyword),
+            new Tuple<string, KecaknoahTokenType>("func", KecaknoahTokenType.FuncKeyword),
+            new Tuple<string, KecaknoahTokenType>("endfunc", KecaknoahTokenType.EndFuncKeyword),
+            new Tuple<string, KecaknoahTokenType>("if", KecaknoahTokenType.IfKeyword),
+            new Tuple<string, KecaknoahTokenType>("elif", KecaknoahTokenType.ElifKeyword),
+            new Tuple<string, KecaknoahTokenType>("then", KecaknoahTokenType.ThenKeyword),
+            new Tuple<string, KecaknoahTokenType>("else", KecaknoahTokenType.ElseKeyword),
+            new Tuple<string, KecaknoahTokenType>("endif", KecaknoahTokenType.EndifKeyword),
+            new Tuple<string, KecaknoahTokenType>("case", KecaknoahTokenType.CaseKeyword),
+            new Tuple<string, KecaknoahTokenType>("when", KecaknoahTokenType.WhenKeyword),
+            new Tuple<string, KecaknoahTokenType>("default", KecaknoahTokenType.DefaultKeyword),
+            new Tuple<string, KecaknoahTokenType>("endcase", KecaknoahTokenType.EndcaseKeyword),
+            new Tuple<string, KecaknoahTokenType>("for", KecaknoahTokenType.ForKeyword),
+            new Tuple<string, KecaknoahTokenType>("continue", KecaknoahTokenType.ContinueKeyword),
+            new Tuple<string, KecaknoahTokenType>("break", KecaknoahTokenType.BreakKeyword),
+            new Tuple<string, KecaknoahTokenType>("next", KecaknoahTokenType.NextKeyword),
+            new Tuple<string, KecaknoahTokenType>("while", KecaknoahTokenType.WhileKeyword),
+            new Tuple<string, KecaknoahTokenType>("do", KecaknoahTokenType.DoKeyword),
+            new Tuple<string, KecaknoahTokenType>("local", KecaknoahTokenType.LocalKeyword),
+            new Tuple<string, KecaknoahTokenType>("true", KecaknoahTokenType.TrueKeyword),
+            new Tuple<string, KecaknoahTokenType>("false", KecaknoahTokenType.FalseKeyword),
+            new Tuple<string, KecaknoahTokenType>("nil", KecaknoahTokenType.NilKeyword),
         }.OrderByDescending(p => p.Item1.Length).ThenBy(p => p.Item1);
 
         private static IOrderedEnumerable<Tuple<string, KecaknoahTokenType>> Operators = new List<Tuple<string, KecaknoahTokenType>>
@@ -165,6 +164,7 @@ namespace Kecaknoah
         /// ソースコードを直接指定して解析します。
         /// </summary>
         /// <param name="source">ソースコード</param>
+        /// <param name="sourceName">ソース名</param>
         /// <returns>解析結果</returns>
         public KecaknoahLexResult AnalyzeFromSource(string source, string sourceName) => AnalyzeFromText(sourceName, source);
 
@@ -182,7 +182,7 @@ namespace Kecaknoah
             var cq = "";
             Tuple<string, KecaknoahTokenType> kw;
             Match lm;
-            KecaknoahLexError ei;
+            KecaknoahError ei;
             while (source != "")
             {
                 //空白論理行
@@ -232,7 +232,7 @@ namespace Kecaknoah
                     //不正な複数行コメント
                     if ((ecs >= 0 && ecs < ce) || ce < 0)
                     {
-                        ei = new KecaknoahLexError
+                        ei = new KecaknoahError
                         {
                             Column = col,
                             Line = line,
@@ -342,7 +342,7 @@ namespace Kecaknoah
                         inp = source.IndexOf(Environment.NewLine);
                         if (inp >= 0 && inp < qp)
                         {
-                            ei = new KecaknoahLexError
+                            ei = new KecaknoahError
                             {
                                 Column = col,
                                 Line = line,
@@ -354,7 +354,7 @@ namespace Kecaknoah
                         }
                         if (qp < 0)
                         {
-                            ei = new KecaknoahLexError
+                            ei = new KecaknoahError
                             {
                                 Column = col,
                                 Line = line,
@@ -384,7 +384,7 @@ namespace Kecaknoah
                     continue;
                 }
                 //不明
-                ei = new KecaknoahLexError
+                ei = new KecaknoahError
                 {
                     Column = col,
                     Line = line,
@@ -397,29 +397,5 @@ namespace Kecaknoah
             result.Success = true;
             return result;
         }
-    }
-
-    internal static class Extensions
-    {
-        public static KecaknoahToken CreateToken(this Tuple<string, KecaknoahTokenType> tt, int col, int line)
-            => new KecaknoahToken { Position = new Tuple<int, int>(col, line), TokenString = tt.Item1, Type = tt.Item2 };
-
-        public static KecaknoahToken CreateTokenAsIdentifer(this string ls, int col, int line)
-            => new KecaknoahToken { Position = new Tuple<int, int>(col, line), TokenString = ls, Type = KecaknoahTokenType.Identifer };
-
-        public static KecaknoahToken CreateTokenAsDecimalNumber(this string ls, int col, int line)
-            => new KecaknoahToken { Position = new Tuple<int, int>(col, line), TokenString = ls, Type = KecaknoahTokenType.DecimalNumberLiteral };
-
-        public static KecaknoahToken CreateTokenAsBinaryNumber(this string ls, int col, int line)
-            => new KecaknoahToken { Position = new Tuple<int, int>(col, line), TokenString = ls, Type = KecaknoahTokenType.BinaryNumberLiteral };
-
-        public static KecaknoahToken CreateTokenAsOctadecimalNumber(this string ls, int col, int line)
-            => new KecaknoahToken { Position = new Tuple<int, int>(col, line), TokenString = ls, Type = KecaknoahTokenType.OctadecimalNumberLiteral };
-
-        public static KecaknoahToken CreateTokenAsHexadecimalNumber(this string ls, int col, int line)
-            => new KecaknoahToken { Position = new Tuple<int, int>(col, line), TokenString = ls, Type = KecaknoahTokenType.HexadecimalNumberLiteral };
-
-        public static KecaknoahToken CreateTokenAsHexatridecimalNumber(this string ls, int col, int line)
-            => new KecaknoahToken { Position = new Tuple<int, int>(col, line), TokenString = ls, Type = KecaknoahTokenType.HexatridecimalNumberLiteral };
     }
 }
