@@ -93,7 +93,7 @@ namespace Kecaknoah
             new Tuple<string, KecaknoahTokenType>("]", KecaknoahTokenType.BracketEnd),
         }.OrderByDescending(p => p.Item1.Length).ThenBy(p => p.Item1);
 
-        private static Regex DecimalNumberPattern = new Regex("[0-9_]+(\\.[0-9_]+)?[df]?");
+        private static Regex DecimalNumberPattern = new Regex("[0-9_]+(\\.[0-9_]+)?f?");
         private static Regex BinaryNumberPattern = new Regex("0b[01]+");
         private static Regex OctadecimalNumberPattern = new Regex("0[oO][0-7]+");
         private static Regex HexadecimalNumberPattern = new Regex("0[xX][0-9a-fA-F]+");

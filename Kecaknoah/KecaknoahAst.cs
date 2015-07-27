@@ -71,13 +71,18 @@ namespace Kecaknoah
         {
             Children = children;
         }
-        
+
         /// <summary>
         /// ノードを追加します。
         /// </summary>
         /// <param name="node">追加するノード</param>
         protected internal void AddNode(KecaknoahAstNode node) => children.Add(node);
 
+        /// <summary>
+        /// ノードを追加します。
+        /// </summary>
+        /// <param name="nodes">追加するノード</param>
+        protected internal void AddNode(IEnumerable<KecaknoahAstNode> nodes) => children.AddRange(nodes);
     }
 
     /// <summary>
