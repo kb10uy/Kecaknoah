@@ -86,6 +86,16 @@ namespace Kecaknoah
         {
             Type = KecaknoahAstNodeType.Function;
         }
+
+        /// <summary>
+        /// 現在のオブジェクトを表す文字列を返します。
+        /// </summary>
+        /// <returns>文字列</returns>
+        public override IReadOnlyList<string> ToDebugStringList()
+        {
+            var result = new List<string>();
+            return result;
+        }
     }
 
     /// <summary>
@@ -109,6 +119,22 @@ namespace Kecaknoah
         protected internal KecaknoahLocalAstNode()
         {
             Type = KecaknoahAstNodeType.LocalStatement;
+        }
+
+        /// <summary>
+        /// 現在のオブジェクトを表す文字列を返します。
+        /// </summary>
+        /// <returns>文字列</returns>
+        public override IReadOnlyList<string> ToDebugStringList()
+        {
+            var result = new List<string>();
+            result.Add($"Local Assign: \"{Name}\"");
+            if (InitialExpression != null)
+            {
+                result.Add("| [Initial Expression]");
+                result.AddRange(InitialExpression.ToDebugStringList().Select(p => "| " + p));
+            }
+            return result;
         }
     }
 
@@ -167,21 +193,58 @@ namespace Kecaknoah
         public double DoubleValue { get; protected internal set; }
 
         /// <summary>
+        /// カッコ式のノードを取得します。
+        /// </summary>
+        public KecaknoahExpressionAstNode ExpressionNode { get; protected internal set; }
+
+        /// <summary>
         /// 知るか
         /// </summary>
         public KecaknoahFactorExpressionAstNode() : base() { }
+
+        /// <summary>
+        /// 現在のオブジェクトを表す文字列を返します。
+        /// </summary>
+        /// <returns>文字列</returns>
+        public override IReadOnlyList<string> ToDebugStringList()
+        {
+            var result = new List<string>();
+            switch (FactorType)
+            {
+                case KecaknoahFactorType.Nil:
+                    result.Add("Nil: Nil");
+                    break;
+                case KecaknoahFactorType.BooleanValue:
+                    result.Add($"Boolean: {BooleanValue}");
+                    break;
+                case KecaknoahFactorType.IntegerValue:
+                    result.Add($"Integer: {IntegerValue}");
+                    break;
+                case KecaknoahFactorType.SingleValue:
+                    result.Add($"Single: {SingleValue}");
+                    break;
+                case KecaknoahFactorType.DoubleValue:
+                    result.Add($"Double: {DoubleValue}");
+                    break;
+                case KecaknoahFactorType.StringValue:
+                    result.Add($"String: {StringValue}");
+                    break;
+                case KecaknoahFactorType.Identifer:
+                    result.Add($"Identifer: {StringValue}");
+                    break;
+                case KecaknoahFactorType.ParenExpression:
+                    result.AddRange(ExpressionNode.ToDebugStringList());
+                    break;
+            }
+            return result;
+        }
     }
 
     /// <summary>
     /// 単項式ノード
     /// </summary>
-    public class KecaknoahPrimaryExpressionAstNode : KecaknoahExpressionAstNode
+    public class KecaknoahPrimaryExpressionAstNode : KecaknoahUnaryExpressionAstNode
     {
-        /// <summary>
-        /// 対象の一次式を取得します。
-        /// </summary>
-        public KecaknoahPrimaryExpressionAstNode Target { get; protected internal set; }
-
         /// <summary>
         /// 初期化
         /// </summary>
@@ -200,6 +263,18 @@ namespace Kecaknoah
         /// 対象の一次式を取得します。
         /// </summary>
         public KecaknoahPrimaryExpressionAstNode Target { get; protected internal set; }
+
+        /// <summary>
+        /// 現在のオブジェクトを表す文字列を返します。
+        /// </summary>
+        /// <returns>文字列</returns>
+        public override IReadOnlyList<string> ToDebugStringList()
+        {
+            var result = new List<string>();
+            result.Add($"Unary: {ExpressionType}");
+            result.AddRange(Target.ToDebugStringList().Select(p => "| " + p));
+            return result;
+        }
     }
 
     /// <summary>
@@ -219,6 +294,23 @@ namespace Kecaknoah
         /// 対象のメンバー名を取得します。
         /// </summary>
         public string MemberName { get; protected internal set; } = "";
+
+        /// <summary>
+        /// 現在のオブジェクトを表す文字列を返します。
+        /// </summary>
+        /// <returns>文字列</returns>
+        public override IReadOnlyList<string> ToDebugStringList()
+        {
+            var result = new List<string>();
+            if (ExpressionType == KecaknoahOperatorType.IndexerAccess)
+            {
+                MemberName = "{Indexer}";
+            }
+            result.Add($"Member Access: {MemberName}");
+            result.Add("| [Target]");
+            result.AddRange(Target.ToDebugStringList().Select(p => "| " + p));
+            return result;
+        }
     }
 
     /// <summary>
@@ -237,7 +329,25 @@ namespace Kecaknoah
         /// </summary>
         protected internal KecaknoahArgumentCallExpressionAstNode() : base()
         {
-            ExpressionType = KecaknoahOperatorType.MemberAccess;
+            ExpressionType = KecaknoahOperatorType.FunctionCall;
+        }
+
+        /// <summary>
+        /// 現在のオブジェクトを表す文字列を返します。
+        /// </summary>
+        /// <returns>文字列</returns>
+        public override IReadOnlyList<string> ToDebugStringList()
+        {
+            var result = new List<string>();
+            result.Add($"Function Call:");
+            result.Add("| [Target]");
+            result.AddRange(Target.ToDebugStringList().Select(p => "| " + p));
+            if (Arguments.Count > 0)
+            {
+                result.Add("| [Arguments]");
+                foreach (var i in Arguments) result.AddRange(i.ToDebugStringList().Select(p => "| " + p));
+            }
+            return result;
         }
     }
 
@@ -249,18 +359,31 @@ namespace Kecaknoah
         /// <summary>
         /// 1項目の式ノードを取得します。
         /// </summary>
-        public KecaknoahUnaryExpressionAstNode FirstNode { get; protected internal set; }
+        public KecaknoahExpressionAstNode FirstNode { get; protected internal set; }
 
         /// <summary>
         /// 1項目の式ノードを取得します。
         /// </summary>
-        public KecaknoahUnaryExpressionAstNode SecondNode { get; protected internal set; }
+        public KecaknoahExpressionAstNode SecondNode { get; protected internal set; }
+
+        /// <summary>
+        /// 現在のオブジェクトを表す文字列を返します。
+        /// </summary>
+        /// <returns>文字列</returns>
+        public override IReadOnlyList<string> ToDebugStringList()
+        {
+            var result = new List<string>();
+            result.Add($"{ExpressionType}:");
+            result.AddRange(FirstNode.ToDebugStringList().Select(p => "| " + p));
+            result.AddRange(SecondNode.ToDebugStringList().Select(p => "| " + p));
+            return result;
+        }
     }
 
     /// <summary>
     /// 三項演算子ノード
     /// </summary>
-    public class KecaknoahConditionalExpressionAstNode : KecaknoahAstNode
+    public class KecaknoahConditionalExpressionAstNode : KecaknoahExpressionAstNode
     {
         /// <summary>
         /// 条件式
@@ -276,6 +399,23 @@ namespace Kecaknoah
         /// falseの場合の式
         /// </summary>
         public KecaknoahExpressionAstNode FalseValueNode { get; protected internal set; }
+
+        /// <summary>
+        /// 現在のオブジェクトを表す文字列を返します。
+        /// </summary>
+        /// <returns>文字列</returns>
+        public override IReadOnlyList<string> ToDebugStringList()
+        {
+            var result = new List<string>();
+            result.Add("Conditional:");
+            result.Add("| [Condition]");
+            result.AddRange(ConditionNode.ToDebugStringList().Select(p => "| " + p));
+            result.Add("| [True Expression]");
+            result.AddRange(TrueValueNode.ToDebugStringList().Select(p => "| " + p));
+            result.Add("| [False Expression]");
+            result.AddRange(FalseValueNode.ToDebugStringList().Select(p => "| " + p));
+            return result;
+        }
     }
 
     /// <summary>
@@ -287,6 +427,10 @@ namespace Kecaknoah
         /// 未定義
         /// </summary>
         Undefined,
+        /// <summary>
+        /// カッコ式
+        /// </summary>
+        ParenExpression,
         /// <summary>
         /// nil
         /// </summary>

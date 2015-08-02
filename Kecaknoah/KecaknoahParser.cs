@@ -53,6 +53,47 @@ namespace Kecaknoah
             [KecaknoahTokenType.NilAssign] = 1,
         };
 
+        private static Dictionary<KecaknoahTokenType, KecaknoahOperatorType> OperatorsTokenTable = new Dictionary<KecaknoahTokenType, KecaknoahOperatorType>
+        {
+            //C#に準拠
+            [KecaknoahTokenType.Plus] = KecaknoahOperatorType.Plus,
+            [KecaknoahTokenType.Minus] = KecaknoahOperatorType.Minus,
+            [KecaknoahTokenType.Multiply] = KecaknoahOperatorType.Multiply,
+            [KecaknoahTokenType.Divide] = KecaknoahOperatorType.Divide,
+            [KecaknoahTokenType.And] = KecaknoahOperatorType.And,
+            [KecaknoahTokenType.Or] = KecaknoahOperatorType.Or,
+            //[KecaknoahTokenType.Not] = KecaknoahOperatorType.Not,
+            [KecaknoahTokenType.Xor] = KecaknoahOperatorType.Xor,
+            [KecaknoahTokenType.Modular] = KecaknoahOperatorType.Modular,
+            [KecaknoahTokenType.Assign] = KecaknoahOperatorType.Assign,
+            [KecaknoahTokenType.LeftBitShift] = KecaknoahOperatorType.LeftBitShift,
+            [KecaknoahTokenType.RightBitShift] = KecaknoahOperatorType.RightBitShift,
+            [KecaknoahTokenType.Equal] = KecaknoahOperatorType.Equal,
+            [KecaknoahTokenType.NotEqual] = KecaknoahOperatorType.NotEqual,
+            [KecaknoahTokenType.Greater] = KecaknoahOperatorType.Greater,
+            [KecaknoahTokenType.Lesser] = KecaknoahOperatorType.Lesser,
+            [KecaknoahTokenType.GreaterEqual] = KecaknoahOperatorType.GreaterEqual,
+            [KecaknoahTokenType.LesserEqual] = KecaknoahOperatorType.LesserEqual,
+            [KecaknoahTokenType.SpecialEqual] = KecaknoahOperatorType.SpecialEqual,
+            [KecaknoahTokenType.AndAlso] = KecaknoahOperatorType.AndAlso,
+            [KecaknoahTokenType.OrElse] = KecaknoahOperatorType.OrElse,
+            [KecaknoahTokenType.PlusAssign] = KecaknoahOperatorType.PlusAssign,
+            [KecaknoahTokenType.MinusAssign] = KecaknoahOperatorType.MinusAssign,
+            [KecaknoahTokenType.MultiplyAssign] = KecaknoahOperatorType.MultiplyAssign,
+            [KecaknoahTokenType.DivideAssign] = KecaknoahOperatorType.DivideAssign,
+            [KecaknoahTokenType.AndAssign] = KecaknoahOperatorType.AndAssign,
+            [KecaknoahTokenType.OrAssign] = KecaknoahOperatorType.OrAssign,
+            [KecaknoahTokenType.XorAssign] = KecaknoahOperatorType.XorAssign,
+            [KecaknoahTokenType.ModularAssign] = KecaknoahOperatorType.ModularAssign,
+            [KecaknoahTokenType.LeftBitShiftAssign] = KecaknoahOperatorType.LeftBitShiftAssign,
+            [KecaknoahTokenType.RightBitShiftAssign] = KecaknoahOperatorType.RightBitShiftAssign,
+            //[KecaknoahTokenType.Increment] = KecaknoahOperatorType.Increment,
+            //[KecaknoahTokenType.Decrement] = KecaknoahOperatorType.Decrement,
+            [KecaknoahTokenType.ConditionalQuestion] = KecaknoahOperatorType.ConditionalQuestion,
+            [KecaknoahTokenType.ConditionalElse] = KecaknoahOperatorType.ConditionalElse,
+            [KecaknoahTokenType.NilAssign] = KecaknoahOperatorType.NilAssign,
+        };
+
         private static int OperatorMaxPriority = OperatorPriorities.Max(p => p.Value);
 
         /// <summary>
@@ -67,6 +108,7 @@ namespace Kecaknoah
         /// 指定された<see cref="KecaknoahLexResult"/>を元にASTを構築します。
         /// </summary>
         /// <param name="lex">字句解析の結果</param>
+        /// <returns>構築されたAST</returns>
         public KecaknoahAst Parse(KecaknoahLexResult lex)
         {
             var result = new KecaknoahAst(lex.SourceName);
@@ -75,6 +117,29 @@ namespace Kecaknoah
                 var top = ParseFirstLevel(new Queue<KecaknoahToken>(lex.Tokens));
                 result.RootNode = top;
                 result.Success = top.IsComplete;
+            }
+            catch (KecaknoahParseException e)
+            {
+                result.RootNode = null;
+                result.Success = false;
+                result.Error = e.Error;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 指定された<see cref="KecaknoahLexResult"/>を式として解析します。
+        /// </summary>
+        /// <param name="lex">字句解析の結果</param>
+        /// <returns>構築されたAST</returns>
+        public KecaknoahAst ParseAsExpression(KecaknoahLexResult lex)
+        {
+            var result = new KecaknoahAst(lex.SourceName);
+            try
+            {
+                var top = ParseExpression(new Queue<KecaknoahToken>(lex.Tokens));
+                result.RootNode = top;
+                result.Success = true;
             }
             catch (KecaknoahParseException e)
             {
@@ -107,7 +172,7 @@ namespace Kecaknoah
                     }
                 }
             }
-            catch (KecaknoahParseException)
+            catch (KecaknoahParseException e)
             {
                 throw;
             }
@@ -224,16 +289,66 @@ namespace Kecaknoah
         private KecaknoahExpressionAstNode ParseBinaryExpression(Queue<KecaknoahToken> tokens, int priority)
         {
             if (priority > OperatorMaxPriority) return ParsePrimaryExpression(tokens);
-            throw new NotImplementedException();
+            var left = ParseBinaryExpression(tokens, priority + 1);
+            var result = new KecaknoahBinaryExpressionAstNode();
+            result.FirstNode = left;
+            while (true)
+            {
+                if (tokens.Count == 0) break;
+                if (tokens.CheckToken(KecaknoahTokenType.ParenEnd, KecaknoahTokenType.Comma,KecaknoahTokenType.BracketEnd))
+                {
+                    //tokens.Dequeue();
+                    break;
+                }
+                var nt = tokens.Peek();
+                if (OperatorPriorities[nt.Type] != priority) break;
+                tokens.Dequeue();
+                var right = ParseBinaryExpression(tokens, priority + 1);
+                result.SecondNode = right;
+                result.ExpressionType = OperatorsTokenTable[nt.Type];
+                var newres = new KecaknoahBinaryExpressionAstNode();
+                newres.FirstNode = result;
+                result = newres;
+            }
+            return result.FirstNode;
         }
 
         private KecaknoahUnaryExpressionAstNode ParseUnaryExpression(Queue<KecaknoahToken> tokens)
         {
-            var pe = ParsePrimaryExpression(tokens);
-            var result = new KecaknoahUnaryExpressionAstNode();
-            result.Target = pe;
-
-            return result;
+            var ut = tokens.Peek();
+            switch (ut.Type)
+            {
+                case KecaknoahTokenType.Minus:
+                    tokens.Dequeue();
+                    var mue = new KecaknoahUnaryExpressionAstNode();
+                    mue.Target = ParsePrimaryExpression(tokens);
+                    mue.ExpressionType = KecaknoahOperatorType.Minus;
+                    return mue;
+                case KecaknoahTokenType.Not:
+                    tokens.Dequeue();
+                    var nue = new KecaknoahUnaryExpressionAstNode();
+                    nue.Target = ParsePrimaryExpression(tokens);
+                    nue.ExpressionType = KecaknoahOperatorType.Not;
+                    return nue;
+                case KecaknoahTokenType.Increment:
+                    tokens.Dequeue();
+                    var iue = new KecaknoahUnaryExpressionAstNode();
+                    iue.Target = ParsePrimaryExpression(tokens);
+                    iue.ExpressionType = KecaknoahOperatorType.Increment;
+                    return iue;
+                case KecaknoahTokenType.Decrement:
+                    tokens.Dequeue();
+                    var due = new KecaknoahUnaryExpressionAstNode();
+                    due.Target = ParsePrimaryExpression(tokens);
+                    due.ExpressionType = KecaknoahOperatorType.Decrement;
+                    return due;
+                case KecaknoahTokenType.Plus:
+                    tokens.Dequeue();
+                    goto default;
+                default:
+                    var pe = ParsePrimaryExpression(tokens);
+                    return pe;
+            }
         }
 
         /// <summary>
@@ -244,7 +359,7 @@ namespace Kecaknoah
         private KecaknoahPrimaryExpressionAstNode ParsePrimaryExpression(Queue<KecaknoahToken> tokens)
         {
             var factor = ParseFactorExpression(tokens);
-            tokens.SkipLogicalLineBreak();
+            //tokens.SkipLogicalLineBreak();
             var re = ParsePrimaryRecursiveExpression(tokens, factor);
             if (re != null) return re;
             if (tokens.CheckToken(KecaknoahTokenType.Increment, KecaknoahTokenType.Decrement)) return factor;
@@ -263,7 +378,7 @@ namespace Kecaknoah
         private KecaknoahPrimaryExpressionAstNode ParsePrimaryRecursiveExpression(Queue<KecaknoahToken> tokens, KecaknoahPrimaryExpressionAstNode parent)
         {
             var result = parent;
-            if (!tokens.CheckToken(KecaknoahTokenType.Period, KecaknoahTokenType.ParenStart)) return null;
+            if (!tokens.CheckToken(KecaknoahTokenType.Period, KecaknoahTokenType.ParenStart)) return result;
             while (true)
             {
                 if (tokens.CheckSkipToken(KecaknoahTokenType.Period))
@@ -352,6 +467,15 @@ namespace Kecaknoah
             var t = tokens.Dequeue();
             switch (t.Type)
             {
+                case KecaknoahTokenType.ParenStart:
+                    var exp = ParseExpression(tokens);
+                    if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("カッコは閉じてください。"));
+                    return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.ParenExpression, ExpressionNode = exp };
+                case KecaknoahTokenType.TrueKeyword:
+                case KecaknoahTokenType.FalseKeyword:
+                    return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.BooleanValue, BooleanValue = Convert.ToBoolean(t.TokenString) };
+                case KecaknoahTokenType.NilKeyword:
+                    return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.Nil };
                 case KecaknoahTokenType.Identifer:
                     return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.Identifer, StringValue = t.TokenString };
                 case KecaknoahTokenType.StringLiteral:
@@ -371,11 +495,11 @@ namespace Kecaknoah
                     }
                     else if (t.TokenString.IndexOf('.') >= 0)
                     {
-                        return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.DoubleValue, DoubleValue = unchecked(Convert.ToDouble(t.TokenString.Substring(0, t.TokenString.Length - 1))) };
+                        return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.DoubleValue, DoubleValue = unchecked(Convert.ToDouble(t.TokenString)) };
                     }
                     else
                     {
-                        return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.IntegerValue, StringValue = t.TokenString };
+                        return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.IntegerValue, IntegerValue = unchecked(Convert.ToInt64(t.TokenString)) };
                     }
                 default:
                     throw new KecaknoahParseException(t.CreateErrorAt("意味不明なfactorが検出されました。"));

@@ -61,6 +61,7 @@ namespace Kecaknoah
         /// <returns>結果</returns>
         public static bool CheckSkipToken(this Queue<KecaknoahToken> tokens, params KecaknoahTokenType[] tt)
         {
+            if (tokens.Count == 0) return false;
             if (!tt.Any(p => p == tokens.Peek().Type)) return false;
             tokens.Dequeue();
             return true;
@@ -72,6 +73,6 @@ namespace Kecaknoah
         /// <param name="tokens">きゅう</param>
         /// <param name="tt">チェック対象</param>
         /// <returns>結果</returns>
-        public static bool CheckToken(this Queue<KecaknoahToken> tokens, params KecaknoahTokenType[] tt) => tt.Any(p => p == tokens.Peek().Type);
+        public static bool CheckToken(this Queue<KecaknoahToken> tokens, params KecaknoahTokenType[] tt) => tokens.Count != 0 ? tt.Any(p => p == tokens.Peek().Type) : false;
     }
 }

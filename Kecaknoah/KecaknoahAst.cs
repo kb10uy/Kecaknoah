@@ -39,8 +39,6 @@ namespace Kecaknoah
         {
             SourceName = name;
         }
-
-
     }
 
     /// <summary>
@@ -83,6 +81,16 @@ namespace Kecaknoah
         /// </summary>
         /// <param name="nodes">追加するノード</param>
         protected internal void AddNode(IEnumerable<KecaknoahAstNode> nodes) => children.AddRange(nodes);
+
+        /// <summary>
+        /// 現在のオブジェクトを表す文字列を返します。
+        /// </summary>
+        /// <returns>文字列</returns>
+        public virtual IReadOnlyList<string> ToDebugStringList()
+        {
+            var result = new List<string>();
+            return result;
+        }
     }
 
     /// <summary>
