@@ -116,7 +116,7 @@ namespace Kecaknoah
             {
                 var top = ParseFirstLevel(new Queue<KecaknoahToken>(lex.Tokens));
                 result.RootNode = top;
-                result.Success = top.IsComplete;
+                result.Success = true;
             }
             catch (KecaknoahParseException e)
             {
@@ -172,13 +172,9 @@ namespace Kecaknoah
                     }
                 }
             }
-            catch (KecaknoahParseException e)
+            catch (KecaknoahParseException)
             {
                 throw;
-            }
-            catch
-            {
-                result.IsComplete = false;
             }
             return result;
         }

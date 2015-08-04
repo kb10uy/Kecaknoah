@@ -58,11 +58,6 @@ namespace Kecaknoah
         public IReadOnlyList<KecaknoahAstNode> Children { get; protected internal set; }
 
         /// <summary>
-        /// このノードが文脈上完全な胴体の場合trueになります。
-        /// </summary>
-        public bool IsComplete { get; internal set; }
-
-        /// <summary>
         /// インスタンスを初期化します。
         /// </summary>
         public KecaknoahAstNode()

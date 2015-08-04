@@ -47,12 +47,17 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Kecaknoah.cs" />
     <Compile Include="KecaknoahAst.cs" />
+    <Compile Include="KecaknoahEnvironment.cs" />
     <Compile Include="KecaknoahLexer.cs" />
     <Compile Include="KecaknoahLexResult.cs" />
+    <Compile Include="KecaknoahModule.cs" />
     <Compile Include="KecaknoahNodes.cs" />
     <Compile Include="KecaknoahParser.cs" />
     <Compile Include="KecaknoahToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Type\KecaknoahObject.cs" />
+    <Compile Include="Type\KecaknoahTypes.cs" />
+    <Compile Include="Type\TypeExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
