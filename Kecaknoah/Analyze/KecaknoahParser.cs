@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kecaknoah
+namespace Kecaknoah.Analyze
 {
     /// <summary>
     /// Kecaknoahの構文解析器を定義します。
@@ -284,7 +284,7 @@ namespace Kecaknoah
 
         private KecaknoahExpressionAstNode ParseBinaryExpression(Queue<KecaknoahToken> tokens, int priority)
         {
-            if (priority > OperatorMaxPriority) return ParsePrimaryExpression(tokens);
+            if (priority > OperatorMaxPriority) return ParseUnaryExpression(tokens);
             var left = ParseBinaryExpression(tokens, priority + 1);
             var result = new KecaknoahBinaryExpressionAstNode();
             result.FirstNode = left;
@@ -357,9 +357,10 @@ namespace Kecaknoah
             var factor = ParseFactorExpression(tokens);
             //tokens.SkipLogicalLineBreak();
             var re = ParsePrimaryRecursiveExpression(tokens, factor);
-            if (re != null) return re;
-            if (tokens.CheckToken(KecaknoahTokenType.Increment, KecaknoahTokenType.Decrement)) return factor;
+            if (re != factor) return re;
+            if (!tokens.CheckToken(KecaknoahTokenType.Increment, KecaknoahTokenType.Decrement)) return factor;
             re = new KecaknoahPrimaryExpressionAstNode();
+            re.Target = factor;
             if (tokens.CheckSkipToken(KecaknoahTokenType.Increment)) re.ExpressionType = KecaknoahOperatorType.Increment;
             if (tokens.CheckSkipToken(KecaknoahTokenType.Decrement)) re.ExpressionType = KecaknoahOperatorType.Decrement;
             return re;
@@ -374,7 +375,7 @@ namespace Kecaknoah
         private KecaknoahPrimaryExpressionAstNode ParsePrimaryRecursiveExpression(Queue<KecaknoahToken> tokens, KecaknoahPrimaryExpressionAstNode parent)
         {
             var result = parent;
-            if (!tokens.CheckToken(KecaknoahTokenType.Period, KecaknoahTokenType.ParenStart)) return result;
+            if (!tokens.CheckToken(KecaknoahTokenType.Period, KecaknoahTokenType.ParenStart,KecaknoahTokenType.BracketStart)) return result;
             while (true)
             {
                 if (tokens.CheckSkipToken(KecaknoahTokenType.Period))

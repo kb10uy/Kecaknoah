@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kecaknoah
+namespace Kecaknoah.Analyze
 {
     /// <summary>
     /// KecaknoahLexerで使用するトークンを定義します。

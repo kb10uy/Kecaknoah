@@ -65,7 +65,7 @@ namespace Kecaknoah.Type
         /// <param name="op">演算子</param>
         /// <param name="target">2項目の<see cref="KecaknoahObject"/></param>
         /// <returns></returns>
-        public virtual KecaknoahObject ExpressionOperation(KecaknoahOperatorType op,KecaknoahObject target)
+        public virtual KecaknoahObject ExpressionOperation(KecaknoahILCodeType op,KecaknoahObject target)
         {
             throw new InvalidOperationException($"この{nameof(KecaknoahObject)}に対して式操作は出来ません。");
         }
@@ -76,5 +76,11 @@ namespace Kecaknoah.Type
         /// <typeparam name="T">変換対象の型</typeparam>
         /// <returns>変換結果</returns>
         public virtual object AsRawObject<T>() => default(T);
+
+        /// <summary>
+        /// 現在の以下略。
+        /// </summary>
+        /// <returns>知るか</returns>
+        public override string ToString() => "KecaknoahObject";
     }
 }

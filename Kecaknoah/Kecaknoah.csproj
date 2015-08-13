@@ -43,22 +43,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Base36.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="Analyze\Base36.cs" />
+    <Compile Include="Analyze\AnalyzerExtensions.cs" />
     <Compile Include="Kecaknoah.cs" />
     <Compile Include="KecaknoahAst.cs" />
+    <Compile Include="KecaknoahContext.cs" />
+    <Compile Include="KecaknoahPrecompiler.cs" />
     <Compile Include="KecaknoahEnvironment.cs" />
-    <Compile Include="KecaknoahLexer.cs" />
-    <Compile Include="KecaknoahLexResult.cs" />
+    <Compile Include="KecaknoahIL.cs" />
+    <Compile Include="Analyze\KecaknoahLexer.cs" />
+    <Compile Include="Analyze\KecaknoahLexResult.cs" />
     <Compile Include="KecaknoahModule.cs" />
     <Compile Include="KecaknoahNodes.cs" />
-    <Compile Include="KecaknoahParser.cs" />
-    <Compile Include="KecaknoahToken.cs" />
+    <Compile Include="Analyze\KecaknoahParser.cs" />
+    <Compile Include="KecaknoahSource.cs" />
+    <Compile Include="Analyze\KecaknoahToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Type\KecaknoahBoolean.cs" />
+    <Compile Include="Type\KecaknoahDouble.cs" />
+    <Compile Include="Type\KecaknoahInteger.cs" />
+    <Compile Include="Type\KecaknoahInteropFunction.cs" />
+    <Compile Include="Type\KecaknoahNil.cs" />
     <Compile Include="Type\KecaknoahObject.cs" />
-    <Compile Include="Type\KecaknoahTypes.cs" />
+    <Compile Include="Type\KecaknoahSingle.cs" />
+    <Compile Include="Type\KecaknoahString.cs" />
     <Compile Include="Type\TypeExtensions.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

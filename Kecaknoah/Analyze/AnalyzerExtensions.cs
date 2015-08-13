@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kecaknoah
+namespace Kecaknoah.Analyze
 {
-    internal static class Extensions
+    internal static class AnalyzerExtensions
     {
         private static List<KecaknoahTokenType> logicallines = new List<KecaknoahTokenType> {
             KecaknoahTokenType.NewLine,

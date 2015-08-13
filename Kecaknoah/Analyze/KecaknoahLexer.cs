@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Kecaknoah
+namespace Kecaknoah.Analyze
 {
     /// <summary>
     /// Kecaknoahの字句解析器を定義します。

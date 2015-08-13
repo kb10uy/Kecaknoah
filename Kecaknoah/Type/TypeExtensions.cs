@@ -54,6 +54,13 @@ namespace Kecaknoah.Type
         public static KecaknoahBoolean AsKecaknoahBoolean(this bool val) => new KecaknoahBoolean { Value = val };
 
         /// <summary>
+        /// nil化します。
+        /// </summary>
+        /// <param name="obj">値</param>
+        /// <returns>nil</returns>
+        public static KecaknoahNil AsNil(this KecaknoahObject obj) => KecaknoahNil.Instance;
+
+        /// <summary>
         /// <see cref="KecaknoahInteropFunction"/>を生成します。
         /// </summary>
         /// <param name="val">対象の<see cref="KecaknoahDelegate"/></param>
