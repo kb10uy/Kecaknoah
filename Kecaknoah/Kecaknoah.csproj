@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Analyze\Base36.cs" />
     <Compile Include="Analyze\AnalyzerExtensions.cs" />
+    <Compile Include="EnviromnentExtensions.cs" />
     <Compile Include="Kecaknoah.cs" />
     <Compile Include="KecaknoahAst.cs" />
     <Compile Include="KecaknoahContext.cs" />

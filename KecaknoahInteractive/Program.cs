@@ -19,6 +19,16 @@ namespace KecaknoahInteractive
             var precompiler = new KecaknoahPrecompiler();
             var environment = new KecaknoahEnvironment();
             var module = environment.CreateModule("H1manoa");
+            module.RegisterFunction(prm =>
+            {
+                Console.WriteLine($"printメソッド: {prm[0].ToString()}");
+                return KecaknoahNil.Instance;
+            }, "print");
+            module.RegisterFunction(KecaknoahMethods.Sin, "sin");
+            module.RegisterFunction(KecaknoahMethods.Cos, "cos");
+            module.RegisterFunction(KecaknoahMethods.Tan, "tan");
+            module.RegisterFunction(KecaknoahMethods.Max, "max");
+            module.RegisterFunction(KecaknoahMethods.Min, "min");
             lexer.DefaultSourceName = "himanoa";
             var input = "";
             do
@@ -51,25 +61,6 @@ namespace KecaknoahInteractive
                             var val = ctx.ExecuteExpression(il);
                             Console.WriteLine(val);
                         }
-
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        var sw = new Stopwatch();
-                        sw.Start();
-                        for (int i = 0; i < 1024; i++)
-                        {
-                            ret = lexer.AnalyzeFromSource(input);
-                            ast = parser.ParseAsExpression(ret);
-                        }
-                        sw.Stop();
-                        Console.WriteLine($"解析 {sw.ElapsedMilliseconds / 1024.0}ms/回");
-
-                        sw.Reset();
-                        var ctx2 = module.CreateContext();
-                        sw.Start();
-                        for (int i = 0; i < 1048576; i++) ctx2.ExecuteExpression(il);
-                        sw.Stop();
-                        ctx2.Dispose();
-                        Console.WriteLine($"実行 {sw.ElapsedMilliseconds / 1048576.0}ms/回");
                     }
                     else
                     {
@@ -86,5 +77,14 @@ namespace KecaknoahInteractive
                 Console.WriteLine();
             } while (input != "exit");
         }
+    }
+
+    static class KecaknoahMethods
+    {
+        public static KecaknoahObject Sin(KecaknoahObject[] args) => Math.Sin((double)args[0].AsRawObject<double>()).AsKecaknoahDouble();
+        public static KecaknoahObject Cos(KecaknoahObject[] args) => Math.Cos((double)args[0].AsRawObject<double>()).AsKecaknoahDouble();
+        public static KecaknoahObject Tan(KecaknoahObject[] args) => Math.Tan((double)args[0].AsRawObject<double>()).AsKecaknoahDouble();
+        public static KecaknoahObject Max(KecaknoahObject[] args) => Math.Max((double)args[0].AsRawObject<double>(), (double)args[1].AsRawObject<double>()).AsKecaknoahDouble();
+        public static KecaknoahObject Min(KecaknoahObject[] args) => Math.Min((double)args[0].AsRawObject<double>(), (double)args[1].AsRawObject<double>()).AsKecaknoahDouble();
     }
 }

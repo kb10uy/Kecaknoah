@@ -173,6 +173,10 @@ namespace Kecaknoah
     public enum KecaknoahILCodeType
     {
         /// <summary>
+        /// nop
+        /// </summary>
+        Nop,
+        /// <summary>
         /// ジャンプ先などに指定するラベル
         /// </summary>
         Label,

@@ -22,7 +22,7 @@ namespace Kecaknoah
         /// </summary>
         public string Name { get; }
 
-        private Dictionary<string, KecaknoahObject> globalObjects = new Dictionary<string, KecaknoahObject>();
+        internal Dictionary<string, KecaknoahObject> globalObjects = new Dictionary<string, KecaknoahObject>();
         /// <summary>
         /// このモジュール全体で定義されるオブジェクトを取得します。
         /// </summary>

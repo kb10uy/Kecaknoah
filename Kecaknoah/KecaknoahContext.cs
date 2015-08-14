@@ -17,7 +17,7 @@ namespace Kecaknoah
         /// </summary>
         public KecaknoahModule Module { get; }
 
-        private Stack<KecaknoahObject> objstack = new Stack<KecaknoahObject>();
+        private Stack<KecaknoahReference> objstack = new Stack<KecaknoahReference>();
         private Dictionary<string, KecaknoahObject> objects = new Dictionary<string, KecaknoahObject>();
         /// <summary>
         /// このコンテキストで定義されている変数を取得します。
@@ -27,6 +27,7 @@ namespace Kecaknoah
         internal KecaknoahContext(KecaknoahModule module)
         {
             Module = module;
+            Objects = objects;
         }
 
         /// <summary>
@@ -50,10 +51,10 @@ namespace Kecaknoah
             objstack.Clear();
             ExecuteIL(il);
             if (objstack.Count != 1) throw new InvalidOperationException("最終スタックの数が不正です");
-            return objstack.Pop();
+            return objstack.Pop().AsRightValue();
         }
 
-        private void ExecuteIL(KecaknoahIL il)
+        private void ExecuteIL(KecaknoahIL il, params KecaknoahObject[] ilargs)
         {
             var codes = il.Codes;
             int pc = 0;
@@ -64,25 +65,27 @@ namespace Kecaknoah
                 var c = codes[pc];
                 switch (c.Type)
                 {
+                    case KecaknoahILCodeType.Nop:
+                        break;
                     case KecaknoahILCodeType.Label:
                         break;
                     case KecaknoahILCodeType.PushInteger:
-                        objstack.Push(c.IntegerValue.AsKecaknoahInteger());
+                        objstack.Push(c.IntegerValue.AsKecaknoahInteger().AsRightValue());
                         break;
                     case KecaknoahILCodeType.PushString:
-                        objstack.Push(c.StringValue.AsKecaknoahString());
+                        objstack.Push(c.StringValue.AsKecaknoahString().AsRightValue());
                         break;
                     case KecaknoahILCodeType.PushSingle:
-                        objstack.Push(((float)c.FloatValue).AsKecaknoahSingle());
+                        objstack.Push(((float)c.FloatValue).AsKecaknoahSingle().AsRightValue());
                         break;
                     case KecaknoahILCodeType.PushDouble:
-                        objstack.Push(c.FloatValue.AsKecaknoahDouble());
+                        objstack.Push(c.FloatValue.AsKecaknoahDouble().AsRightValue());
                         break;
                     case KecaknoahILCodeType.PushBoolean:
-                        objstack.Push(c.BooleanValue.AsKecaknoahBoolean());
+                        objstack.Push(c.BooleanValue.AsKecaknoahBoolean().AsRightValue());
                         break;
                     case KecaknoahILCodeType.PushNil:
-                        objstack.Push(KecaknoahNil.Instance);
+                        objstack.Push(KecaknoahNil.Instance.AsRightValue());
                         break;
                     case KecaknoahILCodeType.Pop:
                         objstack.Pop();
@@ -105,16 +108,37 @@ namespace Kecaknoah
                     case KecaknoahILCodeType.Lesser:
                     case KecaknoahILCodeType.GreaterEqual:
                     case KecaknoahILCodeType.LesserEqual:
-                        v2 = objstack.Pop();
-                        v1 = objstack.Pop();
-                        objstack.Push(v1.ExpressionOperation(c.Type, v2));
+                        v2 = objstack.Pop().AsRightValue();
+                        v1 = objstack.Pop().AsRightValue();
+                        objstack.Push(v1.ExpressionOperation(c.Type, v2).AsRightValue());
                         break;
                     case KecaknoahILCodeType.Not:
                     case KecaknoahILCodeType.Negative:
-                        v1 = objstack.Pop();
-                        objstack.Push(v1.ExpressionOperation(c.Type, null));
+                        v1 = objstack.Pop().AsRightValue();
+                        objstack.Push(v1.ExpressionOperation(c.Type, null).AsRightValue());
                         break;
                     case KecaknoahILCodeType.Assign:
+                        var val = objstack.Pop().AsRightValue();
+                        var aref = objstack.Pop();
+                        if (!aref.IsLeftValue)
+                        {
+                            //ムチャ言わないで
+                            objstack.Push(KecaknoahNil.Instance.AsRightValue());
+                            break;
+                        }
+                        else if (aref.LeftAccessName.StartsWith("@@"))
+                        {
+                            objects[aref.LeftAccessName.Substring(2)] = val;
+                        }
+                        else if (aref.LeftAccessName.StartsWith("$$"))
+                        {
+                            Module.globalObjects[aref.LeftAccessName.Substring(2)] = val;
+                        }
+                        else
+                        {
+                            aref.Object.SetMember(aref.LeftAccessName, val);
+                        }
+                        break;
                     case KecaknoahILCodeType.PlusAssign:
                     case KecaknoahILCodeType.MinusAssign:
                     case KecaknoahILCodeType.MultiplyAssign:
@@ -134,26 +158,81 @@ namespace Kecaknoah
                         return;
                     case KecaknoahILCodeType.Call:
                         args = new Stack<KecaknoahObject>();
-                        for (int i = 0; i < c.IntegerValue + 1; i++) args.Push(objstack.Pop());
-                        v1 = objstack.Pop();
-                        args.Push(v1.Call(args.ToArray()));
+                        for (int i = 0; i < c.IntegerValue; i++) args.Push(objstack.Pop().AsRightValue());
+                        v1 = objstack.Pop().AsRightValue();
+                        objstack.Push(v1.Call(args.ToArray()).AsRightValue());
                         break;
                     case KecaknoahILCodeType.IndexerCall:
-                        args = new Stack<KecaknoahObject>();
-                        for (int i = 0; i < c.IntegerValue + 1; i++) args.Push(objstack.Pop());
-                        v1 = objstack.Pop();
-                        args.Push(v1.GetIndexer(args.ToArray()));
-                        break;
+                        throw new NotImplementedException("未対応");
+                    //args = new Stack<KecaknoahObject>();
+                    //for (int i = 0; i < c.IntegerValue + 1; i++) args.Push(objstack.Pop().Object);
+                    //v1 = objstack.Pop().Object;
+                    //args.Push(v1.GetIndexer(args.ToArray()));
+                    //break;
                     case KecaknoahILCodeType.PushArgument:
-                        //仮
+                        objstack.Push(ilargs[(int)c.IntegerValue].AsRightValue());
+                        break;
                     case KecaknoahILCodeType.LoadObject:
-                        //仮
-                        objstack.Push(KecaknoahNil.Instance);
+                        //名前解決順
+                        //TODO: オーバーロード解決
+                        //Context変数
+                        //Contextメソッド
+                        //Module変数
+                        //Moduleメソッド
+                        KecaknoahObject target;
+                        string refname = c.StringValue;
+                        //なんつうコードだ
+                        if (!Objects.TryGetValue(c.StringValue, out target))
+                        {
+                            if (!Module.GlobalObjects.TryGetValue(c.StringValue, out target))
+                            {
+                                target = KecaknoahNil.Instance;
+                            }
+                            else
+                            {
+                                refname = $"$${c.StringValue}";
+                            }
+                        }
+                        else
+                        {
+                            refname = $"@@{c.StringValue}";
+                        }
+                        objstack.Push(new KecaknoahReference { Object = target, IsLeftValue = true, LeftAccessName = refname });
                         break;
                     case KecaknoahILCodeType.LoadMember:
-                        v1 = objstack.Pop();
-                        var no = v1.GetMember(c.StringValue);
-                        objstack.Push(no);
+                        var or = objstack.Pop();
+                        if (or.IsLeftValue)
+                        {
+                            if (or.LeftAccessName.StartsWith("@@") || or.LeftAccessName.StartsWith("$$"))
+                            {
+                                var newref = new KecaknoahReference
+                                {
+                                    IsLeftValue = true,
+                                    Object = or.Object.GetMember(c.StringValue),
+                                    LeftAccessName = c.StringValue
+                                };
+                                objstack.Push(newref);
+                            }
+                            else
+                            {
+                                var newref = new KecaknoahReference
+                                {
+                                    IsLeftValue = true,
+                                    Object = or.Object.GetMember(or.LeftAccessName),
+                                    LeftAccessName = c.StringValue
+                                };
+                                objstack.Push(newref);
+                            }
+                        }
+                        else
+                        {
+                            var newref = new KecaknoahReference
+                            {
+                                IsLeftValue = false,
+                                Object = or.Object.GetMember(c.StringValue),
+                            };
+                            objstack.Push(newref);
+                        }
                         break;
                 }
                 pc++;
@@ -169,4 +248,32 @@ namespace Kecaknoah
             objects.Clear();
         }
     }
+
+    /// <summary>
+    /// <see cref="KecaknoahObject"/>と参照を保持します。
+    /// </summary>
+    public sealed class KecaknoahReference
+    {
+        /// <summary>
+        /// 対象の<see cref="KecaknoahObject"/>を取得します。
+        /// </summary>
+        public KecaknoahObject Object { get; internal set; }
+
+        /// <summary>
+        /// 左辺値になりうる場合はtrue。
+        /// </summary>
+        public bool IsLeftValue { get; internal set; }
+
+        /// <summary>
+        /// 左辺値の場合のアクセス名を取得します。
+        /// </summary>
+        public string LeftAccessName { get; internal set; }
+
+        /// <summary>
+        /// 右辺値化します。
+        /// </summary>
+        public KecaknoahObject AsRightValue() => (IsLeftValue == false || LeftAccessName.StartsWith("@@") || LeftAccessName.StartsWith("$$")) ? Object : Object.GetMember(LeftAccessName);
+    }
+
+
 }
