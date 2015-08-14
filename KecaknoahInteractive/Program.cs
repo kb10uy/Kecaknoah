@@ -31,11 +31,22 @@ namespace KecaknoahInteractive
             module.RegisterFunction(KecaknoahMethods.Min, "min");
             lexer.DefaultSourceName = "himanoa";
             var input = "";
+            //var il = "";
             do
             {
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("himanoa > ");
                 input = Console.ReadLine();
+                /*
+                il = "";
+                input = "";
+                do
+                {
+                    il += input + Environment.NewLine;
+                    input = Console.ReadLine();
+                } while (input != "---");
+                */
+                //var ret = lexer.AnalyzeFromSource(il);
                 var ret = lexer.AnalyzeFromSource(input);
                 if (ret.Success)
                 {
@@ -43,11 +54,13 @@ namespace KecaknoahInteractive
                     Console.WriteLine("字句解析結果--------------------");
                     Console.WriteLine(string.Join(", ", ret.Tokens.Select(p => $"{{{p.TokenString}}}")));
                     var ast = parser.ParseAsExpression(ret);
+                    //var ast = parser.Parse(ret);
                     if (ast.Success)
                     {
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.WriteLine("抽象構文木----------------------");
                         foreach (var i in ast.RootNode.ToDebugStringList()) Console.WriteLine(i);
+                        
                         var il = precompiler.PrecompileExpression(ast);
 
                         Console.ForegroundColor = ConsoleColor.Magenta;
@@ -61,6 +74,7 @@ namespace KecaknoahInteractive
                             var val = ctx.ExecuteExpression(il);
                             Console.WriteLine(val);
                         }
+                        
                     }
                     else
                     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Kecaknoah.Analyze;
 
-namespace Kecaknoah
+namespace Kecaknoah.Analyze
 {
     /// <summary>
     /// KecaknoahのAST(抽象構文木)を提供します。
@@ -85,6 +85,7 @@ namespace Kecaknoah
         public virtual IReadOnlyList<string> ToDebugStringList()
         {
             var result = new List<string>();
+            foreach (var i in Children) result.AddRange(i.ToDebugStringList());
             return result;
         }
     }

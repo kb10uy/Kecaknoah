@@ -45,9 +45,10 @@
   <ItemGroup>
     <Compile Include="Analyze\Base36.cs" />
     <Compile Include="Analyze\AnalyzerExtensions.cs" />
+    <Compile Include="Analyze\KecaknoahStructureNodes.cs" />
     <Compile Include="EnviromnentExtensions.cs" />
     <Compile Include="Kecaknoah.cs" />
-    <Compile Include="KecaknoahAst.cs" />
+    <Compile Include="Analyze\KecaknoahAst.cs" />
     <Compile Include="KecaknoahContext.cs" />
     <Compile Include="KecaknoahPrecompiler.cs" />
     <Compile Include="KecaknoahEnvironment.cs" />
@@ -55,7 +56,7 @@
     <Compile Include="Analyze\KecaknoahLexer.cs" />
     <Compile Include="Analyze\KecaknoahLexResult.cs" />
     <Compile Include="KecaknoahModule.cs" />
-    <Compile Include="KecaknoahNodes.cs" />
+    <Compile Include="Analyze\KecaknoahExpressionNodes.cs" />
     <Compile Include="Analyze\KecaknoahParser.cs" />
     <Compile Include="KecaknoahSource.cs" />
     <Compile Include="Analyze\KecaknoahToken.cs" />

@@ -83,7 +83,7 @@ namespace Kecaknoah.Analyze
             new Tuple<string, KecaknoahTokenType>(".", KecaknoahTokenType.Period),
             new Tuple<string, KecaknoahTokenType>("...", KecaknoahTokenType.VariableArguments),
 
-            new Tuple<string, KecaknoahTokenType>(Environment.NewLine, KecaknoahTokenType.NewLine),
+            //new Tuple<string, KecaknoahTokenType>(Environment.NewLine, KecaknoahTokenType.NewLine),
             new Tuple<string, KecaknoahTokenType>(";", KecaknoahTokenType.Semicolon),
             new Tuple<string, KecaknoahTokenType>("(", KecaknoahTokenType.ParenStart),
             new Tuple<string, KecaknoahTokenType>(")", KecaknoahTokenType.ParenEnd),
@@ -190,15 +190,16 @@ namespace Kecaknoah.Analyze
             while (source != "")
             {
                 //空白論理行
-                /*
+                
                 if (source.StartsWith(Environment.NewLine))
                 {
                     source = source.Substring(Environment.NewLine.Length);
-                    result.AddToken(new KecaknoahToken { Position = new Tuple<int, int>(line, col), TokenString = Environment.NewLine, Type = KecaknoahTokenType.NewLine });
+                    result.AddToken(new KecaknoahToken { Position = new Tuple<int, int>(line, col), TokenString = "<NewLine>", Type = KecaknoahTokenType.NewLine });
                     line++;
                     col = 0;
                     continue;
                 }
+                /*
                 if (source.StartsWith(";"))
                 {
                     source = source.Substring(1);
@@ -207,25 +208,6 @@ namespace Kecaknoah.Analyze
                     continue;
                 }
                 */
-                //コメント
-                if ((cq = LineCommentStart.FirstOrDefault(p => source.StartsWith(p))) != null)
-                {
-                    source = source.Substring(cq.Length);
-                    col += cq.Length;
-                    var cl = source.IndexOf(Environment.NewLine);
-                    if (cl >= 0)
-                    {
-                        source.Substring(cl + Environment.NewLine.Length);
-                        line++;
-                        col = 0;
-                    }
-                    else
-                    {
-                        //ラストコメント
-                        source = "";
-                    }
-                    continue;
-                }
                 Tuple<string, string> mcq = null;
                 if ((mcq = MultilineCommentQuotations.FirstOrDefault(p => source.StartsWith(p.Item1))) != null)
                 {
@@ -262,6 +244,25 @@ namespace Kecaknoah.Analyze
                             line++;
                             col = 0;
                         }
+                    }
+                    continue;
+                }
+                //コメント
+                if ((cq = LineCommentStart.FirstOrDefault(p => source.StartsWith(p))) != null)
+                {
+                    source = source.Substring(cq.Length);
+                    col += cq.Length;
+                    var cl = source.IndexOf(Environment.NewLine);
+                    if (cl >= 0)
+                    {
+                        source.Substring(cl + Environment.NewLine.Length);
+                        line++;
+                        col = 0;
+                    }
+                    else
+                    {
+                        //ラストコメント
+                        source = "";
                     }
                     continue;
                 }

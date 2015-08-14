@@ -13,3 +13,12 @@ func do
     endif
   next
 endfunc
+
+#{
+OKなの
+if case for while do local 式
+NGぽいの
+(唐突な)end系、elif,else
+
+
+#}

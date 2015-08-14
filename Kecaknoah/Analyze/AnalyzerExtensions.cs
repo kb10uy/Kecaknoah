@@ -45,11 +45,12 @@ namespace Kecaknoah.Analyze
         /// <returns>1つ以上飛ばせたらtrue</returns>
         public static bool SkipLogicalLineBreak(this Queue<KecaknoahToken> tokens)
         {
+            if (tokens.Count == 0) return false;
             if (!logicallines.Any(p => p == tokens.Peek().Type)) return false;
             do
             {
                 tokens.Dequeue();
-            } while (logicallines.Any(p => p == tokens.Peek().Type));
+            } while (tokens.Count > 0 && logicallines.Any(p => p == tokens.Peek().Type));
             return true;
         }
 
