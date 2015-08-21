@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kecaknoah.Type;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,8 +27,15 @@ namespace Kecaknoah
         {
             var result = new KecaknoahModule(name);
             result.Environment = this;
+            result.RegisterFunction(WriteLine, "print");
             modules[name] = result;
             return result;
+        }
+
+        private KecaknoahObject WriteLine(KecaknoahObject self, KecaknoahObject[] args)
+        {
+            Console.WriteLine(args[0]);
+            return KecaknoahNil.Instance;
         }
     }
 }

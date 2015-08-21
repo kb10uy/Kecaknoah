@@ -14,33 +14,33 @@ namespace Kecaknoah.Type
         /// <summary>
         /// 実際の値を取得・設定します。
         /// </summary>
-        public long Value { get; set; } = 0;
+        public new long Value { get; set; }
 
         /// <summary>
         /// 最大値のインスタンスを取得します。
         /// </summary>
-        public static KecaknoahInteger MaxValue = new KecaknoahInteger { Value = long.MaxValue };
+        public static KecaknoahReference MaxValue = KecaknoahReference.CreateRightReference(long.MaxValue);
 
         /// <summary>
         /// 最小値のインスタンスを取得します。
         /// </summary>
-        public static KecaknoahInteger MinValue = new KecaknoahInteger { Value = long.MaxValue };
+        public static KecaknoahReference MinValue = KecaknoahReference.CreateRightReference(long.MaxValue);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public override KecaknoahObject GetMember(string name)
+        public override KecaknoahReference GetMemberReference(string name)
         {
             switch (name)
             {
                 case "MAX_VALUE":
-                    return long.MaxValue.AsKecaknoahInteger();
+                    return MaxValue;
                 case "MIN_VALUE":
-                    return long.MinValue.AsKecaknoahInteger();
+                    return MinValue;
             }
-            return base.GetMember(name);
+            return base.GetMemberReference(name);
         }
 
         /// <summary>
@@ -51,43 +51,42 @@ namespace Kecaknoah.Type
         /// <returns></returns>
         public override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
-            var ot = target.AsRawObject<long>();
-            if (ot == null) return KecaknoahNil.Instance;
-            var t = (long)ot;
             switch (op)
             {
+                case KecaknoahILCodeType.Negative:
+                    return (-Value).AsKecaknoahInteger();
                 case KecaknoahILCodeType.Plus:
-                    return (Value + t).AsKecaknoahInteger();
+                    return (dynamic)this + (dynamic)target;
                 case KecaknoahILCodeType.Minus:
-                    return (Value - t).AsKecaknoahInteger();
+                    return (dynamic)this - (dynamic)target;
                 case KecaknoahILCodeType.Multiply:
-                    return (Value * t).AsKecaknoahInteger();
+                    return (dynamic)this * (dynamic)target;
                 case KecaknoahILCodeType.Divide:
-                    return (Value / t).AsKecaknoahInteger();
+                    return (dynamic)this / (dynamic)target;
                 case KecaknoahILCodeType.And:
-                    return (Value & t).AsKecaknoahInteger();
+                    return (dynamic)this & (dynamic)target;
                 case KecaknoahILCodeType.Or:
-                    return (Value | t).AsKecaknoahInteger();
+                    return (dynamic)this | (dynamic)target;
                 case KecaknoahILCodeType.Xor:
-                    return (Value ^ t).AsKecaknoahInteger();
+                    return (dynamic)this ^ (dynamic)target;
                 case KecaknoahILCodeType.Modular:
-                    return (Value % t).AsKecaknoahInteger();
+                    return (dynamic)this % (dynamic)target;
                 case KecaknoahILCodeType.LeftBitShift:
-                    return (Value << (int)t).AsKecaknoahInteger();
+                    return (dynamic)this << (dynamic)target;
                 case KecaknoahILCodeType.RightBitShift:
-                    return (Value >> (int)t).AsKecaknoahInteger();
+                    return (dynamic)this >> (dynamic)target;
                 case KecaknoahILCodeType.Equal:
-                    return (Value == t).AsKecaknoahBoolean();
+                    return (dynamic)this == (dynamic)target;
                 case KecaknoahILCodeType.NotEqual:
-                    return (Value != t).AsKecaknoahBoolean();
+                    return (dynamic)this != (dynamic)target;
                 case KecaknoahILCodeType.Greater:
-                    return (Value > t).AsKecaknoahBoolean();
+                    return (dynamic)this > (dynamic)target;
                 case KecaknoahILCodeType.Lesser:
-                    return (Value < t).AsKecaknoahBoolean();
+                    return (dynamic)this < (dynamic)target;
                 case KecaknoahILCodeType.GreaterEqual:
-                    return (Value >= t).AsKecaknoahBoolean();
+                    return (dynamic)this >= (dynamic)target;
                 case KecaknoahILCodeType.LesserEqual:
-                    return (Value <= t).AsKecaknoahBoolean();
+                    return (dynamic)this <= (dynamic)target;
                 default:
                     return KecaknoahNil.Instance;
             }
@@ -96,43 +95,68 @@ namespace Kecaknoah.Type
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public override object AsRawObject<T>()
-        {
-            var to = typeof(T);
-            switch (to.Name)
-            {
-                case nameof(Byte):
-                    return Convert.ToByte(Value);
-                case nameof(SByte):
-                    return Convert.ToSByte(Value);
-                case nameof(Int16):
-                    return Convert.ToInt16(Value);
-                case nameof(UInt16):
-                    return Convert.ToUInt16(Value);
-                case nameof(Int32):
-                    return Convert.ToInt32(Value);
-                case nameof(UInt32):
-                    return Convert.ToUInt32(Value);
-                case nameof(Int64):
-                    return Value;
-                case nameof(UInt64):
-                    return Convert.ToUInt64(Value);
-                case nameof(Single):
-                    return Convert.ToSingle(Value);
-                case nameof(Double):
-                    return Convert.ToDouble(Value);
-                case nameof(Decimal):
-                    return Convert.ToDecimal(Value);
-            }
-            return null;
-        }
+        public override string ToString() => Value.ToString();
 
         /// <summary>
-        /// 現在の以下略。
+        /// 可能ならば<see cref="long"/>型に変換します。
         /// </summary>
-        /// <returns>知るか</returns>
-        public override string ToString() => Value.ToString();
+        /// <returns></returns>
+        public override long ToInt64() => Value;
+
+        /// <summary>
+        /// 可能ならば<see cref="double"/>型に変換します。
+        /// </summary>
+        /// <returns></returns>
+        public override double ToDouble() => Value;
+
+        /// <summary>
+        /// 新しいインスタンスを生成します。
+        /// </summary>
+        public KecaknoahInteger()
+        {
+            Type = TypeCode.Int64;
+        }
+
+#pragma warning disable 1591
+        public override int GetHashCode() => Value.GetHashCode();
+        public override bool Equals(object obj) => ReferenceEquals(this, obj);
+        public override object Clone() => Value.AsKecaknoahInteger();
+
+        public static KecaknoahObject operator +(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value + v2.Value).AsKecaknoahInteger();
+        public static KecaknoahObject operator -(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value - v2.Value).AsKecaknoahInteger();
+        public static KecaknoahObject operator *(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value * v2.Value).AsKecaknoahInteger();
+        public static KecaknoahObject operator /(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value / v2.Value).AsKecaknoahInteger();
+        public static KecaknoahObject operator %(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value % v2.Value).AsKecaknoahInteger();
+        public static KecaknoahObject operator &(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value & v2.Value).AsKecaknoahInteger();
+        public static KecaknoahObject operator ^(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value ^ v2.Value).AsKecaknoahInteger();
+        public static KecaknoahObject operator |(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value | v2.Value).AsKecaknoahInteger();
+        public static KecaknoahObject operator +(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value + v2.Value).AsKecaknoahFloat();
+        public static KecaknoahObject operator -(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value - v2.Value).AsKecaknoahFloat();
+        public static KecaknoahObject operator *(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value * v2.Value).AsKecaknoahFloat();
+        public static KecaknoahObject operator /(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value / v2.Value).AsKecaknoahFloat();
+        public static KecaknoahObject operator %(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value % v2.Value).AsKecaknoahFloat();
+
+        public static KecaknoahObject operator <<(KecaknoahInteger v1, int v2) => (v1.Value << v2).AsKecaknoahInteger();
+        public static KecaknoahObject operator >>(KecaknoahInteger v1, int v2) => (v1.Value >> v2).AsKecaknoahInteger();
+
+        public static KecaknoahObject operator ==(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value == v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator !=(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value != v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator <(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value < v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator >(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value > v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator <=(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value <= v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator >=(KecaknoahInteger v1, KecaknoahInteger v2) => (v1.Value >= v2.Value).AsKecaknoahBoolean();
+
+        public static KecaknoahObject operator ==(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value == v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator !=(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value != v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator <(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value < v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator >(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value > v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator <=(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value <= v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator >=(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value >= v2.Value).AsKecaknoahBoolean();
+
+        public static explicit operator long (KecaknoahInteger v1) => v1.Value;
+        public static explicit operator KecaknoahFloat(KecaknoahInteger v1) => ((double)v1.Value).AsKecaknoahFloat();
+        public static explicit operator KecaknoahInteger(KecaknoahFloat v1) => ((long)v1.Value).AsKecaknoahInteger();
+#pragma warning restore 1591
     }
 }

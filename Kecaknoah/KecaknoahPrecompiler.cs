@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Kecaknoah.Analyze;
+using Kecaknoah.Type;
 
 namespace Kecaknoah
 {
@@ -32,6 +33,22 @@ namespace Kecaknoah
         /// <returns>プリコンパイル結果</returns>
         public KecaknoahSource PrecompileAll(KecaknoahAst ast)
         {
+            var result = new KecaknoahSource();
+            foreach (var i in ast.RootNode.Children)
+            {
+                if (i is KecaknoahClassAstNode)
+                {
+                    result.classes.Add(PrecompileClass(i as KecaknoahClassAstNode));
+                }
+                else if (i is KecaknoahFunctionAstNode)
+                {
+
+                }
+                else
+                {
+                    throw new InvalidOperationException("トップレベルにはクラスとメソッド以外おけません");
+                }
+            }
             throw new NotImplementedException();
         }
 
@@ -55,6 +72,17 @@ namespace Kecaknoah
             var result = new KecaknoahIL();
             result.PushCodes(PrecompileExpression(ast.RootNode));
             return result;
+        }
+
+        private KecaknoahScriptClassInfo PrecompileClass(KecaknoahClassAstNode ast)
+        {
+            //TODO: local初期値式対応
+            throw new NotImplementedException();
+        }
+
+        private KecaknoahScriptMethodInfo PrecompileClass(KecaknoahFunctionAstNode ast)
+        {
+            throw new NotImplementedException();
         }
 
         private IList<KecaknoahILCode> PrecompileExpression(KecaknoahAstNode node)
@@ -97,7 +125,7 @@ namespace Kecaknoah
                         result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PushInteger, IntegerValue = exp.IntegerValue });
                         break;
                     case KecaknoahFactorType.SingleValue:
-                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PushSingle, FloatValue = exp.SingleValue });
+                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PushDouble, FloatValue = exp.SingleValue });
                         break;
                     case KecaknoahFactorType.DoubleValue:
                         result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PushDouble, FloatValue = exp.DoubleValue });
@@ -142,24 +170,46 @@ namespace Kecaknoah
             }
             else if (en is KecaknoahPrimaryExpressionAstNode)
             {
-                throw new NotImplementedException("すいませんインクリメント・デクリメント未実装です");
+                var exp = en as KecaknoahPrimaryExpressionAstNode;
+                //後置
+                result.AddRange(PrecompileExpression(exp.Target));
+                result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.AsValue });
+                result.AddRange(PrecompileExpression(exp.Target));
+                result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PushInteger, IntegerValue = 1 });
+                switch(exp.ExpressionType)
+                {
+                    case KecaknoahOperatorType.Increment:
+                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PlusAssign });
+                        break;
+                    case KecaknoahOperatorType.Decrement:
+                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.MinusAssign });
+                        break;
+                    default:
+                        throw new NotImplementedException("多分実装してない1次式なんだと思う");
+                }
+                result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Pop });
+                
             }
             else if (en is KecaknoahUnaryExpressionAstNode)
             {
                 var exp = en as KecaknoahUnaryExpressionAstNode;
+                result.AddRange(PrecompileExpression(exp.Target));
                 switch (exp.ExpressionType)
                 {
                     case KecaknoahOperatorType.Minus:
-                        result.AddRange(PrecompileExpression(exp.Target));
                         result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Negative });
                         break;
                     case KecaknoahOperatorType.Not:
-                        result.AddRange(PrecompileExpression(exp.Target));
                         result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Not });
                         break;
                     case KecaknoahOperatorType.Increment:
+                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PushInteger, IntegerValue = 1 });
+                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PlusAssign });
+                        break;
                     case KecaknoahOperatorType.Decrement:
-                        throw new NotImplementedException("すいませんインクリメント・デクリメント未実装です");
+                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PushInteger, IntegerValue = 1 });
+                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.MinusAssign });
+                        break;
                 }
             }
             else

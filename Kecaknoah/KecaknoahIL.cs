@@ -305,7 +305,7 @@ namespace Kecaknoah
         /// </summary>
         Call,
         /// <summary>
-        /// 
+        /// idx
         /// </summary>
         IndexerCall,
         /// <summary>
@@ -320,6 +320,10 @@ namespace Kecaknoah
         /// ldm
         /// </summary>
         LoadMember,
+        /// <summary>
+        /// val
+        /// </summary>
+        AsValue,
 
         /// <summary>
         /// ada

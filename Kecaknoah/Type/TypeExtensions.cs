@@ -26,18 +26,11 @@ namespace Kecaknoah.Type
         public static KecaknoahInteger AsKecaknoahInteger(this int num) => new KecaknoahInteger { Value = num };
 
         /// <summary>
-        /// <see cref="KecaknoahSingle"/>を生成します。
-        /// </summary>
-        /// <param name="num">対象の単精度浮動小数点数</param>
-        /// <returns>結果</returns>
-        public static KecaknoahSingle AsKecaknoahSingle(this float num) => new KecaknoahSingle { Value = num };
-
-        /// <summary>
-        /// <see cref="KecaknoahDouble"/>を生成します。
+        /// <see cref="KecaknoahFloat"/>を生成します。
         /// </summary>
         /// <param name="num">対象の倍精度浮動小数点数</param>
         /// <returns>結果</returns>
-        public static KecaknoahDouble AsKecaknoahDouble(this double num) => new KecaknoahDouble { Value = num };
+        public static KecaknoahFloat AsKecaknoahFloat(this double num) => new KecaknoahFloat { Value = num };
 
         /// <summary>
         /// <see cref="KecaknoahString"/>を生成します。
@@ -63,225 +56,197 @@ namespace Kecaknoah.Type
         /// <summary>
         /// <see cref="KecaknoahInteropFunction"/>を生成します。
         /// </summary>
-        /// <param name="val">対象の<see cref="KecaknoahDelegate"/></param>
+        /// <param name="val">対象の<see cref="KecaknoahInteropDelegate"/></param>
         /// <returns>結果</returns>
-        public static KecaknoahInteropFunction AsKecaknoahInteropFunction(this KecaknoahDelegate val) => new KecaknoahInteropFunction { Function = val };
+        public static KecaknoahInteropFunction AsKecaknoahInteropFunction(this KecaknoahInteropDelegate val) => new KecaknoahInteropFunction { Function = val };
 
         /// <summary>
-        /// <see cref="Action"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// <see cref="Action"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns></returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate(this Action func) =>
-            (args) =>
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate(this Action func) =>
+            (self, args) =>
             {
                 func();
                 return null;
             };
 
         /// <summary>
-        /// <see cref="Action"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// <see cref="Action"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns></returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1>(this Action<T1> func) =>
-            (args) =>
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1>(this Action<T1> func) =>
+            (self, args) =>
             {
-                func((T1)args[0].AsRawObject<T1>());
+                func((T1)args[0].Value);
                 return null;
             };
 
         /// <summary>
-        /// <see cref="Action"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// <see cref="Action"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns></returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2>(this Action<T1, T2> func) =>
-            (args) =>
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2>(this Action<T1, T2> func) =>
+            (self, args) =>
             {
-                func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>());
+                func((T1)args[0].Value, (T2)args[1].Value);
                 return null;
             };
 
         /// <summary>
-        /// <see cref="Action"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// <see cref="Action"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns></returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2, T3>(this Action<T1, T2, T3> func) =>
-            (args) =>
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2, T3>(this Action<T1, T2, T3> func) =>
+            (self, args) =>
             {
-                func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>(), (T3)args[2].AsRawObject<T3>());
+                func((T1)args[0].Value, (T2)args[1].Value, (T3)args[2].Value);
                 return null;
             };
 
 
         /// <summary>
-        /// 整数を返す<see cref="Func{TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 整数を返す<see cref="Func{TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate(this Func<int> func) => (args) => func().AsKecaknoahInteger();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate(this Func<int> func) => (self, args) => func().AsKecaknoahInteger();
 
         /// <summary>
-        /// 整数を返す<see cref="Func{T, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 整数を返す<see cref="Func{T, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1>(this Func<T1, int> func) => (args) => func((T1)args[0].AsRawObject<T1>()).AsKecaknoahInteger();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1>(this Func<T1, int> func) => (self, args) => func((T1)args[0].Value).AsKecaknoahInteger();
 
         /// <summary>
-        /// 文字列整数を返す<see cref="Func{T1, T2, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列整数を返す<see cref="Func{T1, T2, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2>(this Func<T1, T2, int> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>()).AsKecaknoahInteger();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2>(this Func<T1, T2, int> func) => (self, args) => func((T1)args[0].Value, (T2)args[1].Value).AsKecaknoahInteger();
 
         /// <summary>
-        /// 整数を返す<see cref="Func{T1, T2, T3, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 整数を返す<see cref="Func{T1, T2, T3, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2, T3>(this Func<T1, T2, T3, int> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>(), (T3)args[2].AsRawObject<T3>()).AsKecaknoahInteger();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2, T3>(this Func<T1, T2, T3, int> func) => (self, args) => func((T1)args[0].Value, (T2)args[1].Value, (T3)args[2].Value).AsKecaknoahInteger();
 
         /// <summary>
-        /// 整数を返す<see cref="Func{TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 整数を返す<see cref="Func{TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate(this Func<long> func) => (args) => func().AsKecaknoahInteger();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate(this Func<long> func) => (self, args) => func().AsKecaknoahInteger();
 
         /// <summary>
-        /// 整数を返す<see cref="Func{T, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 整数を返す<see cref="Func{T, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1>(this Func<T1, long> func) => (args) => func((T1)args[0].AsRawObject<T1>()).AsKecaknoahInteger();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1>(this Func<T1, long> func) => (self, args) => func((T1)args[0].Value).AsKecaknoahInteger();
 
         /// <summary>
-        /// 文字列整数を返す<see cref="Func{T1, T2, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列整数を返す<see cref="Func{T1, T2, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2>(this Func<T1, T2, long> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>()).AsKecaknoahInteger();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2>(this Func<T1, T2, long> func) => (self, args) => func((T1)args[0].Value, (T2)args[1].Value).AsKecaknoahInteger();
 
         /// <summary>
-        /// 整数を返す<see cref="Func{T1, T2, T3, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 整数を返す<see cref="Func{T1, T2, T3, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2, T3>(this Func<T1, T2, T3, long> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>(), (T3)args[2].AsRawObject<T3>()).AsKecaknoahInteger();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2, T3>(this Func<T1, T2, T3, long> func) => (self, args) => func((T1)args[0].Value, (T2)args[1].Value, (T3)args[2].Value).AsKecaknoahInteger();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate(this Func<string> func) => (args) => func().AsKecaknoahString();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate(this Func<string> func) => (self, args) => func().AsKecaknoahString();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{T, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{T, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1>(this Func<T1, string> func) => (args) => func((T1)args[0].AsRawObject<T1>()).AsKecaknoahString();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1>(this Func<T1, string> func) => (self, args) => func((T1)args[0].Value).AsKecaknoahString();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{T1, T2, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{T1, T2, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2>(this Func<T1, T2, string> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>()).AsKecaknoahString();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2>(this Func<T1, T2, string> func) => (self, args) => func((T1)args[0].Value, (T2)args[1].Value).AsKecaknoahString();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{T1, T2, T3, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{T1, T2, T3, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2, T3>(this Func<T1, T2, T3, string> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>(), (T3)args[2].AsRawObject<T3>()).AsKecaknoahString();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2, T3>(this Func<T1, T2, T3, string> func) => (self, args) => func((T1)args[0].Value, (T2)args[1].Value, (T3)args[2].Value).AsKecaknoahString();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate(this Func<double> func) => (args) => func().AsKecaknoahDouble();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate(this Func<double> func) => (self, args) => func().AsKecaknoahFloat();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{T, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{T, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1>(this Func<T1, double> func) => (args) => func((T1)args[0].AsRawObject<T1>()).AsKecaknoahDouble();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1>(this Func<T1, double> func) => (self, args) => func((T1)args[0].Value).AsKecaknoahFloat();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{T1, T2, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{T1, T2, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2>(this Func<T1, T2, double> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>()).AsKecaknoahDouble();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2>(this Func<T1, T2, double> func) => (self, args) => func((T1)args[0].Value, (T2)args[1].Value).AsKecaknoahFloat();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{T1, T2, T3, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{T1, T2, T3, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2, T3>(this Func<T1, T2, T3, double> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>(), (T3)args[2].AsRawObject<T3>()).AsKecaknoahDouble();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2, T3>(this Func<T1, T2, T3, double> func) => (self, args) => func((T1)args[0].Value, (T2)args[1].Value, (T3)args[2].Value).AsKecaknoahFloat();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate(this Func<float> func) => (args) => func().AsKecaknoahSingle();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate(this Func<bool> func) => (self, args) => func().AsKecaknoahBoolean();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{T, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{T, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1>(this Func<T1, float> func) => (args) => func((T1)args[0].AsRawObject<T1>()).AsKecaknoahSingle();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1>(this Func<T1, bool> func) => (self, args) => func((T1)args[0].Value).AsKecaknoahBoolean();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{T1, T2, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{T1, T2, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2>(this Func<T1, T2, float> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>()).AsKecaknoahSingle();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2>(this Func<T1, T2, bool> func) => (self, args) => func((T1)args[0].Value, (T2)args[1].Value).AsKecaknoahBoolean();
 
         /// <summary>
-        /// 文字列を返す<see cref="Func{T1, T2, T3, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
+        /// 文字列を返す<see cref="Func{T1, T2, T3, TResult}"/>を<see cref="KecaknoahInteropDelegate"/>に適合するようにラップします。
         /// </summary>
         /// <param name="func">対象のメソッド</param>
         /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2, T3>(this Func<T1, T2, T3, float> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>(), (T3)args[2].AsRawObject<T3>()).AsKecaknoahSingle();
-
-        /// <summary>
-        /// 文字列を返す<see cref="Func{TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
-        /// </summary>
-        /// <param name="func">対象のメソッド</param>
-        /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate(this Func<bool> func) => (args) => func().AsKecaknoahBoolean();
-
-        /// <summary>
-        /// 文字列を返す<see cref="Func{T, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
-        /// </summary>
-        /// <param name="func">対象のメソッド</param>
-        /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1>(this Func<T1, bool> func) => (args) => func((T1)args[0].AsRawObject<T1>()).AsKecaknoahBoolean();
-
-        /// <summary>
-        /// 文字列を返す<see cref="Func{T1, T2, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
-        /// </summary>
-        /// <param name="func">対象のメソッド</param>
-        /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2>(this Func<T1, T2, bool> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>()).AsKecaknoahBoolean();
-
-        /// <summary>
-        /// 文字列を返す<see cref="Func{T1, T2, T3, TResult}"/>を<see cref="KecaknoahDelegate"/>に適合するようにラップします。
-        /// </summary>
-        /// <param name="func">対象のメソッド</param>
-        /// <returns>結果</returns>
-        public static KecaknoahDelegate AsKecaknoahDelegate<T1, T2, T3>(this Func<T1, T2, T3, bool> func) => (args) => func((T1)args[0].AsRawObject<T1>(), (T2)args[1].AsRawObject<T2>(), (T3)args[2].AsRawObject<T3>()).AsKecaknoahBoolean();
+        public static KecaknoahInteropDelegate AsKecaknoahInteropDelegate<T1, T2, T3>(this Func<T1, T2, T3, bool> func) => (self, args) => func((T1)args[0].Value, (T2)args[1].Value, (T3)args[2].Value).AsKecaknoahBoolean();
     }
 }

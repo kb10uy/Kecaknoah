@@ -442,11 +442,28 @@ namespace Kecaknoah.Analyze
                 if (OperatorPriorities[nt.Type] != priority) break;
                 tokens.Dequeue();
                 var right = ParseBinaryExpression(tokens, priority + 1);
+
                 result.SecondNode = right;
                 result.ExpressionType = OperatorsTokenTable[nt.Type];
                 var newres = new KecaknoahBinaryExpressionAstNode();
                 newres.FirstNode = result;
                 result = newres;
+            }
+            if (priority == 1)
+            {
+                var pn = result.FirstNode as KecaknoahBinaryExpressionAstNode;
+                if (pn == null) return result.FirstNode;
+                while(pn.FirstNode is KecaknoahBinaryExpressionAstNode)
+                {
+                    var kb = pn.FirstNode as KecaknoahBinaryExpressionAstNode;
+                    var nn = new KecaknoahBinaryExpressionAstNode();
+                    nn.ExpressionType = pn.ExpressionType;
+                    nn.SecondNode = pn.SecondNode;
+                    nn.FirstNode = kb.SecondNode;
+                    pn.FirstNode = kb.FirstNode;
+                    pn.SecondNode = nn;
+                }
+                return pn;
             }
             return result.FirstNode;
         }

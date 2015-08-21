@@ -11,28 +11,49 @@ namespace Kecaknoah.Type
     /// </summary>
     public sealed class KecaknoahString : KecaknoahObject
     {
+        private string raw = "";
         /// <summary>
-        /// 実際の値を取得・設定します。
+        /// 実際の値を取得します。
         /// </summary>
-        public string Value { get; set; } = "";
+        public new string Value
+        {
+            get { return raw; }
+            set
+            {
+                raw = value;
+                Length.RawObject = raw.Length.AsKecaknoahInteger();
+            }
+        }
 
+        /// <summary>
+        /// 長さへの参照を取得します。
+        /// </summary>
+        public KecaknoahReference Length { get; } = new KecaknoahReference { IsLeftValue = true, RawObject = 0.AsKecaknoahInteger() };
+        /// <summary>
+        /// replaceメソッドの参照を取得します。
+        /// </summary>
+        public KecaknoahReference Replace { get; }
+        /// <summary>
+        /// Substringメソッドの参照を取得します。
+        /// </summary>
+        public KecaknoahReference Substring { get; }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public override KecaknoahObject GetMember(string name)
+        public override KecaknoahReference GetMemberReference(string name)
         {
             switch (name)
             {
                 case "length":
-                    return Value.Length.AsKecaknoahInteger();
+                    return Length;
                 case "replace":
-                    return new Func<string, string, string>(Value.Replace).AsKecaknoahDelegate().AsKecaknoahInteropFunction();
+                    return Replace;
                 case "substring":
-                    return new Func<int, string>(Value.Substring).AsKecaknoahDelegate().AsKecaknoahInteropFunction();
+                    return Substring;
             }
-            return base.GetMember(name);
+            return base.GetMemberReference(name);
         }
 
         /// <summary>
@@ -43,44 +64,25 @@ namespace Kecaknoah.Type
         /// <returns></returns>
         public override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
-            var t = (string)target.AsRawObject<string>();
-            if (t == null) return KecaknoahNil.Instance;
             switch (op)
             {
                 case KecaknoahILCodeType.Plus:
-                    return (Value + t).AsKecaknoahString();
+                    return (dynamic)this + (dynamic)target;
                 case KecaknoahILCodeType.Equal:
-                    return (Value == t).AsKecaknoahBoolean();
+                    return (dynamic)this == (dynamic)target;
                 case KecaknoahILCodeType.NotEqual:
-                    return (Value != t).AsKecaknoahBoolean();
+                    return (dynamic)this != (dynamic)target;
                 case KecaknoahILCodeType.Greater:
-                    return (Value.CompareTo(t) > 0).AsKecaknoahBoolean();
+                    return (dynamic)this > (dynamic)target;
                 case KecaknoahILCodeType.Lesser:
-                    return (Value.CompareTo(t) < 0).AsKecaknoahBoolean();
+                    return (dynamic)this < (dynamic)target;
                 case KecaknoahILCodeType.GreaterEqual:
-                    return (Value.CompareTo(t) >= 0).AsKecaknoahBoolean();
+                    return (dynamic)this >= (dynamic)target;
                 case KecaknoahILCodeType.LesserEqual:
-                    return (Value.CompareTo(t) <= 0).AsKecaknoahBoolean();
+                    return (dynamic)this <= (dynamic)target;
                 default:
                     return KecaknoahNil.Instance;
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public override object AsRawObject<T>()
-        {
-            var to = typeof(T);
-            switch (to.Name)
-            {
-                case nameof(String):
-                    return Value;
-            }
-
-            return null;
         }
 
         /// <summary>
@@ -88,5 +90,57 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <returns>知るか</returns>
         public override string ToString() => Value;
+
+        /// <summary>
+        /// 新しいインスタンスを生成します。
+        /// </summary>
+        public KecaknoahString()
+        {
+            Type = TypeCode.String;
+            Replace = KecaknoahReference.CreateRightReference(new KecaknoahInteropInstanceFunction(this, InstanceReplace));
+            Substring = KecaknoahReference.CreateRightReference(new KecaknoahInteropInstanceFunction(this, InstanceSubstring));
+        }
+
+        /// <summary>
+        /// 性的なインスタンスを生成します。
+        /// </summary>
+        /// <param name="st"></param>
+        public KecaknoahString(bool st)
+        {
+            Type = TypeCode.String;
+        }
+
+        private KecaknoahObject InstanceSubstring(KecaknoahObject self, KecaknoahObject[] args)
+        {
+            var t = self.ToString();
+            switch (args.Length)
+            {
+                case 0:
+                    return "".AsKecaknoahString();
+                case 1:
+                    return t.Substring((int)args[0].ToInt64()).AsKecaknoahString();
+                default:
+                    return t.Substring((int)args[0].ToInt64(), (int)args[1].ToInt64()).AsKecaknoahString();
+            }
+        }
+
+        private KecaknoahObject InstanceReplace(KecaknoahObject self, KecaknoahObject[] args) => self.ToString().Replace(args[0].ToString(), args[1].ToString()).AsKecaknoahString();
+
+#pragma warning disable 1591
+        public override int GetHashCode() => Value.GetHashCode();
+        public override bool Equals(object obj) => ReferenceEquals(this, obj);
+        public override object Clone() => Value.AsKecaknoahString();
+
+        public static KecaknoahObject operator +(KecaknoahString v1, KecaknoahString v2) => (v1.Value + v2.Value).AsKecaknoahString();
+
+        public static KecaknoahObject operator ==(KecaknoahString v1, KecaknoahString v2) => (v1.Value == v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator !=(KecaknoahString v1, KecaknoahString v2) => (v1.Value != v2.Value).AsKecaknoahBoolean();
+        public static KecaknoahObject operator <(KecaknoahString v1, KecaknoahString v2) => (v1.Value.CompareTo(v2.Value) < 0).AsKecaknoahBoolean();
+        public static KecaknoahObject operator >(KecaknoahString v1, KecaknoahString v2) => (v1.Value.CompareTo(v2.Value) > 0).AsKecaknoahBoolean();
+        public static KecaknoahObject operator <=(KecaknoahString v1, KecaknoahString v2) => (v1.Value.CompareTo(v2.Value) <= 0).AsKecaknoahBoolean();
+        public static KecaknoahObject operator >=(KecaknoahString v1, KecaknoahString v2) => (v1.Value.CompareTo(v2.Value) >= 0).AsKecaknoahBoolean();
+
+        public static explicit operator string (KecaknoahString v1) => v1.Value;
+#pragma warning restore 1591
     }
 }
