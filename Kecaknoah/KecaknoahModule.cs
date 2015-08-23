@@ -1,9 +1,5 @@
 ﻿using Kecaknoah.Type;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah
 {
@@ -43,22 +39,11 @@ namespace Kecaknoah
         public IReadOnlyList<KecaknoahMethodInfo> TopLevelMethods => topMethods;
 
         /// <summary>
-        /// 定義されているオブジェクト・メソッド・クラスの中から検索し、参照を取得・設定します。
+        /// 指定した名前を持つトップレベルの<see cref="KecaknoahObject"/>
         /// </summary>
-        /// <param name="name">キー</param>
-        /// <returns>なければ<see cref="KecaknoahNil.Reference"/></returns>
-        public KecaknoahReference this[string name]
-        {
-            get
-            {
-                KecaknoahReference result;
-                int idx = 0;
-                if (GlobalObjects.TryGetValue(name, out result)) return result;
-                if ((idx = topMethods.FindIndex(p => p.Name == name)) > 0) return methodReferences[idx];
-                if ((idx = classes.FindIndex(p => p.Name == name)) > 0) return classReferences[idx];
-                return KecaknoahNil.Reference;
-            }
-        }
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public KecaknoahObject this[string name] => GetReference(name).RawObject;
 
         /// <summary>
         /// <see cref="KecaknoahModule"/>の新しいインスタンスを生成します。
@@ -73,6 +58,20 @@ namespace Kecaknoah
         /// </summary>
         /// <returns>生成</returns>
         public KecaknoahContext CreateContext() => new KecaknoahContext(this);
+
+        /// <summary>
+        /// 定義されているオブジェクト・メソッド・クラスの中から検索し、参照を取得・設定します。
+        /// </summary>
+        /// <param name="name">キー</param>
+        /// <returns>なければ<see cref="KecaknoahNil.Reference"/></returns>
+        public KecaknoahReference GetReference(string name)
+        {
+            int idx = 0;
+            if (GlobalObjects.ContainsKey(name)) return GlobalObjects[name];
+            if ((idx = topMethods.FindLastIndex(p => p.Name == name)) >= 0) return methodReferences[idx];
+            if ((idx = classes.FindLastIndex(p => p.Name == name)) >= 0) return classReferences[idx];
+            return KecaknoahNil.Reference;
+        }
 
         /// <summary>
         /// .NET上のKecaknoah連携クラスを登録します。
@@ -91,7 +90,7 @@ namespace Kecaknoah
         public void RegisterMethod(KecaknoahInteropMethodInfo method)
         {
             topMethods.Add(method);
-            methodReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahInteropInstanceFunction(null, method.Body)));
+            methodReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(null, method.Body)));
         }
 
 
@@ -104,7 +103,7 @@ namespace Kecaknoah
         {
             var fo = new KecaknoahInteropMethodInfo(name, func);
             topMethods.Add(fo);
-            methodReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahInteropInstanceFunction(null, func)));
+            methodReferences.Add(KecaknoahReference.CreateRightReference(null, func));
         }
 
         /// <summary>
@@ -113,7 +112,6 @@ namespace Kecaknoah
         /// <param name="src">登録する<see cref="KecaknoahSource"/></param>
         public void RegisterSource(KecaknoahSource src)
         {
-            classes.AddRange(src.Classes);
             foreach (var c in src.Classes)
             {
                 classes.Add(c);
@@ -122,7 +120,7 @@ namespace Kecaknoah
             foreach (var m in src.TopLevelMethods)
             {
                 topMethods.Add(m);
-                methodReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahScriptFunction(m)));
+                methodReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahScriptFunction(KecaknoahNil.Instance, m)));
             }
         }
     }

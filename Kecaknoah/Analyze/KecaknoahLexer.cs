@@ -17,6 +17,7 @@ namespace Kecaknoah.Analyze
         {
             new Tuple<string, KecaknoahTokenType>("class", KecaknoahTokenType.ClassKeyword),
             new Tuple<string, KecaknoahTokenType>("endclass", KecaknoahTokenType.EndclassKeyword),
+            new Tuple<string, KecaknoahTokenType>("static", KecaknoahTokenType.StaticKeyword),
             new Tuple<string, KecaknoahTokenType>("func", KecaknoahTokenType.FuncKeyword),
             new Tuple<string, KecaknoahTokenType>("endfunc", KecaknoahTokenType.EndFuncKeyword),
             new Tuple<string, KecaknoahTokenType>("if", KecaknoahTokenType.IfKeyword),
@@ -39,6 +40,11 @@ namespace Kecaknoah.Analyze
             new Tuple<string, KecaknoahTokenType>("true", KecaknoahTokenType.TrueKeyword),
             new Tuple<string, KecaknoahTokenType>("false", KecaknoahTokenType.FalseKeyword),
             new Tuple<string, KecaknoahTokenType>("nil", KecaknoahTokenType.NilKeyword),
+            new Tuple<string, KecaknoahTokenType>("VARGS", KecaknoahTokenType.VargsKeyword),
+            new Tuple<string, KecaknoahTokenType>("return", KecaknoahTokenType.ReturnKeyword),
+            new Tuple<string, KecaknoahTokenType>("yield", KecaknoahTokenType.YieldKeyword),
+            new Tuple<string, KecaknoahTokenType>("coroutine", KecaknoahTokenType.CoroutineKeyword),
+            new Tuple<string, KecaknoahTokenType>("coresume", KecaknoahTokenType.CoresumeKeyword),
         }.OrderByDescending(p => p.Item1.Length).ThenBy(p => p.Item1);
 
         private static IOrderedEnumerable<Tuple<string, KecaknoahTokenType>> Operators = new List<Tuple<string, KecaknoahTokenType>>
@@ -118,10 +124,6 @@ namespace Kecaknoah.Analyze
         #endregion
 
         #region properties
-        /// <summary>
-        /// エラーや警告などの情報を出力する<see cref="TextWriter"/>を取得・設定します。
-        /// </summary>
-        public TextWriter OutputWriter { get; set; } = Console.Out;
 
         /// <summary>
         /// <see cref="AnalyzeFromFile(string)"/>で出力される<see cref="KecaknoahLexResult.SourceName"/>にフルパスを設定します。
@@ -190,7 +192,7 @@ namespace Kecaknoah.Analyze
             while (source != "")
             {
                 //空白論理行
-                
+
                 if (source.StartsWith(Environment.NewLine))
                 {
                     source = source.Substring(Environment.NewLine.Length);
@@ -255,7 +257,7 @@ namespace Kecaknoah.Analyze
                     var cl = source.IndexOf(Environment.NewLine);
                     if (cl >= 0)
                     {
-                        source.Substring(cl + Environment.NewLine.Length);
+                        source = source.Substring(cl + Environment.NewLine.Length);
                         line++;
                         col = 0;
                     }

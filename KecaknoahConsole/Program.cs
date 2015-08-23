@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Kecaknoah;
 using Kecaknoah.Analyze;
 using Kecaknoah.Type;
+using System.Diagnostics;
 
 namespace KecaknoahConsole
 {
@@ -27,12 +28,14 @@ namespace KecaknoahConsole
             if (!lr.Success)
             {
                 Console.WriteLine($"字句解析エラー ({lr.Error.Column}, {lr.Error.Line}): {lr.Error.Message}");
+                Console.ReadLine();
                 return;
             }
             var ast = parser.Parse(lr);
             if (!ast.Success)
             {
                 Console.WriteLine($"構文解析エラー ({ast.Error.Column}, {ast.Error.Line}): {ast.Error.Message}");
+                Console.ReadLine();
             }
             var prc = new KecaknoahPrecompiler();
             var src = prc.PrecompileAll(ast);
@@ -40,10 +43,11 @@ namespace KecaknoahConsole
             var environment = new KecaknoahEnvironment();
             var module = environment.CreateModule("Main");
             module.RegisterSource(src);
-            using (var ctx = module.CreateContext())
-            {
-                module["main"].RawObject.Call(new KecaknoahObject[0]);
-            }
+            var ctx = module.CreateContext();
+            var sw = new Stopwatch();
+            var il = src.TopLevelMethods[0].Codes;
+            ctx.Execute(il);
+            Console.ReadLine();
         }
     }
 }

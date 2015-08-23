@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah.Analyze
 {
@@ -95,6 +92,11 @@ namespace Kecaknoah.Analyze
         public bool AllowsVariableArguments { get; protected internal set; }
 
         /// <summary>
+        /// このメソッドがクラスメソッドであるかどうかを取得します。
+        /// </summary>
+        public bool StaticMethod { get; protected internal set; }
+
+        /// <summary>
         /// インスタンスを初期化します。
         /// </summary>
         protected internal KecaknoahFunctionAstNode()
@@ -155,6 +157,81 @@ namespace Kecaknoah.Analyze
             if (InitialExpression != null)
             {
                 result.Add("| [Initial Expression]");
+                result.AddRange(InitialExpression.ToDebugStringList().Select(p => "| " + p));
+            }
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// return/yield文のノードです。
+    /// </summary>
+    public class KecaknoahReturnAstNode : KecaknoahAstNode
+    {
+        /// <summary>
+        /// 返り値がある場合はその式のノードが格納されます。
+        /// </summary>
+        public KecaknoahExpressionAstNode Value { get; protected internal set; }
+
+        /// <summary>
+        /// インスタンスを初期化します。
+        /// </summary>
+        protected internal KecaknoahReturnAstNode()
+        {
+            Type = KecaknoahAstNodeType.ReturnStatement;
+        }
+
+        /// <summary>
+        /// 現在のオブジェクトを表す文字列を返します。
+        /// </summary>
+        /// <returns>文字列</returns>
+        public override IReadOnlyList<string> ToDebugStringList()
+        {
+            var result = new List<string>();
+            result.Add("Return");
+            if (Value != null)
+            {
+                result.Add("| [Expression]");
+                result.AddRange(Value.ToDebugStringList().Select(p => "| " + p));
+            }
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// local宣言のノードです。
+    /// </summary>
+    public class KecaknoahCoroutineDeclareAstNode : KecaknoahAstNode
+    {
+        /// <summary>
+        /// 変数名を取得します。
+        /// </summary>
+        public string Name { get; protected internal set; } = "";
+
+        /// <summary>
+        /// 初期値定義がある場合はその式のノードが格納されます。
+        /// </summary>
+        public KecaknoahExpressionAstNode InitialExpression { get; protected internal set; }
+
+        /// <summary>
+        /// インスタンスを初期化します。
+        /// </summary>
+        protected internal KecaknoahCoroutineDeclareAstNode()
+        {
+            Type = KecaknoahAstNodeType.LocalStatement;
+        }
+
+        /// <summary>
+        /// 現在のオブジェクトを表す文字列を返します。
+        /// </summary>
+        /// <returns>文字列</returns>
+        public override IReadOnlyList<string> ToDebugStringList()
+        {
+            var result = new List<string>();
+            result.Add($"Coroutine Declare: \"{Name}\"");
+            if (InitialExpression != null)
+            {
+                result.Add("| [Expression]");
                 result.AddRange(InitialExpression.ToDebugStringList().Select(p => "| " + p));
             }
             return result;
@@ -233,6 +310,68 @@ namespace Kecaknoah.Analyze
                 result.AddRange(i.ToDebugStringList().Select(p => "| " + p));
             }
             return result;
+        }
+    }
+
+    /// <summary>
+    /// 繰り返し文だよ
+    /// </summary>
+    public class KecaknoahLoopAstNode : KecaknoahAstNode
+    {
+        /// <summary>
+        /// 条件式を取得します。
+        /// </summary>
+        public KecaknoahExpressionAstNode Condition { get; protected internal set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public KecaknoahLoopAstNode()
+        {
+            Type = KecaknoahAstNodeType.WhileStatement;
+        }
+    }
+
+    /// <summary>
+    /// for文です
+    /// </summary>
+    public class KecaknoahForAstNode : KecaknoahLoopAstNode
+    {
+        /// <summary>
+        /// 初期化式を取得します。
+        /// </summary>
+        public IList<KecaknoahExpressionAstNode> InitializeExpressions { get; } = new List<KecaknoahExpressionAstNode>();
+
+        /// <summary>
+        /// カウンタ操作の式を取得します。
+        /// </summary>
+        public IList<KecaknoahExpressionAstNode> CounterExpressions { get; } = new List<KecaknoahExpressionAstNode>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public KecaknoahForAstNode()
+        {
+            Type = KecaknoahAstNodeType.ForStatement;
+        }
+    }
+
+    /// <summary>
+    /// continue文
+    /// </summary>
+    public class KecaknoahContinueAstNode : KecaknoahAstNode
+    {
+        /// <summary>
+        /// ジャンプ先ラベル名を取得します。
+        /// </summary>
+        public string Label { get; protected internal set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public KecaknoahContinueAstNode()
+        {
+            Type = KecaknoahAstNodeType.ContinueStatement;
         }
     }
 }

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah.Analyze
 {
@@ -102,6 +99,9 @@ namespace Kecaknoah.Analyze
                     break;
                 case KecaknoahFactorType.ParenExpression:
                     result.AddRange(ExpressionNode.ToDebugStringList());
+                    break;
+                case KecaknoahFactorType.VariableArguments:
+                    result.Add($"VariableArguments");
                     break;
             }
             return result;
@@ -327,6 +327,14 @@ namespace Kecaknoah.Analyze
         /// 識別子
         /// </summary>
         Identifer,
+        /// <summary>
+        /// 可変長引数
+        /// </summary>
+        VariableArguments,
+        /// <summary>
+        /// coresume文
+        /// </summary>
+        CoroutineResume,
     }
 
     /// <summary>

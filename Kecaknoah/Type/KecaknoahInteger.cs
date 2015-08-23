@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah.Type
 {
@@ -31,7 +27,7 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public override KecaknoahReference GetMemberReference(string name)
+        protected internal override KecaknoahReference GetMemberReference(string name)
         {
             switch (name)
             {
@@ -49,7 +45,7 @@ namespace Kecaknoah.Type
         /// <param name="op"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        public override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
+        protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
             switch (op)
             {

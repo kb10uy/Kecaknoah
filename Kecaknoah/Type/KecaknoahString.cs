@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah.Type
 {
@@ -42,7 +38,7 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public override KecaknoahReference GetMemberReference(string name)
+        protected internal override KecaknoahReference GetMemberReference(string name)
         {
             switch (name)
             {
@@ -62,7 +58,7 @@ namespace Kecaknoah.Type
         /// <param name="op"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        public override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
+        protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
             switch (op)
             {
@@ -97,8 +93,8 @@ namespace Kecaknoah.Type
         public KecaknoahString()
         {
             Type = TypeCode.String;
-            Replace = KecaknoahReference.CreateRightReference(new KecaknoahInteropInstanceFunction(this, InstanceReplace));
-            Substring = KecaknoahReference.CreateRightReference(new KecaknoahInteropInstanceFunction(this, InstanceSubstring));
+            Replace = KecaknoahReference.CreateRightReference(this, InstanceReplace);
+            Substring = KecaknoahReference.CreateRightReference(this, InstanceSubstring);
         }
 
         /// <summary>
@@ -110,21 +106,21 @@ namespace Kecaknoah.Type
             Type = TypeCode.String;
         }
 
-        private KecaknoahObject InstanceSubstring(KecaknoahObject self, KecaknoahObject[] args)
+        private KecaknoahFunctionResult InstanceSubstring(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
             var t = self.ToString();
             switch (args.Length)
             {
                 case 0:
-                    return "".AsKecaknoahString();
+                    return "".AsKecaknoahString().NoResume();
                 case 1:
-                    return t.Substring((int)args[0].ToInt64()).AsKecaknoahString();
+                    return t.Substring((int)args[0].ToInt64()).AsKecaknoahString().NoResume();
                 default:
-                    return t.Substring((int)args[0].ToInt64(), (int)args[1].ToInt64()).AsKecaknoahString();
+                    return t.Substring((int)args[0].ToInt64(), (int)args[1].ToInt64()).AsKecaknoahString().NoResume();
             }
         }
 
-        private KecaknoahObject InstanceReplace(KecaknoahObject self, KecaknoahObject[] args) => self.ToString().Replace(args[0].ToString(), args[1].ToString()).AsKecaknoahString();
+        private KecaknoahFunctionResult InstanceReplace(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => self.ToString().Replace(args[0].ToString(), args[1].ToString()).AsKecaknoahString().NoResume();
 
 #pragma warning disable 1591
         public override int GetHashCode() => Value.GetHashCode();

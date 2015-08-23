@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Kecaknoah.Type
+﻿namespace Kecaknoah.Type
 {
     /// <summary>
     /// Kecaknoahで利用されるメソッドの規定を定義します。

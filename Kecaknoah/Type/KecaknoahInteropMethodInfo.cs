@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah.Type
 {
@@ -62,64 +58,4 @@ namespace Kecaknoah.Type
             throw new NotImplementedException();
         }
     }
-
-    /// <summary>
-    /// Kecaknoahでの.NET連携メソッドを定義します。
-    /// </summary>
-    public class KecaknoahInteropFunction : KecaknoahObject
-    {
-        /// <summary>
-        /// 呼び出し対象のデリゲートを取得・設定します。
-        /// </summary>
-        public KecaknoahInteropDelegate Function { get; set; }
-
-        /// <summary>
-        /// 呼び出します。
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public override KecaknoahObject Call(KecaknoahObject[] args) => Function(KecaknoahNil.Instance, args);
-    }
-
-    /// <summary>
-    /// Kecaknoahでの.NET連携インスタンスメソッドを定義します。
-    /// </summary>
-    public class KecaknoahInteropInstanceFunction : KecaknoahInteropFunction
-    {
-        /// <summary>
-        /// 呼び出し対象のデリゲートを取得・設定します。
-        /// </summary>
-        public new KecaknoahInteropDelegate Function { get; }
-
-        /// <summary>
-        /// インスタンスを取得・設定します。
-        /// </summary>
-        public KecaknoahObject Instance { get; }
-
-        /// <summary>
-        /// 呼び出します。
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public override KecaknoahObject Call(KecaknoahObject[] args) => Function(Instance, args);
-
-        /// <summary>
-        /// 新しいインスタンスを初期化します。
-        /// </summary>
-        /// <param name="instance">属するインスタンス</param>
-        /// <param name="func">メソッド</param>
-        public KecaknoahInteropInstanceFunction(KecaknoahObject instance,KecaknoahInteropDelegate func)
-        {
-            Function = func;
-            Instance = instance;
-        }
-    }
-
-    /// <summary>
-    /// Kecaknoahでの.NET連携インスタンスメソッドの形式を定義します。
-    /// </summary>
-    /// <param name="self">インスタンス</param>
-    /// <param name="args">引数</param>
-    /// <returns>返り値</returns>
-    public delegate KecaknoahObject KecaknoahInteropDelegate(KecaknoahObject self, KecaknoahObject[] args);
 }

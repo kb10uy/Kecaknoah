@@ -21,16 +21,6 @@ namespace KecaknoahInteractive
             var sw = new Stopwatch();
             var module = environment.CreateModule("Himanoa");
             var ctx = module.CreateContext();
-            module.RegisterFunction((self, prm) =>
-            {
-                Console.WriteLine($"printメソッド: {prm[0].ToString()}");
-                return KecaknoahNil.Instance;
-            }, "print");
-            module.RegisterFunction(KecaknoahMethods.Sin, "sin");
-            module.RegisterFunction(KecaknoahMethods.Cos, "cos");
-            module.RegisterFunction(KecaknoahMethods.Tan, "tan");
-            module.RegisterFunction(KecaknoahMethods.Max, "max");
-            module.RegisterFunction(KecaknoahMethods.Min, "min");
             lexer.DefaultSourceName = "himanoa";
             var input = "";
             //var il = "";
@@ -71,29 +61,36 @@ namespace KecaknoahInteractive
 
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("実行結果------------------------");
-                        var val = ctx.ExecuteExpression(il);
-                        Console.WriteLine(val);
-                        Console.ForegroundColor = ConsoleColor.DarkRed;
-                        Console.WriteLine("環境情報------------------------");
-                        foreach (var i in ctx.Objects)
+                        try
                         {
-                            Console.WriteLine($"{i.Key} : {i.Value.RawObject.ToString()}");
-                        }
-
-
-                        /*
-                        sw.Reset();
-                        sw.Start();
-                        using (var ctx = module.CreateContext())
-                        {
+                            var sf = ctx.ExecuteWithStackFrame(il);
+                            Console.WriteLine(sf.ReturningObject);
+                            /*
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            Console.WriteLine("環境情報------------------------");
+                            foreach (var i in sf.Locals)
+                            {
+                                Console.WriteLine($"{i.Key} : {i.Value.RawObject.ToString()}");
+                            }
+                            sw.Reset();
+                            sw.Start();
                             for (int i = 0; i < 1048576; i++)
                             {
-                                var val = ctx.ExecuteExpression(il);
+                                var val = ctx.Execute(il);
                             }
+                            sw.Stop();
+                            Console.WriteLine($"{sw.ElapsedMilliseconds / 1048576.0 }ms/call");
+                            */
                         }
-                        sw.Stop();
-                        Console.WriteLine($"{sw.ElapsedMilliseconds / 1048576.0 }ms/call");
-                        */
+                        catch (Exception e)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("実行時エラー");
+                            Console.WriteLine($"{nameof(e)}: {e.Message}");
+                        }
+
+
+
                     }
                     else
                     {
@@ -109,16 +106,6 @@ namespace KecaknoahInteractive
                 }
                 Console.WriteLine();
             } while (input != "exit");
-            ctx.Dispose();
         }
-    }
-
-    static class KecaknoahMethods
-    {
-        public static KecaknoahObject Sin(KecaknoahObject self, KecaknoahObject[] args) => Math.Sin(args[0].ToDouble()).AsKecaknoahFloat();
-        public static KecaknoahObject Cos(KecaknoahObject self, KecaknoahObject[] args) => Math.Cos(args[0].ToDouble()).AsKecaknoahFloat();
-        public static KecaknoahObject Tan(KecaknoahObject self, KecaknoahObject[] args) => Math.Tan(args[0].ToDouble()).AsKecaknoahFloat();
-        public static KecaknoahObject Max(KecaknoahObject self, KecaknoahObject[] args) => Math.Max(args[0].ToInt64(), args[1].ToInt64()).AsKecaknoahInteger();
-        public static KecaknoahObject Min(KecaknoahObject self, KecaknoahObject[] args) => Math.Min(args[0].ToInt64(), args[1].ToInt64()).AsKecaknoahInteger();
     }
 }

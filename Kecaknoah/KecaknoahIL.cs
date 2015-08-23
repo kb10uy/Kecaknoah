@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah
 {
@@ -45,6 +43,15 @@ namespace Kecaknoah
         internal void PushCode(KecaknoahILCodeType codeType)
         {
             codes.Add(new KecaknoahILCode { Type = codeType });
+        }
+
+        /// <summary>
+        /// コードを追加します。
+        /// </summary>
+        /// <param name="code">コード</param>
+        internal void PushCode(KecaknoahILCode code)
+        {
+            codes.Add(code);
         }
 
         /// <summary>
@@ -93,6 +100,28 @@ namespace Kecaknoah
         /// <param name="list">コード</param>
         internal void PushCodes(IEnumerable<KecaknoahILCode> list)
         {
+            codes.AddRange(list);
+        }
+
+        /// <summary>
+        /// 複数のコードの先頭にFalseJumpを追加します。
+        /// </summary>
+        /// <param name="list">コード</param>
+        internal void PushCodesWithFalseJump(IEnumerable<KecaknoahILCode> list)
+        {
+            var t = codes.Count;
+            codes.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.FalseJump, IntegerValue = t + list.Count() + 1 });
+            codes.AddRange(list);
+        }
+
+        /// <summary>
+        /// 複数のコードの先頭にTrueJumpを追加します。
+        /// </summary>
+        /// <param name="list">コード</param>
+        internal void PushCodesWithTrueJump(IEnumerable<KecaknoahILCode> list)
+        {
+            var t = codes.Count;
+            codes.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.FalseJump, IntegerValue = t + list.Count() + 1 });
             codes.AddRange(list);
         }
     }
@@ -151,6 +180,10 @@ namespace Kecaknoah
                     return $"Push.nil";
                 case KecaknoahILCodeType.Jump:
                     return $"Jump to {IntegerValue}";
+                case KecaknoahILCodeType.FalseJump:
+                    return $"FalseJump to {IntegerValue}";
+                case KecaknoahILCodeType.TrueJump:
+                    return $"TrueJump to {IntegerValue}";
                 case KecaknoahILCodeType.Call:
                     return $"Call with {IntegerValue} arguments";
                 case KecaknoahILCodeType.IndexerCall:
@@ -161,6 +194,10 @@ namespace Kecaknoah
                     return $"LoadObject \"{StringValue}\"";
                 case KecaknoahILCodeType.PushArgument:
                     return $"Push Argument#{IntegerValue}";
+                case KecaknoahILCodeType.LoadVarg:
+                    return $"Load Vargs with {IntegerValue} arguments";
+                case KecaknoahILCodeType.ResumeCoroutine:
+                    return $"Resume \"{StringValue}\"";
                 default:
                     return Type.ToString();
             }
@@ -297,9 +334,21 @@ namespace Kecaknoah
         /// </summary>
         Jump,
         /// <summary>
+        /// tjm
+        /// </summary>
+        TrueJump,
+        /// <summary>
+        /// fjm
+        /// </summary>
+        FalseJump,
+        /// <summary>
         /// ret
         /// </summary>
         Return,
+        /// <summary>
+        /// yld
+        /// </summary>
+        Yield,
         /// <summary>
         /// cal
         /// </summary>
@@ -324,6 +373,18 @@ namespace Kecaknoah
         /// val
         /// </summary>
         AsValue,
+        /// <summary>
+        /// vrg
+        /// </summary>
+        LoadVarg,
+        /// <summary>
+        /// scr
+        /// </summary>
+        StartCoroutine,
+        /// <summary>
+        /// rcr
+        /// </summary>
+        ResumeCoroutine,
 
         /// <summary>
         /// ada

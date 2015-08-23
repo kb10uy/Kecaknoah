@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Kecaknoah.Type
 {
@@ -21,6 +17,7 @@ namespace Kecaknoah.Type
         /// </summary>
         public KecaknoahReference Constructor { get; }
 
+        private Dictionary<string, KecaknoahReference> methods = new Dictionary<string, KecaknoahReference>();
         /// <summary>
         /// 新しいインスタンスを初期化します。
         /// </summary>
@@ -28,7 +25,11 @@ namespace Kecaknoah.Type
         public KecaknoahScriptClassObject(KecaknoahScriptClassInfo info)
         {
             Class = info;
-            Constructor = KecaknoahReference.CreateRightReference(new KecaknoahInteropInstanceFunction(this, CreateInstance));
+            Constructor = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, CreateInstance));
+            foreach (var i in Class.classMethods)
+            {
+                methods[i.Name] = (KecaknoahReference.CreateRightReference(new KecaknoahScriptFunction(KecaknoahNil.Instance, i)));
+            }
         }
 
         /// <summary>
@@ -36,17 +37,27 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public override KecaknoahReference GetMemberReference(string name)
+        protected internal override KecaknoahReference GetMemberReference(string name)
         {
             switch (name)
             {
                 case "new":
                     return Constructor;
+                default:
+                    if (methods.ContainsKey(name)) return methods[name];
+                    return KecaknoahNil.Reference;
             }
-            return KecaknoahNil.Reference;
         }
 
-        private KecaknoahObject CreateInstance(KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahInstance(Class);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        protected internal override KecaknoahFunctionResult Call(KecaknoahContext context, KecaknoahObject[] args) => new KecaknoahInstance(Class, context, args).NoResume();
+
+        private KecaknoahFunctionResult CreateInstance(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahInstance(Class, context, args).NoResume();
     }
 
     /// <summary>
@@ -71,7 +82,7 @@ namespace Kecaknoah.Type
         public KecaknoahInteropClassObject(KecaknoahInteropClassInfo info)
         {
             Class = info;
-            Constructor = KecaknoahReference.CreateRightReference(new KecaknoahInteropInstanceFunction(this, CreateInstance));
+            Constructor = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, CreateInstance));
         }
 
         /// <summary>
@@ -79,7 +90,7 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public override KecaknoahReference GetMemberReference(string name)
+        protected internal override KecaknoahReference GetMemberReference(string name)
         {
             switch (name)
             {
@@ -89,6 +100,6 @@ namespace Kecaknoah.Type
             return KecaknoahNil.Reference;
         }
 
-        private KecaknoahObject CreateInstance(KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahInstance(Class);
+        private KecaknoahFunctionResult CreateInstance(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahInstance(Class).NoResume();
     }
 }

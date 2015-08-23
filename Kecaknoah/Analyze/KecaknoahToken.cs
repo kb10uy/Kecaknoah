@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah.Analyze
 {
@@ -71,6 +67,10 @@ namespace Kecaknoah.Analyze
         /// endclass
         /// </summary>
         EndclassKeyword,
+        /// <summary>
+        /// static
+        /// </summary>
+        StaticKeyword,
         /// <summary>
         /// func
         /// </summary>
@@ -159,6 +159,18 @@ namespace Kecaknoah.Analyze
         /// nil
         /// </summary>
         NilKeyword,
+        /// <summary>
+        /// VARGS
+        /// </summary>
+        VargsKeyword,
+        /// <summary>
+        /// costart
+        /// </summary>
+        CoroutineKeyword,
+        /// <summary>
+        /// coresume
+        /// </summary>
+        CoresumeKeyword,
 
         /// <summary>
         /// (
@@ -352,5 +364,14 @@ namespace Kecaknoah.Analyze
         /// ...
         /// </summary>
         VariableArguments,
+
+        /// <summary>
+        /// return
+        /// </summary>
+        ReturnKeyword,
+        /// <summary>
+        /// yield
+        /// </summary>
+        YieldKeyword,
     }
 }

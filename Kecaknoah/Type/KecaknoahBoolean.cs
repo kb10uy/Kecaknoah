@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah.Type
 {
@@ -22,7 +18,7 @@ namespace Kecaknoah.Type
         /// <param name="op"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        public override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
+        protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
             switch (op)
             {

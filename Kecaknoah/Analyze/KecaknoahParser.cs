@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah.Analyze
 {
@@ -137,7 +135,9 @@ namespace Kecaknoah.Analyze
             var result = new KecaknoahAst(lex.SourceName);
             try
             {
-                var top = ParseExpression(new Queue<KecaknoahToken>(lex.Tokens));
+                var q = new Queue<KecaknoahToken>(lex.Tokens);
+                var top = ParseExpression(q);
+                if (q.Count != 0) throw new KecaknoahParseException(q.Dequeue().CreateErrorAt("解析されないトークンが残っています。"));
                 result.RootNode = top;
                 result.Success = true;
             }
@@ -165,7 +165,7 @@ namespace Kecaknoah.Analyze
                             result.AddNode(ParseClass(tokens));
                             break;
                         case KecaknoahTokenType.FuncKeyword:
-                            result.AddNode(ParseFunction(tokens));
+                            result.AddNode(ParseFunction(tokens, true));
                             break;
                         default:
                             throw new KecaknoahParseException(t.CreateErrorAt("トップレベルにはクラスとメソッド以外は定義できません。"));
@@ -196,7 +196,7 @@ namespace Kecaknoah.Analyze
                 switch (t.Type)
                 {
                     case KecaknoahTokenType.FuncKeyword:
-                        result.AddFunctionNode(ParseFunction(tokens));
+                        result.AddFunctionNode(ParseFunction(tokens, false));
                         break;
                     case KecaknoahTokenType.LocalKeyword:
                         result.AddLocalNode(ParseLocal(tokens));
@@ -208,9 +208,20 @@ namespace Kecaknoah.Analyze
             return result;
         }
 
-        private KecaknoahFunctionAstNode ParseFunction(Queue<KecaknoahToken> tokens)
+        private KecaknoahFunctionAstNode ParseFunction(Queue<KecaknoahToken> tokens, bool top)
         {
             var result = new KecaknoahFunctionAstNode();
+            if (tokens.CheckSkipToken(KecaknoahTokenType.StaticKeyword))
+            {
+                if (top)
+                {
+                    throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("トップレベルのメソッドにstaticは指定できません。"));
+                }
+                else
+                {
+                    result.StaticMethod = true;
+                }
+            }
             var nt = tokens.Dequeue();
             if (nt.Type != KecaknoahTokenType.Identifer) throw new KecaknoahParseException(nt.CreateErrorAt("メソッド名にはキーワードではない識別子を指定してください。"));
             result.Name = nt.TokenString;
@@ -268,17 +279,34 @@ namespace Kecaknoah.Analyze
                 {
                     case KecaknoahTokenType.LocalKeyword:
                         tokens.Dequeue();
-                        var l = ParseLocal(tokens);
-                        foreach (var i in l) result.Add(i);
+                        result.AddRange(ParseLocal(tokens));
+                        break;
+                    case KecaknoahTokenType.CoroutineKeyword:
+                        tokens.Dequeue();
+                        result.AddRange(ParseCoroutineDeclare(tokens));
+                        break;
+                    case KecaknoahTokenType.ReturnKeyword:
+                    case KecaknoahTokenType.YieldKeyword:
+                        result.Add(ParseReturn(tokens));
                         break;
                     case KecaknoahTokenType.IfKeyword:
                         tokens.Dequeue();
-                        var ifn = ParseIf(tokens);
-                        result.Add(ifn);
+                        result.Add(ParseIf(tokens));
                         break;
                     case KecaknoahTokenType.CaseKeyword:
+                        break;
                     case KecaknoahTokenType.ForKeyword:
+                        tokens.Dequeue();
+                        result.Add(ParseFor(tokens));
+                        break;
                     case KecaknoahTokenType.WhileKeyword:
+                        tokens.Dequeue();
+                        result.Add(ParseWhile(tokens));
+                        break;
+                    case KecaknoahTokenType.ContinueKeyword:
+                        tokens.Dequeue();
+                        result.Add(new KecaknoahContinueAstNode());
+                        break;
                     case KecaknoahTokenType.DoKeyword:
                         break;
                     case KecaknoahTokenType.ElifKeyword:
@@ -299,6 +327,14 @@ namespace Kecaknoah.Analyze
         EndBlock: return result;
         }
 
+        private KecaknoahReturnAstNode ParseReturn(Queue<KecaknoahToken> tokens)
+        {
+            var result = new KecaknoahReturnAstNode();
+            var nt = tokens.Dequeue();
+            result.Type = nt.Type == KecaknoahTokenType.ReturnKeyword ? KecaknoahAstNodeType.ReturnStatement : KecaknoahAstNodeType.YieldStatement;
+            if (!tokens.SkipLogicalLineBreak()) result.Value = ParseExpression(tokens);
+            return result;
+        }
 
         private IList<KecaknoahLocalAstNode> ParseLocal(Queue<KecaknoahToken> tokens)
         {
@@ -310,6 +346,7 @@ namespace Kecaknoah.Analyze
                 if (nt.Type != KecaknoahTokenType.Identifer) throw new KecaknoahParseException(nt.CreateErrorAt("識別子を指定してください。"));
                 var lan = new KecaknoahLocalAstNode();
                 lan.Name = nt.TokenString;
+                result.Add(lan);
                 if (tokens.SkipLogicalLineBreak()) return result;
                 nt = tokens.Dequeue();
                 switch (nt.Type)
@@ -325,6 +362,25 @@ namespace Kecaknoah.Analyze
                         throw new KecaknoahParseException(nt.CreateErrorAt("無効なlocal宣言です。"));
                 }
             }
+        }
+
+        private IList<KecaknoahCoroutineDeclareAstNode> ParseCoroutineDeclare(Queue<KecaknoahToken> tokens)
+        {
+            var result = new List<KecaknoahCoroutineDeclareAstNode>();
+            if (tokens.SkipLogicalLineBreak()) return result;
+            while (true)
+            {
+                var nt = tokens.Dequeue();
+                if (nt.Type != KecaknoahTokenType.Identifer) throw new KecaknoahParseException(nt.CreateErrorAt("識別子を指定してください。"));
+                var lan = new KecaknoahCoroutineDeclareAstNode();
+                lan.Name = nt.TokenString;
+                nt = tokens.Dequeue();
+                if (nt.Type != KecaknoahTokenType.Assign) throw new KecaknoahParseException(nt.CreateErrorAt("coroutine宣言は必ず代入してください。"));
+                lan.InitialExpression = ParseExpression(tokens);
+                result.Add(lan);
+                if (!tokens.CheckSkipToken(KecaknoahTokenType.Comma)) break;
+            }
+            return result;
         }
 
         private KecaknoahIfAstNode ParseIf(Queue<KecaknoahToken> tokens)
@@ -379,19 +435,77 @@ namespace Kecaknoah.Analyze
             else
             {
                 //単行if
-                var exp = ParseExpression(tokens);
-                if (!CheckStatementExpression(exp)) throw new KecaknoahParseException("ステートメントにできない式です。");
-                ifb.AddNode(exp);
+                ifb.AddNode(ParseSingleLineStatement(tokens));
                 result.IfBlock = ifb;
                 if (tokens.CheckSkipToken(KecaknoahTokenType.ElseKeyword))
                 {
-                    exp = ParseExpression(tokens);
-                    if (!CheckStatementExpression(exp)) throw new KecaknoahParseException("ステートメントにできない式です。");
                     var esb = new KecaknoahIfBlockAstNode();
-                    esb.AddNode(exp);
+                    esb.AddNode(ParseSingleLineStatement(tokens));
                     result.ElseBlock = esb;
                 }
             }
+            return result;
+        }
+
+        private KecaknoahAstNode ParseSingleLineStatement(Queue<KecaknoahToken> tokens)
+        {
+            var nt = tokens.Peek();
+            switch(nt.Type)
+            {
+                case KecaknoahTokenType.ReturnKeyword:
+                case KecaknoahTokenType.YieldKeyword:
+                    return ParseReturn(tokens);
+                case KecaknoahTokenType.BreakKeyword:
+                    tokens.Dequeue();
+                    return new KecaknoahContinueAstNode { Type = KecaknoahAstNodeType.BreakStatement };
+                case KecaknoahTokenType.ContinueKeyword:
+                    tokens.Dequeue();
+                    return new KecaknoahContinueAstNode();
+                default:
+                    var exp = ParseExpression(tokens);
+                    if (!CheckStatementExpression(exp)) throw new KecaknoahParseException("ステートメントにできない式です。");
+                    return exp;
+            }
+        }
+
+        private KecaknoahForAstNode ParseFor(Queue<KecaknoahToken> tokens)
+        {
+            var result = new KecaknoahForAstNode();
+            if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("forの各式は全体をカッコでくくってください。"));
+            while (true)
+            {
+                if (tokens.CheckSkipToken(KecaknoahTokenType.Semicolon)) break;
+                var exp = ParseExpression(tokens);
+                result.InitializeExpressions.Add(exp);
+                if (tokens.CheckSkipToken(KecaknoahTokenType.Semicolon)) break;
+                if (!tokens.CheckSkipToken(KecaknoahTokenType.Comma)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("初期化式はコンマで区切ってください。"));
+            }
+            if (!tokens.CheckToken(KecaknoahTokenType.Semicolon)) result.Condition = ParseExpression(tokens);
+            if (!tokens.CheckSkipToken(KecaknoahTokenType.Semicolon)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("セミコロンで区切ってください。"));
+            while (true)
+            {
+                if (tokens.CheckToken(KecaknoahTokenType.ParenEnd)) break;
+                var exp = ParseExpression(tokens);
+                result.CounterExpressions.Add(exp);
+                if (tokens.CheckToken(KecaknoahTokenType.ParenEnd)) break;
+                if (!tokens.CheckSkipToken(KecaknoahTokenType.Comma)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("初期化式はコンマで区切ってください。"));
+            }
+            if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("forの各式は全体をカッコでくくってください。"));
+            if (!tokens.SkipLogicalLineBreak()) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("for文の後に改行を入れてください。"));
+            foreach (var i in ParseBlock(tokens)) result.AddNode(i);
+            if (!tokens.CheckSkipToken(KecaknoahTokenType.NextKeyword)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("nextで終わっていません。"));
+            return result;
+        }
+
+        private KecaknoahLoopAstNode ParseWhile(Queue<KecaknoahToken> tokens)
+        {
+            var result = new KecaknoahLoopAstNode();
+            if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("whileの条件式はカッコでくくってください。"));
+            result.Condition = ParseExpression(tokens);
+            if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("whileの条件式はカッコでくくってください。"));
+            if (!tokens.SkipLogicalLineBreak()) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("whileの文の後に改行を入れてください。"));
+            foreach (var i in ParseBlock(tokens)) result.AddNode(i);
+            if (!tokens.CheckSkipToken(KecaknoahTokenType.NextKeyword)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("nextで終わっていません。"));
             return result;
         }
 
@@ -453,8 +567,26 @@ namespace Kecaknoah.Analyze
             {
                 var pn = result.FirstNode as KecaknoahBinaryExpressionAstNode;
                 if (pn == null) return result.FirstNode;
-                while(pn.FirstNode is KecaknoahBinaryExpressionAstNode)
+                while (pn.FirstNode is KecaknoahBinaryExpressionAstNode)
                 {
+                    switch(pn.ExpressionType)
+                    {
+                        case KecaknoahOperatorType.Assign:
+                        case KecaknoahOperatorType.PlusAssign:
+                        case KecaknoahOperatorType.MinusAssign:
+                        case KecaknoahOperatorType.MultiplyAssign:
+                        case KecaknoahOperatorType.DivideAssign:
+                        case KecaknoahOperatorType.AndAssign:
+                        case KecaknoahOperatorType.OrAssign:
+                        case KecaknoahOperatorType.XorAssign:
+                        case KecaknoahOperatorType.ModularAssign:
+                        case KecaknoahOperatorType.LeftBitShiftAssign:
+                        case KecaknoahOperatorType.RightBitShiftAssign:
+                        case KecaknoahOperatorType.NilAssign:
+                            break;
+                        default:
+                            return pn;
+                    }
                     var kb = pn.FirstNode as KecaknoahBinaryExpressionAstNode;
                     var nn = new KecaknoahBinaryExpressionAstNode();
                     nn.ExpressionType = pn.ExpressionType;
@@ -623,6 +755,13 @@ namespace Kecaknoah.Analyze
             var t = tokens.Dequeue();
             switch (t.Type)
             {
+                case KecaknoahTokenType.CoresumeKeyword:
+                    if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(t.CreateErrorAt("coresumeが不正です。"));
+                    t = tokens.Dequeue();
+                    if (t.Type != KecaknoahTokenType.Identifer) throw new KecaknoahParseException(t.CreateErrorAt("coresumeが不正です。"));
+                    var result = new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.CoroutineResume, StringValue = t.TokenString };
+                    if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(t.CreateErrorAt("coresumeが不正です。"));
+                    return result;
                 case KecaknoahTokenType.ParenStart:
                     var exp = ParseExpression(tokens);
                     if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("カッコは閉じてください。"));
@@ -632,6 +771,8 @@ namespace Kecaknoah.Analyze
                     return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.BooleanValue, BooleanValue = Convert.ToBoolean(t.TokenString) };
                 case KecaknoahTokenType.NilKeyword:
                     return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.Nil };
+                case KecaknoahTokenType.VargsKeyword:
+                    return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.VariableArguments };
                 case KecaknoahTokenType.Identifer:
                     return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.Identifer, StringValue = t.TokenString };
                 case KecaknoahTokenType.StringLiteral:
@@ -668,7 +809,7 @@ namespace Kecaknoah.Analyze
     /// KecaknoahのAST構築時の例外を定義します。
     /// </summary>
     [Serializable]
-    public class KecaknoahParseException : Exception
+    internal class KecaknoahParseException : Exception
     {
         /// <summary>
         /// 発生時の<see cref="KecaknoahError"/>を取得します。

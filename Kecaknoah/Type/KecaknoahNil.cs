@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Kecaknoah.Type
+﻿namespace Kecaknoah.Type
 {
     /// <summary>
     /// Kecaknoahのnil(null)を定義します。
@@ -32,29 +26,41 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <param name="name">メンバー名</param>
         /// <returns>アクセスできる場合は対象のオブジェクト</returns>
-        public override KecaknoahReference GetMemberReference(string name) => Reference;
+        protected internal override KecaknoahReference GetMemberReference(string name) => Reference;
 
         /// <summary>
         /// このオブジェクトに対してメソッドとしての呼び出しをしようとしてもnilです。
         /// </summary>
+        /// <param name="context"></param>
         /// <param name="args">引数</param>
         /// <returns>返り値</returns>
-        public override KecaknoahObject Call(KecaknoahObject[] args) => Instance;
+        protected internal override KecaknoahFunctionResult Call(KecaknoahContext context, KecaknoahObject[] args) => Instance.NoResume();
 
         /// <summary>
         /// このオブジェクトに対してインデクサーアクセスを試みようとしてもnilです。 
         /// </summary>
         /// <param name="indices">インデックス引数</param>
         /// <returns></returns>
-        public override KecaknoahReference GetIndexerReference(KecaknoahObject[] indices) => Reference;
+        protected internal override KecaknoahReference GetIndexerReference(KecaknoahObject[] indices) => Reference;
 
         /// <summary>
-        /// このオブジェクトに対して二項式としての演算をしようとしてもnilです。
+        /// このオブジェクトに対して二項式としての演算をしようとしても大体nilです。
         /// </summary>
         /// <param name="op">演算子</param>
         /// <param name="target">2項目の<see cref="KecaknoahObject"/></param>
         /// <returns></returns>
-        public override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target) => Instance;
+        protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
+        {
+            switch (op)
+            {
+                case KecaknoahILCodeType.Equal:
+                    return (dynamic)this == (dynamic)target;
+                case KecaknoahILCodeType.NotEqual:
+                    return (dynamic)this != (dynamic)target;
+                default:
+                    return KecaknoahNil.Instance;
+            }
+        }
 
         /// <summary>
         /// 現在の以下略。
@@ -67,5 +73,16 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <returns></returns>
         public override object Clone() => Instance;
+
+#pragma warning disable 1591
+        public override bool Equals(object obj) => base.Equals(obj);
+        public override int GetHashCode() => base.GetHashCode();
+        public static KecaknoahObject operator ==(KecaknoahNil v1, KecaknoahObject v2) => (v2.Equals(Instance)).AsKecaknoahBoolean();
+        public static KecaknoahObject operator !=(KecaknoahNil v1, KecaknoahObject v2) => (!v2.Equals(Instance)).AsKecaknoahBoolean();
+        public static KecaknoahObject operator ==(KecaknoahObject v1, KecaknoahNil v2) => (v1.Equals(Instance)).AsKecaknoahBoolean();
+        public static KecaknoahObject operator !=(KecaknoahObject v1, KecaknoahNil v2) => (!v1.Equals(Instance)).AsKecaknoahBoolean();
+        public static KecaknoahObject operator ==(KecaknoahNil v1, KecaknoahNil v2) => true.AsKecaknoahBoolean();
+        public static KecaknoahObject operator !=(KecaknoahNil v1, KecaknoahNil v2) => false.AsKecaknoahBoolean();
+#pragma warning restore 1591
     }
 }

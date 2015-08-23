@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Kecaknoah.Type
 {
@@ -22,9 +18,14 @@ namespace Kecaknoah.Type
         public abstract IReadOnlyList<KecaknoahClassInfo> InnerClasses { get; }
 
         /// <summary>
-        /// メソッドを取得します。
+        /// インスタンスメソッドを取得します。
         /// </summary>
         public abstract IReadOnlyList<KecaknoahMethodInfo> InstanceMethods { get; }
+
+        /// <summary>
+        /// クラスメソッドを取得します。
+        /// </summary>
+        public abstract IReadOnlyList<KecaknoahMethodInfo> ClassMethods { get; }
 
         /// <summary>
         /// 予め定義されるフィールドを定義します。
@@ -32,8 +33,8 @@ namespace Kecaknoah.Type
         public abstract IReadOnlyList<string> Locals { get; }
 
         /// <summary>
-        /// 継承元クラスを取得します。
+        /// 継承元クラスの名前を取得します。
         /// </summary>
-        public abstract KecaknoahClassInfo BaseClass { get; }
+        public abstract string BaseClass { get; }
     }
 }

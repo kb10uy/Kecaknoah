@@ -1,9 +1,5 @@
 ﻿using Kecaknoah.Type;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah
 {
@@ -16,12 +12,12 @@ namespace Kecaknoah
         /// <summary>
         /// クラスを取得します。
         /// </summary>
-        public IReadOnlyList<KecaknoahScriptClassInfo> Classes { get; }
+        public IReadOnlyList<KecaknoahScriptClassInfo> Classes => classes;
 
-        internal List<KecaknoahMethodInfo> methods = new List<KecaknoahMethodInfo>();
+        internal List<KecaknoahScriptMethodInfo> methods = new List<KecaknoahScriptMethodInfo>();
         /// <summary>
         /// トップレベルに定義されたメソッドを取得します。
         /// </summary>
-        public IReadOnlyList<KecaknoahScriptMethodInfo> TopLevelMethods { get; }
+        public IReadOnlyList<KecaknoahScriptMethodInfo> TopLevelMethods => methods;
     }
 }

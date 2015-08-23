@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah.Type
 {
@@ -24,9 +22,15 @@ namespace Kecaknoah.Type
 
         internal List<KecaknoahScriptMethodInfo> methods = new List<KecaknoahScriptMethodInfo>();
         /// <summary>
-        /// このクラスのインナークラスを取得します。
+        /// このクラスのインスタンスメソッドを取得します。
         /// </summary>
         public override IReadOnlyList<KecaknoahMethodInfo> InstanceMethods => methods;
+
+        internal List<KecaknoahScriptMethodInfo> classMethods = new List<KecaknoahScriptMethodInfo>();
+        /// <summary>
+        /// このクラスのクラスメソッドを取得します。
+        /// </summary>
+        public override IReadOnlyList<KecaknoahMethodInfo> ClassMethods => classMethods;
 
         private List<string> locals = new List<string>();
         /// <summary>
@@ -37,7 +41,7 @@ namespace Kecaknoah.Type
         /// <summary>
         /// 継承元のクラスを取得・設定します。
         /// </summary>
-        public override KecaknoahClassInfo BaseClass { get; }
+        public override string BaseClass { get; }
 
         /// <summary>
         /// 新しいインスタンスを初期化します。
@@ -62,9 +66,18 @@ namespace Kecaknoah.Type
         /// メソッドを追加します。
         /// </summary>
         /// <param name="method">追加するメソッド</param>
-        internal void AddMethod(KecaknoahScriptMethodInfo method)
+        internal void AddInstanceMethod(KecaknoahScriptMethodInfo method)
         {
             methods.Add(method);
+        }
+
+        /// <summary>
+        /// メソッドを追加します。
+        /// </summary>
+        /// <param name="method">追加するメソッド</param>
+        internal void AddClassMethod(KecaknoahScriptMethodInfo method)
+        {
+            classMethods.Add(method);
         }
 
         /// <summary>

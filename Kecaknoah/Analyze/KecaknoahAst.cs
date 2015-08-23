@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Kecaknoah.Analyze;
+﻿using System.Collections.Generic;
 
 namespace Kecaknoah.Analyze
 {
@@ -140,10 +135,30 @@ namespace Kecaknoah.Analyze
         /// </summary>
         LocalStatement,
         /// <summary>
+        /// coroutine文
+        /// </summary>
+        CoroutineStatement,
+        /// <summary>
+        /// return文
+        /// </summary>
+        ReturnStatement,
+        /// <summary>
+        /// yield文
+        /// </summary>
+        YieldStatement,
+        /// <summary>
+        /// continue文
+        /// </summary>
+        ContinueStatement,
+        /// <summary>
         /// 式
         /// </summary>
         Expression,
 
+        /// <summary>
+        /// break文
+        /// </summary>
+        BreakStatement,
     }
 
 }

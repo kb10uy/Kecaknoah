@@ -1,0 +1,342 @@
+﻿using System;
+using System.Collections.Generic;
+using Kecaknoah.Type;
+
+namespace Kecaknoah
+{
+    /// <summary>
+    /// ローカル変数を含むスタックフレームを提供します。
+    /// </summary>
+    public sealed class KecaknoahStackFrame
+    {
+        private Dictionary<string, KecaknoahReference> locals = new Dictionary<string, KecaknoahReference>();
+        /// <summary>
+        /// ローカル変数の参照を取得します。
+        /// </summary>
+        /// <remarks>再開可能な状態で操作すると不具合が発生する可能性があります。</remarks>
+        public IDictionary<string, KecaknoahReference> Locals => locals;
+
+        private Dictionary<string, KecaknoahStackFrame> cors = new Dictionary<string, KecaknoahStackFrame>();
+        /// <summary>
+        /// 起動中のコルーチンの参照を取得します。
+        /// </summary>
+        /// <remarks>再開可能な状態で操作すると不具合が発生する可能性があります。</remarks>
+        public IDictionary<string, KecaknoahStackFrame> Coroutines => cors;
+
+        /// <summary>
+        /// 実行中の<see cref="KecaknoahILCode"/>のリストを取得します。
+        /// </summary>
+        public IReadOnlyList<KecaknoahILCode> Codes { get; internal set; }
+
+        /// <summary>
+        /// コードにおける参照のスタックを取得します。
+        /// </summary>
+        /// <remarks>再開可能な状態で操作すると不具合が発生する可能性があります。</remarks>
+        public Stack<KecaknoahReference> ReferenceStack { get; internal set; } = new Stack<KecaknoahReference>();
+
+        /// <summary>
+        /// 引数を取得します。
+        /// </summary>
+        public IList<KecaknoahObject> Arguments { get; internal set; } = new List<KecaknoahObject>();
+
+        /// <summary>
+        /// 可変長引数を取得します。
+        /// </summary>
+        public IList<KecaknoahObject> VariableArguments { get; internal set; } = new List<KecaknoahObject>();
+
+        /// <summary>
+        /// 現在このスタックフレームが属している<see cref="KecaknoahContext"/>を取得します。
+        /// </summary>
+        public KecaknoahContext RunningContext { get; internal set; }
+
+        /// <summary>
+        /// 現在の<see cref="KecaknoahIL"/>の位置を取得します。
+        /// </summary>
+        public int ProgramCounter { get; internal set; }
+
+        /// <summary>
+        /// 現在の状態でreturn/yieldされた<see cref="KecaknoahObject"/>を取得します。
+        /// </summary>
+        public KecaknoahObject ReturningObject { get; internal set; } = KecaknoahNil.Instance;
+
+        /// <summary>
+        /// 新しいインスタンスを初期化します。
+        /// </summary>
+        /// <param name="ctx">実行している<see cref="KecaknoahContext"/></param>
+        /// <param name="il">実行する<see cref="KecaknoahIL"/></param>
+        public KecaknoahStackFrame(KecaknoahContext ctx, KecaknoahIL il)
+        {
+            Codes = il.Codes;
+            ProgramCounter = 0;
+            RunningContext = ctx;
+        }
+
+        private KecaknoahReference GetReference(string name)
+        {
+            KecaknoahReference result;
+            if (Locals.ContainsKey(name)) return Locals[name];
+            if ((result = RunningContext.Module.GetReference(name)) != KecaknoahNil.Reference) return result;
+            result = new KecaknoahReference { IsLeftValue = true };
+            locals[name] = result;
+            return result;
+        }
+
+        /// <summary>
+        /// 現在のコードを最初から実行します。
+        /// </summary>
+        /// <returns>継続可能な場合はtrueが、それ以外の場合はfalseが帰ります。</returns>
+        public bool Execute()
+        {
+            Reset();
+            return Resume();
+        }
+
+        /// <summary>
+        /// 現在の状態で、現在のコードの実行を再開します。
+        /// </summary>
+        /// <returns></returns>
+        public bool Resume()
+        {
+            KecaknoahObject v1, v2;
+            KecaknoahReference rfr;
+            Stack<KecaknoahObject> args;
+            while (ProgramCounter < Codes.Count)
+            {
+                var c = Codes[ProgramCounter];
+                switch (c.Type)
+                {
+                    //基本--------------------------------------------------------------------
+                    case KecaknoahILCodeType.Nop:
+                        break;
+                    case KecaknoahILCodeType.Label:
+                        break;
+                    case KecaknoahILCodeType.PushInteger:
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(c.IntegerValue));
+                        break;
+                    case KecaknoahILCodeType.PushString:
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(c.StringValue));
+                        break;
+                    case KecaknoahILCodeType.PushDouble:
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(c.FloatValue));
+                        break;
+                    case KecaknoahILCodeType.PushBoolean:
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(c.BooleanValue));
+                        break;
+                    case KecaknoahILCodeType.PushNil:
+                        ReferenceStack.Push(KecaknoahNil.Reference);
+                        break;
+                    case KecaknoahILCodeType.Pop:
+                        ReferenceStack.Pop();
+                        break;
+
+                    //二項演算子--------------------------------------------------------------
+                    case KecaknoahILCodeType.Plus:
+                    case KecaknoahILCodeType.Minus:
+                    case KecaknoahILCodeType.Multiply:
+                    case KecaknoahILCodeType.Divide:
+                    case KecaknoahILCodeType.Modular:
+                    case KecaknoahILCodeType.And:
+                    case KecaknoahILCodeType.Or:
+                    case KecaknoahILCodeType.Xor:
+                    case KecaknoahILCodeType.AndAlso:
+                    case KecaknoahILCodeType.OrElse:
+                    case KecaknoahILCodeType.LeftBitShift:
+                    case KecaknoahILCodeType.RightBitShift:
+                    case KecaknoahILCodeType.Equal:
+                    case KecaknoahILCodeType.NotEqual:
+                    case KecaknoahILCodeType.Greater:
+                    case KecaknoahILCodeType.Lesser:
+                    case KecaknoahILCodeType.GreaterEqual:
+                    case KecaknoahILCodeType.LesserEqual:
+                        v2 = ReferenceStack.Pop().RawObject;
+                        v1 = ReferenceStack.Pop().RawObject;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v1.ExpressionOperation(c.Type, v2)));
+                        break;
+                    case KecaknoahILCodeType.Not:
+                    case KecaknoahILCodeType.Negative:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v1.ExpressionOperation(c.Type, null)));
+                        break;
+
+                    //代入など--------------------------------------------------------------
+                    case KecaknoahILCodeType.Assign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        rfr.RawObject = v1;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v1));
+                        break;
+                    case KecaknoahILCodeType.PlusAssign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        v2 = rfr.RawObject.ExpressionOperation(KecaknoahILCodeType.Plus, v1);
+                        rfr.RawObject = v2;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v2));
+                        break;
+                    case KecaknoahILCodeType.MinusAssign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        v2 = rfr.RawObject.ExpressionOperation(KecaknoahILCodeType.Minus, v1);
+                        rfr.RawObject = v2;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v2));
+                        break;
+                    case KecaknoahILCodeType.MultiplyAssign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        v2 = rfr.RawObject.ExpressionOperation(KecaknoahILCodeType.Multiply, v1);
+                        rfr.RawObject = v2;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v2));
+                        break;
+                    case KecaknoahILCodeType.DivideAssign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        v2 = rfr.RawObject.ExpressionOperation(KecaknoahILCodeType.Divide, v1);
+                        rfr.RawObject = v2;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v2));
+                        break;
+                    case KecaknoahILCodeType.AndAssign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        v2 = rfr.RawObject.ExpressionOperation(KecaknoahILCodeType.And, v1);
+                        rfr.RawObject = v2;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v2));
+                        break;
+                    case KecaknoahILCodeType.OrAssign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        v2 = rfr.RawObject.ExpressionOperation(KecaknoahILCodeType.Or, v1);
+                        rfr.RawObject = v2;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v2));
+                        break;
+                    case KecaknoahILCodeType.XorAssign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        v2 = rfr.RawObject.ExpressionOperation(KecaknoahILCodeType.Xor, v1);
+                        rfr.RawObject = v2;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v2));
+                        break;
+                    case KecaknoahILCodeType.ModularAssign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        v2 = rfr.RawObject.ExpressionOperation(KecaknoahILCodeType.Modular, v1);
+                        rfr.RawObject = v2;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v2));
+                        break;
+                    case KecaknoahILCodeType.LeftBitShiftAssign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        v2 = rfr.RawObject.ExpressionOperation(KecaknoahILCodeType.LeftBitShift, v1);
+                        rfr.RawObject = v2;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v2));
+                        break;
+                    case KecaknoahILCodeType.RightBitShiftAssign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        v2 = rfr.RawObject.ExpressionOperation(KecaknoahILCodeType.RightBitShift, v1);
+                        rfr.RawObject = v2;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v2));
+                        break;
+                    case KecaknoahILCodeType.NilAssign:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        rfr = ReferenceStack.Pop();
+                        v2 = rfr.RawObject.ExpressionOperation(KecaknoahILCodeType.NilAssign, v1);
+                        rfr.RawObject = v2;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v2));
+                        break;
+
+                    //特殊----------------------------------------------------------------------------
+                    case KecaknoahILCodeType.StartCoroutine:
+                        var ct = ReferenceStack.Pop().RawObject as KecaknoahScriptFunction;
+                        if (ct==null)
+                        {
+                            throw new InvalidOperationException("スクリプト上のメソッド以外はコルーチン化出来ません");
+                        }
+                        cors[c.StringValue] = new KecaknoahStackFrame(RunningContext, ct.BaseMethod.Codes);
+                        break;
+                    case KecaknoahILCodeType.ResumeCoroutine:
+                        var cobj = cors[c.StringValue];
+                        if (cobj == null)
+                        {
+                            ReferenceStack.Push(KecaknoahNil.Reference);
+                            break;
+                        }
+                        var cr = cobj.Resume();
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(cobj.ReturningObject));
+                        if (!cr)
+                        {
+                            cors[c.StringValue] = null;
+                        }
+                        break;
+                    case KecaknoahILCodeType.Jump:
+                        ProgramCounter = (int)c.IntegerValue;
+                        continue;
+                    case KecaknoahILCodeType.TrueJump:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        if (v1.ToBoolean())
+                        {
+                            ProgramCounter = (int)c.IntegerValue;
+                            continue;
+                        }
+                        break;
+                    case KecaknoahILCodeType.FalseJump:
+                        v1 = ReferenceStack.Pop().RawObject;
+                        if (!v1.ToBoolean())
+                        {
+                            ProgramCounter = (int)c.IntegerValue;
+                            continue;
+                        }
+                        break;
+                    case KecaknoahILCodeType.Return:
+                        ReturningObject = ReferenceStack.Pop().RawObject;
+                        return false;
+                    case KecaknoahILCodeType.Yield:
+                        ReturningObject = ReferenceStack.Pop().RawObject;
+                        ProgramCounter++;
+                        return true;
+                    case KecaknoahILCodeType.Call:
+                        args = new Stack<KecaknoahObject>();
+                        for (int i = 0; i < c.IntegerValue; i++) args.Push(ReferenceStack.Pop().RawObject);
+                        v1 = ReferenceStack.Pop().RawObject;
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(v1.Call(RunningContext, args.ToArray()).ReturningObject));
+                        break;
+                    case KecaknoahILCodeType.IndexerCall:
+                        args = new Stack<KecaknoahObject>();
+                        for (int i = 0; i < c.IntegerValue; i++) args.Push(ReferenceStack.Pop().RawObject);
+                        v1 = ReferenceStack.Pop().RawObject;
+                        ReferenceStack.Push(v1.GetIndexerReference(args.ToArray()));
+                        break;
+                    case KecaknoahILCodeType.PushArgument:
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(Arguments[(int)c.IntegerValue]));
+                        break;
+                    case KecaknoahILCodeType.LoadObject:
+                        string refname = c.StringValue;
+                        ReferenceStack.Push(GetReference(refname));
+                        break;
+                    case KecaknoahILCodeType.LoadMember:
+                        var or = ReferenceStack.Pop();
+                        ReferenceStack.Push(or.GetMemberReference(c.StringValue));
+                        break;
+                    case KecaknoahILCodeType.LoadVarg:
+                        args = new Stack<KecaknoahObject>();
+                        for (int i = 0; i < c.IntegerValue; i++) args.Push(ReferenceStack.Pop().RawObject);
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(VariableArguments[(int)args.Pop().ToInt64()]));
+                        break;
+                    case KecaknoahILCodeType.AsValue:
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(ReferenceStack.Pop().RawObject.Clone() as KecaknoahObject));
+                        break;
+                }
+                ProgramCounter++;
+            }
+            if (ReferenceStack.Count == 0) ReferenceStack.Push(KecaknoahNil.Reference);
+            ReturningObject = ReferenceStack.Pop().RawObject;
+            return false;
+        }
+
+        /// <summary>
+        /// 実行位置をリセットします。
+        /// </summary>
+        public void Reset()
+        {
+            ProgramCounter = 0;
+        }
+    }
+}

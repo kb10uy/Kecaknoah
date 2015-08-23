@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah.Type
 {
@@ -26,14 +22,38 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <param name="name">メンバー名</param>
         /// <returns>アクセスできる場合は対象のオブジェクト</returns>
-        public virtual KecaknoahReference GetMemberReference(string name) => null;
+        protected internal virtual KecaknoahReference GetMemberReference(string name)
+        {
+            switch (name)
+            {
+                case "to_str":
+                    return InstanceToString(this);
+                case "hash":
+                    return InstanceHash(this);
+                default:
+                    return KecaknoahNil.Reference;
+            }
+        }
+
+        /// <summary>
+        /// <see cref="GetMemberReference(string)"/>の簡易版。
+        /// <see cref="GetIndexerReference(KecaknoahObject[])"/>は参照しないので注意してください。
+        /// </summary>
+        /// <param name="name">メンバー名</param>
+        /// <returns>アクセスできる場合は対象のオブジェクト</returns>
+        protected KecaknoahObject this[string name]
+        {
+            get { return GetMemberReference(name).RawObject; }
+            set { GetMemberReference(name).RawObject = value; }
+        }
 
         /// <summary>
         /// このオブジェクトに対してメソッドとしての呼び出しをします。
         /// </summary>
+        /// <param name="context">実行される<see cref="KecaknoahContext"/></param>
         /// <param name="args">引数</param>
         /// <returns>返り値</returns>
-        public virtual KecaknoahObject Call(KecaknoahObject[] args)
+        protected internal virtual KecaknoahFunctionResult Call(KecaknoahContext context, KecaknoahObject[] args)
         {
             throw new InvalidOperationException($"この{nameof(KecaknoahObject)}に対してメソッド呼び出しは出来ません。");
         }
@@ -43,7 +63,7 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <param name="indices">インデックス引数</param>
         /// <returns></returns>
-        public virtual KecaknoahReference GetIndexerReference(KecaknoahObject[] indices)
+        protected internal virtual KecaknoahReference GetIndexerReference(KecaknoahObject[] indices)
         {
             throw new InvalidOperationException($"この{nameof(KecaknoahObject)}に対してインデクサー呼び出しは出来ません。");
         }
@@ -54,16 +74,10 @@ namespace Kecaknoah.Type
         /// <param name="op">演算子</param>
         /// <param name="target">2項目の<see cref="KecaknoahObject"/></param>
         /// <returns></returns>
-        public virtual KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
+        protected internal virtual KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
             throw new InvalidOperationException($"この{nameof(KecaknoahObject)}に対して式操作は出来ません。");
         }
-
-        /// <summary>
-        /// 現在の以下略。
-        /// </summary>
-        /// <returns>知るか</returns>
-        public override string ToString() => "KecaknoahObject";
 
         /// <summary>
         /// 新しいインスタンスを生成します。
@@ -73,14 +87,15 @@ namespace Kecaknoah.Type
             Type = TypeCode.Empty;
         }
 
+        private static KecaknoahReference InstanceToString(KecaknoahObject self) => KecaknoahReference.CreateRightReference(self, (ctx, s, args) => s.ToString().AsKecaknoahString().NoResume());
+
+        private static KecaknoahReference InstanceHash(KecaknoahObject self) => KecaknoahReference.CreateRightReference(self, (ctx, s, args) => s.GetHashCode().AsKecaknoahInteger().NoResume());
+
         /// <summary>
-        /// 新しいインスタンスを生成します。
-        /// <param name="st"></param>
+        /// 現在の以下略。
         /// </summary>
-        public KecaknoahObject(bool st)
-        {
-            Type = TypeCode.Empty;
-        }
+        /// <returns>知るか</returns>
+        public override string ToString() => "KecaknoahObject";
 
         /// <summary>
         /// 可能ならば<see cref="long"/>型に変換します。
@@ -143,6 +158,33 @@ namespace Kecaknoah.Type
         public static explicit operator string (KecaknoahObject obj) => ((KecaknoahString)obj).Value;
         public static explicit operator bool (KecaknoahObject obj) => ((KecaknoahBoolean)obj).Value;
 #pragma warning restore 1591
+
+    }
+
+    /// <summary>
+    /// Kecaknoahのメソッドの実行結果を定義します。
+    /// </summary>
+    public sealed class KecaknoahFunctionResult
+    {
+        /// <summary>
+        /// このメソッドを再開できるかどうかを取得します。
+        /// </summary>
+        public bool CanResume { get; }
+        /// <summary>
+        /// 今回のreturn/yieldに属する<see cref="KecaknoahObject"/>を取得します。
+        /// </summary>
+        public KecaknoahObject ReturningObject { get; }
+
+        /// <summary>
+        /// 新しいインスタンスを初期化します。
+        /// </summary>
+        /// <param name="obj">返却する<see cref="KecaknoahObject"/></param>
+        /// <param name="res">再開可能な場合はtrue</param>
+        public KecaknoahFunctionResult(KecaknoahObject obj, bool res)
+        {
+            CanResume = res;
+            ReturningObject = obj;
+        }
 
     }
 }

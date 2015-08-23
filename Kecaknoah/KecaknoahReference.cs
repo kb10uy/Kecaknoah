@@ -1,9 +1,5 @@
 ﻿using Kecaknoah.Type;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah
 {
@@ -91,6 +87,18 @@ namespace Kecaknoah
         {
             IsLeftValue = false,
             obj = sobj.AsKecaknoahString()
+        };
+
+        /// <summary>
+        /// 右辺値を生成します。
+        /// </summary>
+        /// <param name="self">属するインスタンス</param>
+        /// <param name="sobj">対象</param>
+        /// <returns>右辺値参照</returns>
+        public static KecaknoahReference CreateRightReference(KecaknoahObject self, KecaknoahInteropDelegate sobj) => new KecaknoahReference
+        {
+            IsLeftValue = false,
+            obj = new KecaknoahInteropFunction(self, sobj)
         };
     }
 }

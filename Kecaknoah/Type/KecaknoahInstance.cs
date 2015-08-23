@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kecaknoah.Type
 {
@@ -42,7 +39,7 @@ namespace Kecaknoah.Type
                 methodReferences[i.Name] = new KecaknoahReference()
                 {
                     IsLeftValue = true,
-                    RawObject = new KecaknoahScriptInstanceFunction(this, i)
+                    RawObject = new KecaknoahScriptFunction(this, i)
                 };
         }
 
@@ -60,8 +57,65 @@ namespace Kecaknoah.Type
                 methodReferences[i.Name] = new KecaknoahReference()
                 {
                     IsLeftValue = true,
-                    RawObject = new KecaknoahInteropInstanceFunction(this, i.Body)
+                    RawObject = new KecaknoahInteropFunction(this, i.Body)
                 };
+        }
+
+        /// <summary>
+        /// 特定の<see cref="KecaknoahScriptClassInfo"/>を元にして、インスタンスを生成します。
+        /// コンストラクタがあった場合、呼び出します。
+        /// </summary>
+        /// <param name="klass">クラス</param>
+        /// <param name="ctx">コンテキスト</param>
+        /// <param name="ctorArgs">コンストラクタ引数</param>
+        public KecaknoahInstance(KecaknoahScriptClassInfo klass, KecaknoahContext ctx, KecaknoahObject[] ctorArgs)
+        {
+            Class = klass;
+            LocalFieldReferences = localReferences;
+            InstanceMethodReferences = methodReferences;
+            foreach (var i in klass.Locals) localReferences[i] = new KecaknoahReference() { IsLeftValue = true };
+            foreach (var i in klass.methods)
+                methodReferences[i.Name] = new KecaknoahReference()
+                {
+                    IsLeftValue = true,
+                    RawObject = new KecaknoahScriptFunction(this, i)
+                };
+            if (klass.classMethods.Any(p => p.Name == "new"))
+            {
+                var ctor = klass.classMethods.First(p => p.Name == "new");
+                new KecaknoahScriptFunction(this, ctor).Call(ctx, ctorArgs);
+            }
+        }
+
+        /// <summary>
+        /// 特定の<see cref="KecaknoahInteropClassInfo"/>を元にして、インスタンスを生成します。
+        /// コンストラクタがあった場合、呼び出します。
+        /// </summary>
+        /// <param name="klass">クラス</param>
+        /// <param name="ctx">コンテキスト</param>
+        /// <param name="ctorArgs">コンストラクタ引数</param>
+        public KecaknoahInstance(KecaknoahInteropClassInfo klass, KecaknoahContext ctx, KecaknoahObject[] ctorArgs)
+        {
+            Class = klass;
+            LocalFieldReferences = localReferences;
+            InstanceMethodReferences = methodReferences;
+            foreach (var i in klass.Locals) localReferences[i] = new KecaknoahReference() { IsLeftValue = true };
+            foreach (var i in klass.methods)
+                methodReferences[i.Name] = new KecaknoahReference()
+                {
+                    IsLeftValue = true,
+                    RawObject = new KecaknoahInteropFunction(this, i.Body)
+                };
+            if (klass.classMethods.Any(p => p.Name == "new"))
+            {
+                var ctor = klass.classMethods.First(p => p.Name == "new");
+                ctor.Body(ctx, this, ctorArgs);
+            }
+        }
+
+        private void TryCallConstructor(KecaknoahObject[] args)
+        {
+
         }
 
         /// <summary>
@@ -69,9 +123,17 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public override KecaknoahReference GetMemberReference(string name) =>
-            LocalFieldReferences.FirstOrDefault(p => p.Key == name).Value
-                ?? InstanceMethodReferences.FirstOrDefault(p => p.Key == name).Value
-                ?? base.GetMemberReference(name);
+        protected internal override KecaknoahReference GetMemberReference(string name)
+        {
+            if (LocalFieldReferences.ContainsKey(name)) return LocalFieldReferences[name];
+            if (InstanceMethodReferences.ContainsKey(name)) return InstanceMethodReferences[name];
+            KecaknoahReference result;
+            if ((result = base.GetMemberReference(name)) == KecaknoahNil.Reference)
+            {
+                result = localReferences[name] = new KecaknoahReference { IsLeftValue = true };
+            }
+            return result;
+        }
+
     }
 }
