@@ -43,16 +43,16 @@ namespace Kecaknoah
             return result.NoResume();
         }
 
-        private KecaknoahFunctionResult Format(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
+        private KecaknoahFunctionResult WriteLine(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
             Console.WriteLine(args[0].ToString());
             return KecaknoahNil.Instance.NoResume();
         }
 
-        private KecaknoahFunctionResult WriteLine(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
+        private KecaknoahFunctionResult Format(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
             var b = args[0].ToString();
-            var ar = b.Skip(1).Select(p => p.ToString()).ToArray();
+            var ar = args.Skip(1).Select(p => p.ToString()).ToArray();
             return string.Format(b, ar).AsKecaknoahString().NoResume();
         }
 

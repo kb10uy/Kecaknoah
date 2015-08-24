@@ -42,6 +42,7 @@ namespace Kecaknoah
         public KecaknoahScriptCoroutineFrame(KecaknoahContext ctx, KecaknoahScriptFunction func, KecaknoahObject[] args)
         {
             StackFrame = new KecaknoahStackFrame(ctx, func.BaseMethod.Codes);
+            Args = args;
             StackFrame.Arguments = Args;
         }
 
