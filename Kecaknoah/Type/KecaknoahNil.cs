@@ -68,21 +68,8 @@
         /// <returns>知るか</returns>
         public override string ToString() => "nil";
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public override object Clone() => Instance;
-
 #pragma warning disable 1591
-        public override bool Equals(object obj) => base.Equals(obj);
-        public override int GetHashCode() => base.GetHashCode();
-        public static KecaknoahObject operator ==(KecaknoahNil v1, KecaknoahObject v2) => (v2.Equals(Instance)).AsKecaknoahBoolean();
-        public static KecaknoahObject operator !=(KecaknoahNil v1, KecaknoahObject v2) => (!v2.Equals(Instance)).AsKecaknoahBoolean();
-        public static KecaknoahObject operator ==(KecaknoahObject v1, KecaknoahNil v2) => (v1.Equals(Instance)).AsKecaknoahBoolean();
-        public static KecaknoahObject operator !=(KecaknoahObject v1, KecaknoahNil v2) => (!v1.Equals(Instance)).AsKecaknoahBoolean();
-        public static KecaknoahObject operator ==(KecaknoahNil v1, KecaknoahNil v2) => true.AsKecaknoahBoolean();
-        public static KecaknoahObject operator !=(KecaknoahNil v1, KecaknoahNil v2) => false.AsKecaknoahBoolean();
+        public override object Clone() => Instance;
 #pragma warning restore 1591
     }
 }

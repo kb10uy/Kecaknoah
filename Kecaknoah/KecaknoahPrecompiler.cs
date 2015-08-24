@@ -24,6 +24,8 @@ namespace Kecaknoah
 
         }
 
+
+        private KecaknoahSource current;
         /// <summary>
         /// 1つのソースコード全体からなる<see cref="KecaknoahAst"/>をプリコンパイルします。
         /// </summary>
@@ -32,6 +34,7 @@ namespace Kecaknoah
         public KecaknoahSource PrecompileAll(KecaknoahAst ast)
         {
             var result = new KecaknoahSource();
+            current = result;
             foreach (var i in ast.RootNode.Children)
             {
                 if (i is KecaknoahClassAstNode)
@@ -47,13 +50,16 @@ namespace Kecaknoah
                     throw new InvalidOperationException("トップレベルにはクラスとメソッド以外おけません");
                 }
             }
+            current = null;
             return result;
         }
 
+        private Stack<KecaknoahScriptClassInfo> cuc = new Stack<KecaknoahScriptClassInfo>();
         private KecaknoahScriptClassInfo PrecompileClass(KecaknoahClassAstNode ast)
         {
             //TODO: local初期値式対応
             var result = new KecaknoahScriptClassInfo(ast.Name);
+            cuc.Push(result);
             foreach (var i in ast.Functions)
             {
                 if (i.StaticMethod)
@@ -69,6 +75,7 @@ namespace Kecaknoah
             {
                 result.AddLocal(i.Name);
             }
+            cuc.Pop();
             return result;
         }
 
@@ -115,10 +122,15 @@ namespace Kecaknoah
             {
                 if (i is KecaknoahExpressionAstNode)
                 {
-                    if (i is KecaknoahArgumentCallExpressionAstNode)
+                    if (i is KecaknoahFactorExpressionAstNode)
+                    {
+                        var exp = i as KecaknoahFactorExpressionAstNode;
+                        if (exp.FactorType != KecaknoahFactorType.CoroutineResume) throw new InvalidOperationException("ステートメントにできる式はcoresume・代入・呼び出し・インクリメント・デクリメントのみです");
+                    }
+                    else if (i is KecaknoahArgumentCallExpressionAstNode)
                     {
                         var exp = i as KecaknoahArgumentCallExpressionAstNode;
-                        if (exp.ExpressionType != KecaknoahOperatorType.FunctionCall) throw new InvalidOperationException("ステートメントにできる式は代入・呼び出し・インクリメント・デクリメントのみです");
+                        if (exp.ExpressionType != KecaknoahOperatorType.FunctionCall) throw new InvalidOperationException("ステートメントにできる式はcoresume・代入・呼び出し・インクリメント・デクリメントのみです");
                         result.PushCodes(PrecompileFunctionCall(exp));
                         result.PushCode(KecaknoahILCodeType.Pop);
                     }
@@ -143,7 +155,7 @@ namespace Kecaknoah
                                 result.PushCode(KecaknoahILCodeType.Pop);
                                 break;
                             default:
-                                throw new InvalidOperationException("ステートメントにできる式は代入・呼び出し・インクリメント・デクリメントのみです");
+                                throw new InvalidOperationException("ステートメントにできる式はcoresume・代入・呼び出し・インクリメント・デクリメントのみです");
                         }
 
                     }
@@ -161,7 +173,7 @@ namespace Kecaknoah
                                 result.PushCode(KecaknoahILCodeType.Pop);
                                 break;
                             default:
-                                throw new InvalidOperationException("ステートメントにできる式は代入・呼び出し・インクリメント・デクリメントのみです");
+                                throw new InvalidOperationException("ステートメントにできる式はcoresume・代入・呼び出し・インクリメント・デクリメントのみです");
                         }
                     }
                     else if (i is KecaknoahUnaryExpressionAstNode)
@@ -178,12 +190,12 @@ namespace Kecaknoah
                                 result.PushCode(KecaknoahILCodeType.Pop);
                                 break;
                             default:
-                                throw new InvalidOperationException("ステートメントにできる式は代入・呼び出し・インクリメント・デクリメントのみです");
+                                throw new InvalidOperationException("ステートメントにできる式はcoresume・代入・呼び出し・インクリメント・デクリメントのみです");
                         }
                     }
                     else
                     {
-                        throw new InvalidOperationException("ステートメントにできる式は代入・呼び出し・インクリメント・デクリメントのみです");
+                        throw new InvalidOperationException("ステートメントにできる式はcoresume・代入・呼び出し・インクリメント・デクリメントのみです");
                     }
                 }
                 else if (i is KecaknoahLocalAstNode)
@@ -214,7 +226,8 @@ namespace Kecaknoah
                 {
                     var cd = i as KecaknoahCoroutineDeclareAstNode;
                     result.PushCodes(PrecompileExpression(cd.InitialExpression));
-                    result.PushCode(KecaknoahILCodeType.StartCoroutine, cd.Name);
+                    foreach (var pe in cd.ParameterExpressions) result.PushCodes(PrecompileExpression(pe));
+                    result.PushCode(new KecaknoahILCode { Type = KecaknoahILCodeType.StartCoroutine, StringValue = cd.Name, IntegerValue = cd.ParameterExpressions.Count });
                 }
                 else if (i is KecaknoahContinueAstNode)
                 {
@@ -343,7 +356,39 @@ namespace Kecaknoah
                         result.AddRange(PrecompileExpression(exp.ExpressionNode));
                         break;
                     case KecaknoahFactorType.CoroutineResume:
-                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.ResumeCoroutine, StringValue = exp.StringValue });
+                        if (exp.BooleanValue)
+                        {
+                            // state = coresume(cor, val)
+                            result.AddRange(PrecompileExpression(exp.ExpressionNode));
+                        }
+                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.ResumeCoroutine, StringValue = exp.StringValue, BooleanValue = exp.BooleanValue });
+                        break;
+                    case KecaknoahFactorType.Array:
+                        foreach (var i in exp.ElementNodes) result.AddRange(PrecompileExpression(i));
+                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.MakeArray, IntegerValue = exp.ElementNodes.Count });
+                        break;
+                    case KecaknoahFactorType.Lambda:
+                        var lma = exp.ElementNodes.Select(p => ((KecaknoahFactorExpressionAstNode)p).StringValue).ToList();
+                        var name = $"Lambda-{Guid.NewGuid().ToString().Substring(0, 17)}";
+                        var func = new KecaknoahScriptMethodInfo(name);
+                        var eil = PrecompileExpression(exp.ExpressionNode);
+                        eil.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Return });
+                        foreach (var i in eil.Where(p => p.Type == KecaknoahILCodeType.LoadObject && lma.Contains(p.StringValue)))
+                        {
+                            i.Type = KecaknoahILCodeType.PushArgument;
+                            i.IntegerValue = lma.IndexOf(i.StringValue);
+                        }
+                        func.Codes = new KecaknoahIL();
+                        func.Codes.PushCodes(eil);
+                        if (cuc.Count == 0)
+                        {
+                            current.methods.Add(func);
+                        }
+                        else
+                        {
+                            cuc.Peek().AddInstanceMethod(func);
+                        }
+                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = name });
                         break;
                 }
             }

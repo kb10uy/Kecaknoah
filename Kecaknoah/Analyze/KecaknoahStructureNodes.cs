@@ -209,16 +209,21 @@ namespace Kecaknoah.Analyze
         public string Name { get; protected internal set; } = "";
 
         /// <summary>
-        /// 初期値定義がある場合はその式のノードが格納されます。
+        /// コルーチンのノードを取得します。
         /// </summary>
         public KecaknoahExpressionAstNode InitialExpression { get; protected internal set; }
+
+        /// <summary>
+        /// 引数がある場合はその式のノードが格納されます。
+        /// </summary>
+        public IList<KecaknoahExpressionAstNode> ParameterExpressions { get; } = new List<KecaknoahExpressionAstNode>();
 
         /// <summary>
         /// インスタンスを初期化します。
         /// </summary>
         protected internal KecaknoahCoroutineDeclareAstNode()
         {
-            Type = KecaknoahAstNodeType.LocalStatement;
+            Type = KecaknoahAstNodeType.CoroutineStatement;
         }
 
         /// <summary>

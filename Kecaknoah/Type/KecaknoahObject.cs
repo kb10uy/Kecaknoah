@@ -125,38 +125,10 @@ namespace Kecaknoah.Type
         }
 
 #pragma warning disable 1591
-        public override int GetHashCode() => Value.GetHashCode();
-        public override bool Equals(object obj) => ReferenceEquals(this, obj);
-
         public virtual object Clone()
         {
             throw new NotImplementedException();
         }
-
-        public static KecaknoahObject operator +(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator -(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator *(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator /(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator %(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator &(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator ^(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator |(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator <<(KecaknoahObject v1, int v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator >>(KecaknoahObject v1, int v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator ==(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator !=(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator <(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator >(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator <=(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static KecaknoahObject operator >=(KecaknoahObject v1, KecaknoahObject v2) => KecaknoahNil.Instance;
-        public static bool operator true(KecaknoahObject v1) => false;
-        public static bool operator false(KecaknoahObject v1) => false;
-
-
-        public static explicit operator long (KecaknoahObject obj) => ((KecaknoahInteger)obj).Value;
-        public static explicit operator double (KecaknoahObject obj) => ((KecaknoahFloat)obj).Value;
-        public static explicit operator string (KecaknoahObject obj) => ((KecaknoahString)obj).Value;
-        public static explicit operator bool (KecaknoahObject obj) => ((KecaknoahBoolean)obj).Value;
 #pragma warning restore 1591
 
     }

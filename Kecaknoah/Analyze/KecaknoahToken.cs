@@ -332,11 +332,11 @@ namespace Kecaknoah.Analyze
         /// <summary>
         /// ?
         /// </summary>
-        ConditionalQuestion,
+        Question,
         /// <summary>
         /// :
         /// </summary>
-        ConditionalElse,
+        Colon,
         /// <summary>
         /// ||=
         /// </summary>
@@ -373,5 +373,9 @@ namespace Kecaknoah.Analyze
         /// yield
         /// </summary>
         YieldKeyword,
+        /// <summary>
+        /// lambda
+        /// </summary>
+        Lambda,
     }
 }

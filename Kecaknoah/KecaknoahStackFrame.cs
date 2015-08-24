@@ -16,12 +16,12 @@ namespace Kecaknoah
         /// <remarks>再開可能な状態で操作すると不具合が発生する可能性があります。</remarks>
         public IDictionary<string, KecaknoahReference> Locals => locals;
 
-        private Dictionary<string, KecaknoahStackFrame> cors = new Dictionary<string, KecaknoahStackFrame>();
+        private Dictionary<string, KecaknoahCoroutineFrame> cors = new Dictionary<string, KecaknoahCoroutineFrame>();
         /// <summary>
         /// 起動中のコルーチンの参照を取得します。
         /// </summary>
         /// <remarks>再開可能な状態で操作すると不具合が発生する可能性があります。</remarks>
-        public IDictionary<string, KecaknoahStackFrame> Coroutines => cors;
+        public IDictionary<string, KecaknoahCoroutineFrame> Coroutines => cors;
 
         /// <summary>
         /// 実行中の<see cref="KecaknoahILCode"/>のリストを取得します。
@@ -245,12 +245,20 @@ namespace Kecaknoah
 
                     //特殊----------------------------------------------------------------------------
                     case KecaknoahILCodeType.StartCoroutine:
-                        var ct = ReferenceStack.Pop().RawObject as KecaknoahScriptFunction;
-                        if (ct==null)
+                        args = new Stack<KecaknoahObject>();
+                        for (int i = 0; i < c.IntegerValue; i++) args.Push(ReferenceStack.Pop().RawObject);
+                        var ct = ReferenceStack.Peek().RawObject as KecaknoahScriptFunction;
+                        var ict = ReferenceStack.Peek().RawObject as KecaknoahInteropFunction;
+                        ReferenceStack.Pop();
+                        if (ct.Equals(null) && ict.Equals(null)) throw new InvalidOperationException("スクリプト上のメソッド以外はコルーチン化出来ません");
+                        if (!ct.Equals(null))
                         {
-                            throw new InvalidOperationException("スクリプト上のメソッド以外はコルーチン化出来ません");
+                            cors[c.StringValue] = new KecaknoahScriptCoroutineFrame(RunningContext, ct, args.ToArray());
                         }
-                        cors[c.StringValue] = new KecaknoahStackFrame(RunningContext, ct.BaseMethod.Codes);
+                        else
+                        {
+                            cors[c.StringValue] = new KecaknoahInteropCoroutineFrame(RunningContext, ict, args.ToArray());
+                        }
                         break;
                     case KecaknoahILCodeType.ResumeCoroutine:
                         var cobj = cors[c.StringValue];
@@ -260,11 +268,29 @@ namespace Kecaknoah
                             break;
                         }
                         var cr = cobj.Resume();
-                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(cobj.ReturningObject));
-                        if (!cr)
+                        if (c.BooleanValue)
+                        {
+                            //2引数
+                            var vas = ReferenceStack.Pop();
+                            vas.RawObject = cr.ReturningObject;
+                            ReferenceStack.Push(KecaknoahReference.CreateRightReference(cr.CanResume.AsKecaknoahBoolean()));
+                        }
+                        else
+                        {
+                            //1引数
+                            ReferenceStack.Push(KecaknoahReference.CreateRightReference(cr.ReturningObject));
+                        }
+                        if (!cr.CanResume)
                         {
                             cors[c.StringValue] = null;
                         }
+                        break;
+                    case KecaknoahILCodeType.MakeArray:
+                        var ars = new Stack<KecaknoahObject>();
+                        for (int i = 0; i < c.IntegerValue; i++) ars.Push(ReferenceStack.Pop().RawObject);
+                        var arr = new KecaknoahArray(new[] { (int)c.IntegerValue });
+                        for (int i = 0; i < c.IntegerValue; i++) arr.array[i] = new KecaknoahReference { IsLeftValue = true, RawObject = ars.Pop() };
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(arr));
                         break;
                     case KecaknoahILCodeType.Jump:
                         ProgramCounter = (int)c.IntegerValue;

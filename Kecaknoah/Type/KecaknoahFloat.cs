@@ -47,32 +47,89 @@ namespace Kecaknoah.Type
         /// <returns></returns>
         protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
+            if (target.Type == TypeCode.Int64)
+            {
+                return ExpressionOperation(op, (KecaknoahInteger)target);
+            }
+            else if (target.Type == TypeCode.Double)
+            {
+                return ExpressionOperation(op, (KecaknoahFloat)target);
+            }
+            else
+            {
+                switch (op)
+                {
+                    case KecaknoahILCodeType.Equal:
+                        return KecaknoahBoolean.False;
+                    case KecaknoahILCodeType.NotEqual:
+                        return KecaknoahBoolean.True;
+                    default:
+                        return KecaknoahNil.Instance;
+                }
+            }
+        }
+
+        private KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahInteger target)
+        {
             switch (op)
             {
                 case KecaknoahILCodeType.Negative:
                     return (-Value).AsKecaknoahFloat();
                 case KecaknoahILCodeType.Plus:
-                    return (dynamic)this + (dynamic)target;
+                    return (Value + target.Value).AsKecaknoahFloat();
                 case KecaknoahILCodeType.Minus:
-                    return (dynamic)this - (dynamic)target;
+                    return (Value - target.Value).AsKecaknoahFloat();
                 case KecaknoahILCodeType.Multiply:
-                    return (dynamic)this * (dynamic)target;
+                    return (Value * target.Value).AsKecaknoahFloat();
                 case KecaknoahILCodeType.Divide:
-                    return (dynamic)this / (dynamic)target;
+                    return (Value / target.Value).AsKecaknoahFloat();
                 case KecaknoahILCodeType.Modular:
-                    return (dynamic)this % (dynamic)target;
+                    return (Value % target.Value).AsKecaknoahFloat();
                 case KecaknoahILCodeType.Equal:
-                    return (dynamic)this == (dynamic)target;
+                    return (Value == target.Value).AsKecaknoahBoolean();
                 case KecaknoahILCodeType.NotEqual:
-                    return (dynamic)this != (dynamic)target;
+                    return (Value != target.Value).AsKecaknoahBoolean();
                 case KecaknoahILCodeType.Greater:
-                    return (dynamic)this > (dynamic)target;
+                    return (Value > target.Value).AsKecaknoahBoolean();
                 case KecaknoahILCodeType.Lesser:
-                    return (dynamic)this < (dynamic)target;
+                    return (Value < target.Value).AsKecaknoahBoolean();
                 case KecaknoahILCodeType.GreaterEqual:
-                    return (dynamic)this >= (dynamic)target;
+                    return (Value >= target.Value).AsKecaknoahBoolean();
                 case KecaknoahILCodeType.LesserEqual:
-                    return (dynamic)this <= (dynamic)target;
+                    return (Value <= target.Value).AsKecaknoahBoolean();
+                default:
+                    return KecaknoahNil.Instance;
+            }
+        }
+
+        private KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahFloat target)
+        {
+            switch (op)
+            {
+                case KecaknoahILCodeType.Negative:
+                    return (-Value).AsKecaknoahFloat();
+                case KecaknoahILCodeType.Plus:
+                    return (Value + target.Value).AsKecaknoahFloat();
+                case KecaknoahILCodeType.Minus:
+                    return (Value - target.Value).AsKecaknoahFloat();
+                case KecaknoahILCodeType.Multiply:
+                    return (Value * target.Value).AsKecaknoahFloat();
+                case KecaknoahILCodeType.Divide:
+                    return (Value / target.Value).AsKecaknoahFloat();
+                case KecaknoahILCodeType.Modular:
+                    return (Value % target.Value).AsKecaknoahFloat();
+                case KecaknoahILCodeType.Equal:
+                    return (Value == target.Value).AsKecaknoahBoolean();
+                case KecaknoahILCodeType.NotEqual:
+                    return (Value != target.Value).AsKecaknoahBoolean();
+                case KecaknoahILCodeType.Greater:
+                    return (Value > target.Value).AsKecaknoahBoolean();
+                case KecaknoahILCodeType.Lesser:
+                    return (Value < target.Value).AsKecaknoahBoolean();
+                case KecaknoahILCodeType.GreaterEqual:
+                    return (Value >= target.Value).AsKecaknoahBoolean();
+                case KecaknoahILCodeType.LesserEqual:
+                    return (Value <= target.Value).AsKecaknoahBoolean();
                 default:
                     return KecaknoahNil.Instance;
             }
@@ -105,38 +162,7 @@ namespace Kecaknoah.Type
         }
 
 #pragma warning disable 1591
-        public override int GetHashCode() => Value.GetHashCode();
-        public override bool Equals(object obj) => ReferenceEquals(this, obj);
         public override object Clone() => Value.AsKecaknoahFloat();
-
-        public static KecaknoahObject operator +(KecaknoahFloat v1, KecaknoahFloat v2) => (v1.Value + v2.Value).AsKecaknoahFloat();
-        public static KecaknoahObject operator -(KecaknoahFloat v1, KecaknoahFloat v2) => (v1.Value - v2.Value).AsKecaknoahFloat();
-        public static KecaknoahObject operator *(KecaknoahFloat v1, KecaknoahFloat v2) => (v1.Value * v2.Value).AsKecaknoahFloat();
-        public static KecaknoahObject operator /(KecaknoahFloat v1, KecaknoahFloat v2) => (v1.Value / v2.Value).AsKecaknoahFloat();
-        public static KecaknoahObject operator %(KecaknoahFloat v1, KecaknoahFloat v2) => (v1.Value % v2.Value).AsKecaknoahFloat();
-        public static KecaknoahObject operator +(KecaknoahFloat v1, KecaknoahInteger v2) => (v1.Value + v2.Value).AsKecaknoahFloat();
-        public static KecaknoahObject operator -(KecaknoahFloat v1, KecaknoahInteger v2) => (v1.Value - v2.Value).AsKecaknoahFloat();
-        public static KecaknoahObject operator *(KecaknoahFloat v1, KecaknoahInteger v2) => (v1.Value * v2.Value).AsKecaknoahFloat();
-        public static KecaknoahObject operator /(KecaknoahFloat v1, KecaknoahInteger v2) => (v1.Value / v2.Value).AsKecaknoahFloat();
-        public static KecaknoahObject operator %(KecaknoahInteger v1, KecaknoahFloat v2) => (v1.Value % v2.Value).AsKecaknoahFloat();
-
-        public static KecaknoahObject operator ==(KecaknoahFloat v1, KecaknoahFloat v2) => (v1.Value == v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator !=(KecaknoahFloat v1, KecaknoahFloat v2) => (v1.Value != v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator <(KecaknoahFloat v1, KecaknoahFloat v2) => (v1.Value < v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator >(KecaknoahFloat v1, KecaknoahFloat v2) => (v1.Value > v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator <=(KecaknoahFloat v1, KecaknoahFloat v2) => (v1.Value <= v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator >=(KecaknoahFloat v1, KecaknoahFloat v2) => (v1.Value >= v2.Value).AsKecaknoahBoolean();
-
-        public static KecaknoahObject operator ==(KecaknoahFloat v1, KecaknoahInteger v2) => (v1.Value == v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator !=(KecaknoahFloat v1, KecaknoahInteger v2) => (v1.Value != v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator <(KecaknoahFloat v1, KecaknoahInteger v2) => (v1.Value < v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator >(KecaknoahFloat v1, KecaknoahInteger v2) => (v1.Value > v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator <=(KecaknoahFloat v1, KecaknoahInteger v2) => (v1.Value <= v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator >=(KecaknoahFloat v1, KecaknoahInteger v2) => (v1.Value >= v2.Value).AsKecaknoahBoolean();
-
-        public static explicit operator double (KecaknoahFloat v1) => v1.Value;
-        public static explicit operator KecaknoahInteger(KecaknoahFloat v1) => ((long)v1.Value).AsKecaknoahInteger();
-        public static explicit operator KecaknoahFloat(KecaknoahInteger v1) => ((double)v1.Value).AsKecaknoahFloat();
 #pragma warning restore 1591
     }
 }

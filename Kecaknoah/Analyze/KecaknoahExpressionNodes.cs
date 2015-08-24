@@ -63,6 +63,11 @@ namespace Kecaknoah.Analyze
         public KecaknoahExpressionAstNode ExpressionNode { get; protected internal set; }
 
         /// <summary>
+        /// 配列要素のノードを取得します。
+        /// </summary>
+        public IList<KecaknoahExpressionAstNode> ElementNodes { get; protected internal set; } = new List<KecaknoahExpressionAstNode>();
+
+        /// <summary>
         /// 知るか
         /// </summary>
         public KecaknoahFactorExpressionAstNode() : base() { }
@@ -102,6 +107,15 @@ namespace Kecaknoah.Analyze
                     break;
                 case KecaknoahFactorType.VariableArguments:
                     result.Add($"VariableArguments");
+                    break;
+                case KecaknoahFactorType.CoroutineResume:
+                    result.Add($"Resume {StringValue}");
+                    break;
+                case KecaknoahFactorType.Array:
+                    result.Add($"Array");
+                    break;
+                case KecaknoahFactorType.Lambda:
+                    result.Add($"Array");
                     break;
             }
             return result;
@@ -249,44 +263,6 @@ namespace Kecaknoah.Analyze
     }
 
     /// <summary>
-    /// 三項演算子ノード
-    /// </summary>
-    public class KecaknoahConditionalExpressionAstNode : KecaknoahExpressionAstNode
-    {
-        /// <summary>
-        /// 条件式
-        /// </summary>
-        public KecaknoahExpressionAstNode ConditionNode { get; protected internal set; }
-
-        /// <summary>
-        /// trueの場合の式
-        /// </summary>
-        public KecaknoahExpressionAstNode TrueValueNode { get; protected internal set; }
-
-        /// <summary>
-        /// falseの場合の式
-        /// </summary>
-        public KecaknoahExpressionAstNode FalseValueNode { get; protected internal set; }
-
-        /// <summary>
-        /// 現在のオブジェクトを表す文字列を返します。
-        /// </summary>
-        /// <returns>文字列</returns>
-        public override IReadOnlyList<string> ToDebugStringList()
-        {
-            var result = new List<string>();
-            result.Add("Conditional:");
-            result.Add("| [Condition]");
-            result.AddRange(ConditionNode.ToDebugStringList().Select(p => "| " + p));
-            result.Add("| [True Expression]");
-            result.AddRange(TrueValueNode.ToDebugStringList().Select(p => "| " + p));
-            result.Add("| [False Expression]");
-            result.AddRange(FalseValueNode.ToDebugStringList().Select(p => "| " + p));
-            return result;
-        }
-    }
-
-    /// <summary>
     /// 因子の種類を定義します。
     /// </summary>
     public enum KecaknoahFactorType
@@ -335,6 +311,14 @@ namespace Kecaknoah.Analyze
         /// coresume文
         /// </summary>
         CoroutineResume,
+        /// <summary>
+        /// 配列
+        /// </summary>
+        Array,
+        /// <summary>
+        /// ラムダ式
+        /// </summary>
+        Lambda,
     }
 
     /// <summary>

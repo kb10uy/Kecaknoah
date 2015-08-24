@@ -28,6 +28,7 @@ namespace Kecaknoah
             result.RegisterFunction(CreateArray, "array");
             result.RegisterFunction(WriteLine, "println");
             result.RegisterFunction(Write, "print");
+            result.RegisterFunction(Format, "format");
             result.RegisterFunction(Exit, "exit");
             modules[name] = result;
             return result;
@@ -42,10 +43,17 @@ namespace Kecaknoah
             return result.NoResume();
         }
 
+        private KecaknoahFunctionResult Format(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
+        {
+            Console.WriteLine(args[0].ToString());
+            return KecaknoahNil.Instance.NoResume();
+        }
+
         private KecaknoahFunctionResult WriteLine(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
-            Console.WriteLine(args[0]);
-            return KecaknoahNil.Instance.NoResume();
+            var b = args[0].ToString();
+            var ar = b.Skip(1).Select(p => p.ToString()).ToArray();
+            return string.Format(b, ar).AsKecaknoahString().NoResume();
         }
 
         private KecaknoahFunctionResult Write(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)

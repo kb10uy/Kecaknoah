@@ -20,27 +20,44 @@ namespace Kecaknoah.Type
         /// <returns></returns>
         protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
-            switch (op)
+            if (target.Type == TypeCode.Boolean)
             {
-                case KecaknoahILCodeType.Not:
-                    return (!Value).AsKecaknoahBoolean();
-                case KecaknoahILCodeType.AndAlso:
-                    return (dynamic)this && (dynamic)target;
-                case KecaknoahILCodeType.OrElse:
-                    return (dynamic)this || (dynamic)target;
-                case KecaknoahILCodeType.And:
-                    return (dynamic)this & (dynamic)target;
-                case KecaknoahILCodeType.Or:
-                    return (dynamic)this | (dynamic)target;
-                case KecaknoahILCodeType.Xor:
-                    return (dynamic)this ^ (dynamic)target;
-                case KecaknoahILCodeType.Equal:
-                    return (dynamic)this == (dynamic)target;
-                case KecaknoahILCodeType.NotEqual:
-                    return (dynamic)this != (dynamic)target;
-                default:
-                    return KecaknoahNil.Instance;
+                var t = (KecaknoahBoolean)target;
+                switch (op)
+                {
+                    case KecaknoahILCodeType.Not:
+                        return (!Value).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.AndAlso:
+                        return (Value && t.Value).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.OrElse:
+                        return (Value || t.Value).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.And:
+                        return (Value & t.Value).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.Or:
+                        return (Value | t.Value).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.Xor:
+                        return (Value ^ t.Value).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.Equal:
+                        return (Value == t.Value).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.NotEqual:
+                        return (Value != t.Value).AsKecaknoahBoolean();
+                    default:
+                        return KecaknoahNil.Instance;
+                }
             }
+            else
+            {
+                switch (op)
+                {
+                    case KecaknoahILCodeType.Equal:
+                        return False;
+                    case KecaknoahILCodeType.NotEqual:
+                        return True;
+                    default:
+                        return KecaknoahNil.Instance;
+                }
+            }
+
         }
 
         /// <summary>
@@ -64,21 +81,18 @@ namespace Kecaknoah.Type
             Type = TypeCode.Boolean;
         }
 
+        /// <summary>
+        /// true。
+        /// </summary>
+        public static KecaknoahBoolean True { get; } = true.AsKecaknoahBoolean();
+
+        /// <summary>
+        /// false。
+        /// </summary>
+        public static KecaknoahBoolean False { get; } = false.AsKecaknoahBoolean();
 
 #pragma warning disable 1591
-        public override int GetHashCode() => Value.GetHashCode();
-        public override bool Equals(object obj) => ReferenceEquals(this, obj);
         public override object Clone() => Value.AsKecaknoahBoolean();
-
-        public static KecaknoahObject operator &(KecaknoahBoolean v1, KecaknoahBoolean v2) => (v1.Value & v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator ^(KecaknoahBoolean v1, KecaknoahBoolean v2) => (v1.Value ^ v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator |(KecaknoahBoolean v1, KecaknoahBoolean v2) => (v1.Value | v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator ==(KecaknoahBoolean v1, KecaknoahBoolean v2) => (v1.Value == v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator !=(KecaknoahBoolean v1, KecaknoahBoolean v2) => (v1.Value != v2.Value).AsKecaknoahBoolean();
-        public static bool operator true(KecaknoahBoolean v1) => v1.Value;
-        public static bool operator false(KecaknoahBoolean v1) => !v1.Value;
-
-        public static explicit operator bool (KecaknoahBoolean v1) => v1.Value;
 #pragma warning restore 1591
 
     }

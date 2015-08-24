@@ -196,6 +196,8 @@ namespace Kecaknoah
                     return $"Push Argument#{IntegerValue}";
                 case KecaknoahILCodeType.LoadVarg:
                     return $"Load Vargs with {IntegerValue} arguments";
+                case KecaknoahILCodeType.StartCoroutine:
+                    return $"Start \"{StringValue}\" with {IntegerValue} arguments";
                 case KecaknoahILCodeType.ResumeCoroutine:
                     return $"Resume \"{StringValue}\"";
                 default:
@@ -385,6 +387,10 @@ namespace Kecaknoah
         /// rcr
         /// </summary>
         ResumeCoroutine,
+        /// <summary>
+        /// arr
+        /// </summary>
+        MakeArray,
 
         /// <summary>
         /// ada

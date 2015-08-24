@@ -60,24 +60,40 @@ namespace Kecaknoah.Type
         /// <returns></returns>
         protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
-            switch (op)
+            if (target.Type == TypeCode.String)
             {
-                case KecaknoahILCodeType.Plus:
-                    return (dynamic)this + (dynamic)target;
-                case KecaknoahILCodeType.Equal:
-                    return (dynamic)this == (dynamic)target;
-                case KecaknoahILCodeType.NotEqual:
-                    return (dynamic)this != (dynamic)target;
-                case KecaknoahILCodeType.Greater:
-                    return (dynamic)this > (dynamic)target;
-                case KecaknoahILCodeType.Lesser:
-                    return (dynamic)this < (dynamic)target;
-                case KecaknoahILCodeType.GreaterEqual:
-                    return (dynamic)this >= (dynamic)target;
-                case KecaknoahILCodeType.LesserEqual:
-                    return (dynamic)this <= (dynamic)target;
-                default:
-                    return KecaknoahNil.Instance;
+                var t = (KecaknoahString)target;
+                switch (op)
+                {
+                    case KecaknoahILCodeType.Plus:
+                        return (Value + t.Value).AsKecaknoahString();
+                    case KecaknoahILCodeType.Equal:
+                        return (Value == t.Value).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.NotEqual:
+                        return (Value != t.Value).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.Greater:
+                        return (Value.CompareTo(t.Value) > 0).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.Lesser:
+                        return (Value.CompareTo(t.Value) < 0).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.GreaterEqual:
+                        return (Value.CompareTo(t.Value) >= 0).AsKecaknoahBoolean();
+                    case KecaknoahILCodeType.LesserEqual:
+                        return (Value.CompareTo(t.Value) <= 0).AsKecaknoahBoolean();
+                    default:
+                        return KecaknoahNil.Instance;
+                }
+            }
+            else
+            {
+                switch (op)
+                {
+                    case KecaknoahILCodeType.Equal:
+                        return KecaknoahBoolean.False;
+                    case KecaknoahILCodeType.NotEqual:
+                        return KecaknoahBoolean.True;
+                    default:
+                        return KecaknoahNil.Instance;
+                }
             }
         }
 
@@ -123,20 +139,7 @@ namespace Kecaknoah.Type
         private KecaknoahFunctionResult InstanceReplace(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => self.ToString().Replace(args[0].ToString(), args[1].ToString()).AsKecaknoahString().NoResume();
 
 #pragma warning disable 1591
-        public override int GetHashCode() => Value.GetHashCode();
-        public override bool Equals(object obj) => ReferenceEquals(this, obj);
         public override object Clone() => Value.AsKecaknoahString();
-
-        public static KecaknoahObject operator +(KecaknoahString v1, KecaknoahString v2) => (v1.Value + v2.Value).AsKecaknoahString();
-
-        public static KecaknoahObject operator ==(KecaknoahString v1, KecaknoahString v2) => (v1.Value == v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator !=(KecaknoahString v1, KecaknoahString v2) => (v1.Value != v2.Value).AsKecaknoahBoolean();
-        public static KecaknoahObject operator <(KecaknoahString v1, KecaknoahString v2) => (v1.Value.CompareTo(v2.Value) < 0).AsKecaknoahBoolean();
-        public static KecaknoahObject operator >(KecaknoahString v1, KecaknoahString v2) => (v1.Value.CompareTo(v2.Value) > 0).AsKecaknoahBoolean();
-        public static KecaknoahObject operator <=(KecaknoahString v1, KecaknoahString v2) => (v1.Value.CompareTo(v2.Value) <= 0).AsKecaknoahBoolean();
-        public static KecaknoahObject operator >=(KecaknoahString v1, KecaknoahString v2) => (v1.Value.CompareTo(v2.Value) >= 0).AsKecaknoahBoolean();
-
-        public static explicit operator string (KecaknoahString v1) => v1.Value;
 #pragma warning restore 1591
     }
 }
