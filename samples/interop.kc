@@ -2,6 +2,6 @@
 //using文実装しないとね
 //あと論理行の最後には;が付けられる
 //Luaと同じスタンス
-func do
+func main
   Console.WriteLine("Hello, World!");
 endfunc

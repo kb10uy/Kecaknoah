@@ -1,6 +1,6 @@
 //FizzBuzzサンプル
-// いわゆるトップレベルに記述するものはdoという特別なメソッドに記述
-func do
+// いわゆるトップレベルに記述するものはmainという特別なメソッドに記述
+func main
   for(local i = 1; i <= 100; i++)
     if (i % 15 == 0) then
       print("FizzBuzz")
