@@ -338,6 +338,40 @@ namespace Kecaknoah.Analyze
     }
 
     /// <summary>
+    /// foreach文だよ
+    /// </summary>
+    public class KecaknoahForeachAstNode : KecaknoahLoopAstNode
+    {
+        /// <summary>
+        /// ソースの式を取得します。
+        /// </summary>
+        public KecaknoahExpressionAstNode Source { get; protected internal set; }
+
+        /// <summary>
+        /// コルーチンforeachのコルーチン引数を取得します。
+        /// </summary>
+        public IList<KecaknoahExpressionAstNode> CoroutineArguments { get; } = new List<KecaknoahExpressionAstNode>();
+
+        /// <summary>
+        /// 要素を格納する変数名を取得します。
+        /// </summary>
+        public string ElementVariableName { get; protected internal set; } = "";
+
+        /// <summary>
+        /// foreach ofのコルーチンforeachならtrueです
+        /// </summary>
+        public bool IsCoroutineSource { get; protected internal set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public KecaknoahForeachAstNode()
+        {
+            Type = KecaknoahAstNodeType.ForeachStatement;
+        }
+    }
+
+    /// <summary>
     /// for文です
     /// </summary>
     public class KecaknoahForAstNode : KecaknoahLoopAstNode

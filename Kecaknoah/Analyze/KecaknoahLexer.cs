@@ -35,6 +35,9 @@ namespace Kecaknoah.Analyze
             new Tuple<string, KecaknoahTokenType>("next", KecaknoahTokenType.NextKeyword),
             new Tuple<string, KecaknoahTokenType>("while", KecaknoahTokenType.WhileKeyword),
             new Tuple<string, KecaknoahTokenType>("do", KecaknoahTokenType.DoKeyword),
+            new Tuple<string, KecaknoahTokenType>("foreach", KecaknoahTokenType.ForeachKeyword),
+            new Tuple<string, KecaknoahTokenType>("in", KecaknoahTokenType.InKeyword),
+            new Tuple<string, KecaknoahTokenType>("of", KecaknoahTokenType.OfKeyword),
             new Tuple<string, KecaknoahTokenType>("local", KecaknoahTokenType.LocalKeyword),
             //new Tuple<string, KecaknoahTokenType>("self", KecaknoahTokenType.SelfKeyword),
             new Tuple<string, KecaknoahTokenType>("true", KecaknoahTokenType.TrueKeyword),
@@ -100,7 +103,7 @@ namespace Kecaknoah.Analyze
             new Tuple<string, KecaknoahTokenType>("]", KecaknoahTokenType.BracketEnd),
         }.OrderByDescending(p => p.Item1.Length).ThenBy(p => p.Item1);
 
-        private static Regex DecimalNumberPattern = new Regex("[0-9_]+(\\.[0-9_]+)?f?");
+        private static Regex DecimalNumberPattern = new Regex("[0-9_]+(\\.[0-9_]+)?");
         private static Regex BinaryNumberPattern = new Regex("0b[01]+");
         private static Regex OctadecimalNumberPattern = new Regex("0[oO][0-7]+");
         private static Regex HexadecimalNumberPattern = new Regex("0[xX][0-9a-fA-F]+");

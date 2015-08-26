@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Kecaknoah.Type
+namespace Kecaknoah
 {
     /// <summary>
     /// Kecaknoahで定義されるクラスを定義します。

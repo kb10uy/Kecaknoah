@@ -48,12 +48,17 @@ namespace Base36Encoder
                 negative = true;
                 value = value.Substring(1, value.Length - 1);
             }
+            //overflow対策
+            if (value.Length > 12) value = value.Substring(value.Length - 12);
             if (value.Any(c => !Digits.Contains(c)))
                 throw new ArgumentException("Invalid value: \"" + value + "\".");
-            var decoded = 0L;
-            for (var i = 0; i < value.Length; ++i)
-                decoded += Digits.IndexOf(value[i]) * (long)BigInteger.Pow(Digits.Length, value.Length - i - 1);
-            return negative ? decoded * -1 : decoded;
+            unchecked
+            {
+                var decoded = 0L;
+                for (var i = 0; i < value.Length; ++i)
+                    decoded += Digits.IndexOf(value[i]) * (long)BigInteger.Pow(Digits.Length, value.Length - i - 1);
+                return negative ? decoded * -1 : decoded;
+            }
         }
 
         public static string Encode(long value)

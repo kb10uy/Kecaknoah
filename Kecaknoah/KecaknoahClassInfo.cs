@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Kecaknoah.Type
+namespace Kecaknoah
 {
     /// <summary>
     /// Kecakanoahで利用されるクラスの情報を提供します。

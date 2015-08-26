@@ -60,17 +60,7 @@ namespace Kecaknoah.Type
 
         }
 
-        /// <summary>
-        /// 現在の以下略。
-        /// </summary>
-        /// <returns>知るか</returns>
-        public override string ToString() => Value.ToString();
-
-        /// <summary>
-        /// 可能ならば<see cref="bool"/>型に変換します。
-        /// </summary>
-        /// <returns></returns>
-        public override bool ToBoolean() => Value;
+        
 
         /// <summary>
         /// 新しいインスタンスを生成します。
@@ -93,6 +83,15 @@ namespace Kecaknoah.Type
 
 #pragma warning disable 1591
         public override object Clone() => Value.AsKecaknoahBoolean();
+        public override KecaknoahObject AsByValValue() => Value.AsKecaknoahBoolean();
+        public override bool Equals(object obj)
+        {
+            var t = obj as KecaknoahBoolean;
+            return t != null && t.Value == Value;
+        }
+        public override int GetHashCode() => Value.GetHashCode();
+        public override string ToString() => Value.ToString();
+        public override bool ToBoolean() => Value;
 #pragma warning restore 1591
 
     }

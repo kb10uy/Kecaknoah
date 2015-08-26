@@ -15,10 +15,15 @@ namespace Kecaknoah.Type
         /// <summary>
         /// このオブジェクトの型を取得・設定します。
         /// </summary>
-        public TypeCode Type { get; set; }
+        public TypeCode Type { get; protected internal set; }
 
         /// <summary>
-        /// 特定の名前を持つメンバーに対してアクセスを試み、値を取得します。
+        /// 追加の型情報を取得します。
+        /// </summary>
+        public string ExtraType { get; protected internal set; } = "";
+
+        /// <summary>
+        /// 特定の名前を持つメンバーに対してアクセスを試み、参照を取得します。
         /// </summary>
         /// <param name="name">メンバー名</param>
         /// <returns>アクセスできる場合は対象のオブジェクト</returns>
@@ -41,7 +46,7 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <param name="name">メンバー名</param>
         /// <returns>アクセスできる場合は対象のオブジェクト</returns>
-        protected KecaknoahObject this[string name]
+        public KecaknoahObject this[string name]
         {
             get { return GetMemberReference(name).RawObject; }
             set { GetMemberReference(name).RawObject = value; }
@@ -98,6 +103,12 @@ namespace Kecaknoah.Type
         public override string ToString() => "KecaknoahObject";
 
         /// <summary>
+        /// 可能ならば<see cref="int"/>型に変換します。
+        /// </summary>
+        /// <returns></returns>
+        public int ToInt32() => (int)ToInt64();
+
+        /// <summary>
         /// 可能ならば<see cref="long"/>型に変換します。
         /// </summary>
         /// <returns></returns>
@@ -124,11 +135,18 @@ namespace Kecaknoah.Type
             throw new InvalidCastException();
         }
 
+        /// <summary>
+        /// 値渡しの時に渡されるオブジェクトを生成します。
+        /// 値型の場合はクローンが、参照型の場合には自分自身が帰ります。
+        /// </summary>
+        /// <returns></returns>
+        public virtual KecaknoahObject AsByValValue() => this;
+
 #pragma warning disable 1591
-        public virtual object Clone()
-        {
-            throw new NotImplementedException();
-        }
+        public virtual object Clone() => this;
+
+        public override bool Equals(object obj) => ReferenceEquals(this, obj);
+        public override int GetHashCode() => base.GetHashCode();
 #pragma warning restore 1591
 
     }

@@ -1,4 +1,5 @@
 ﻿using Kecaknoah.Type;
+using System;
 using System.Collections.Generic;
 
 namespace Kecaknoah
@@ -73,6 +74,25 @@ namespace Kecaknoah
             return KecaknoahNil.Reference;
         }
 
+
+        /// <summary>
+        /// プリコンパイルしたソースコードを登録します。
+        /// </summary>
+        /// <param name="src">登録する<see cref="KecaknoahSource"/></param>
+        public void RegisterSource(KecaknoahSource src)
+        {
+            foreach (var c in src.Classes)
+            {
+                classes.Add(c);
+                classReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahScriptClassObject(c)));
+            }
+            foreach (var m in src.TopLevelMethods)
+            {
+                topMethods.Add(m);
+                methodReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahScriptFunction(KecaknoahNil.Instance, m)));
+            }
+        }
+
         /// <summary>
         /// .NET上のKecaknoah連携クラスを登録します。
         /// </summary>
@@ -107,21 +127,101 @@ namespace Kecaknoah
         }
 
         /// <summary>
-        /// プリコンパイルしたソースコードを登録します。
+        /// .NETメソッドをトップレベルに登録します。
         /// </summary>
-        /// <param name="src">登録する<see cref="KecaknoahSource"/></param>
-        public void RegisterSource(KecaknoahSource src)
+        /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
+        /// <param name="name">メソッド名</param>
+        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], KecaknoahObject> func, string name)
         {
-            foreach (var c in src.Classes)
-            {
-                classes.Add(c);
-                classReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahScriptClassObject(c)));
-            }
-            foreach (var m in src.TopLevelMethods)
-            {
-                topMethods.Add(m);
-                methodReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahScriptFunction(KecaknoahNil.Instance, m)));
-            }
+            KecaknoahInteropDelegate wp =
+                (ctx, self, args) => func(self, args).NoResume();
+            var fo = new KecaknoahInteropMethodInfo(name, wp);
+            topMethods.Add(fo);
+            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+        }
+
+        /// <summary>
+        /// .NETメソッドをトップレベルに登録します。
+        /// </summary>
+        /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
+        /// <param name="name">メソッド名</param>
+        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], int> func, string name)
+        {
+            KecaknoahInteropDelegate wp =
+                (ctx, self, args) => func(self, args).AsKecaknoahInteger().NoResume();
+            var fo = new KecaknoahInteropMethodInfo(name, wp);
+            topMethods.Add(fo);
+            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+        }
+
+        /// <summary>
+        /// .NETメソッドをトップレベルに登録します。
+        /// </summary>
+        /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
+        /// <param name="name">メソッド名</param>
+        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], long> func, string name)
+        {
+            KecaknoahInteropDelegate wp =
+                (ctx, self, args) => func(self, args).AsKecaknoahInteger().NoResume();
+            var fo = new KecaknoahInteropMethodInfo(name, wp);
+            topMethods.Add(fo);
+            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+        }
+
+        /// <summary>
+        /// .NETメソッドをトップレベルに登録します。
+        /// </summary>
+        /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
+        /// <param name="name">メソッド名</param>
+        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], float> func, string name)
+        {
+            KecaknoahInteropDelegate wp =
+                (ctx, self, args) => ((double)func(self, args)).AsKecaknoahFloat().NoResume();
+            var fo = new KecaknoahInteropMethodInfo(name, wp);
+            topMethods.Add(fo);
+            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+        }
+
+        /// <summary>
+        /// .NETメソッドをトップレベルに登録します。
+        /// </summary>
+        /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
+        /// <param name="name">メソッド名</param>
+        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], double> func, string name)
+        {
+            KecaknoahInteropDelegate wp =
+                (ctx, self, args) => func(self, args).AsKecaknoahFloat().NoResume();
+            var fo = new KecaknoahInteropMethodInfo(name, wp);
+            topMethods.Add(fo);
+            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+        }
+
+        /// <summary>
+        /// .NETメソッドをトップレベルに登録します。
+        /// </summary>
+        /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
+        /// <param name="name">メソッド名</param>
+        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], bool> func, string name)
+        {
+            KecaknoahInteropDelegate wp =
+                (ctx, self, args) => func(self, args).AsKecaknoahBoolean().NoResume();
+            var fo = new KecaknoahInteropMethodInfo(name, wp);
+            topMethods.Add(fo);
+            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+        }
+
+        /// <summary>
+        /// .NETメソッドをトップレベルに登録します。
+        /// </summary>
+        /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
+        /// <param name="name">メソッド名</param>
+        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], string> func, string name)
+        {
+            KecaknoahInteropDelegate wp =
+                (ctx, self, args) => func(self, args).AsKecaknoahString().NoResume();
+            var fo = new KecaknoahInteropMethodInfo(name, wp);
+            topMethods.Add(fo);
+            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
         }
     }
 }

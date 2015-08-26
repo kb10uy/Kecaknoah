@@ -70,10 +70,7 @@ namespace Kecaknoah.Type
         /// </summary>
         public KecaknoahInteropClassInfo Class { get; }
 
-        /// <summary>
-        /// コンストラクターの参照を取得します。
-        /// </summary>
-        public KecaknoahReference Constructor { get; }
+        private Dictionary<string, KecaknoahReference> methods = new Dictionary<string, KecaknoahReference>();
 
         /// <summary>
         /// 新しいインスタンスを初期化します。
@@ -82,7 +79,10 @@ namespace Kecaknoah.Type
         public KecaknoahInteropClassObject(KecaknoahInteropClassInfo info)
         {
             Class = info;
-            Constructor = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, CreateInstance));
+            foreach (var i in Class.classMethods)
+            {
+                methods[i.Name] = (KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(KecaknoahNil.Instance, i.Body)));
+            }
         }
 
         /// <summary>
@@ -94,10 +94,14 @@ namespace Kecaknoah.Type
         {
             switch (name)
             {
+                /*
                 case "new":
                     return Constructor;
+                */
+                default:
+                    if (methods.ContainsKey(name)) return methods[name];
+                    return KecaknoahNil.Reference;
             }
-            return KecaknoahNil.Reference;
         }
 
         private KecaknoahFunctionResult CreateInstance(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahInstance(Class).NoResume();

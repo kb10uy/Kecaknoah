@@ -1,4 +1,5 @@
-﻿using Kecaknoah.Type;
+﻿using Kecaknoah.Standard;
+using Kecaknoah.Type;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,12 +26,16 @@ namespace Kecaknoah
         {
             var result = new KecaknoahModule(name);
             result.Environment = this;
+            modules[name] = result;
+
+            result.RegisterClass(KecaknoahList.Information);
+            result.RegisterClass(KecaknoahDictionary.Information);
             result.RegisterFunction(CreateArray, "array");
             result.RegisterFunction(WriteLine, "println");
             result.RegisterFunction(Write, "print");
             result.RegisterFunction(Format, "format");
             result.RegisterFunction(Exit, "exit");
-            modules[name] = result;
+
             return result;
         }
 
@@ -45,7 +50,15 @@ namespace Kecaknoah
 
         private KecaknoahFunctionResult WriteLine(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
-            Console.WriteLine(args[0].ToString());
+            if (args.Length == 0)
+            {
+                Console.WriteLine();
+            }
+            else
+            {
+                Console.WriteLine(args[0].ToString());
+            }
+
             return KecaknoahNil.Instance.NoResume();
         }
 

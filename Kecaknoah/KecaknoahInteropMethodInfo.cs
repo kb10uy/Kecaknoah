@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Kecaknoah.Type;
+using System;
 
-namespace Kecaknoah.Type
+namespace Kecaknoah
 {
     /// <summary>
     /// .NETで定義したメソッドの情報を提供します。

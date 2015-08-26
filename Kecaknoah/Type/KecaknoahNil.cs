@@ -70,6 +70,8 @@
 
 #pragma warning disable 1591
         public override object Clone() => Instance;
+        public override bool Equals(object obj) => obj is KecaknoahNil;
+        public override int GetHashCode() => "nil".GetHashCode();
 #pragma warning restore 1591
     }
 }

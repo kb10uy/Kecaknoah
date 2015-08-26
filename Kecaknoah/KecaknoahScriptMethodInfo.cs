@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Kecaknoah.Type;
+using System;
 
-namespace Kecaknoah.Type
+namespace Kecaknoah
 {
     /// <summary>
     /// Kecaknoahで定義されるメソッドを定義します。

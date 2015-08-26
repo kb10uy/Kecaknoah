@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 namespace Kecaknoah.Standard
 {
     /// <summary>
-    /// Kecaknoahと.NET連携の値型の基底を提供します。
-    /// 実際に作成する際はこのクラスをコピーするといいかもしれません。
-    /// というかこの他にもオーバーロードできるメソッドはあるので適当にどうにかしてください。
+    /// Kecaknoah上の辞書(ディクショナリ)構造を提供します。
     /// </summary>
-    public sealed class KecaknoahInteropClassBase : KecaknoahObject
+    public sealed class KecaknoahDictionary : KecaknoahObject
     {
         /// <summary>
         /// Kecaknoah上でのクラス名を取得します。
         /// </summary>
-        public static readonly string ClassName = "InteropBase";
+        public static readonly string ClassName = "Dictionary";
+
+        private Dictionary<KecaknoahObject, KecaknoahReference> dict = new Dictionary<KecaknoahObject, KecaknoahReference>();
 
         #region 改変不要
         /// <summary>
@@ -34,7 +34,7 @@ namespace Kecaknoah.Standard
         /// コンストラクタを含む全てのクラスメソッドはここから追加してください。
         /// 逆に登録しなければコンストラクタを隠蔽できるということでもありますが。
         /// </summary>
-        static KecaknoahInteropClassBase()
+        static KecaknoahDictionary()
         {
             Information.AddClassMethod(new KecaknoahInteropMethodInfo("new", ClassNew));
         }
@@ -45,7 +45,7 @@ namespace Kecaknoah.Standard
         /// インスタンスメソッドやプロパティの設定を忘れずにしてください。
         /// あと<see cref="KecaknoahObject.ExtraType"/>に型名をセットしておくと便利です。
         /// </summary>
-        public KecaknoahInteropClassBase()
+        public KecaknoahDictionary()
         {
             ExtraType = ClassName;
             RegisterInstanceFunction();
@@ -65,23 +65,15 @@ namespace Kecaknoah.Standard
         /// <returns></returns>
         protected internal override KecaknoahReference GetMemberReference(string name)
         {
-            return base.GetMemberReference(name);
-        }
+            switch (name)
+            {
+                case nameof(each): return each;
+                case nameof(remove): return remove;
+                case nameof(has_key): return has_key;
 
-        /// <summary>
-        /// この<see cref="KecaknoahObject"/>を「呼び出し」ます。
-        /// このインスタンスそのものがメソッドのオブジェクトであるかのように振る舞います。
-        /// あまり乱用するべきではありません。
-        /// </summary>
-        /// <param name="context">呼び出される時の<see cref="KecaknoahContext"/></param>
-        /// <param name="args">引数</param>
-        /// <returns>
-        /// 返り値。基本的にはresumeできないと思うので適当な<see cref="KecaknoahObject"/>に<see cref="TypeExtensions.NoResume(KecaknoahObject)"/>してください。
-        /// 参考にしてください。
-        /// </returns>
-        protected internal override KecaknoahFunctionResult Call(KecaknoahContext context, KecaknoahObject[] args)
-        {
-            return base.Call(context, args);
+                case "length": return KecaknoahReference.CreateRightReference(dict.Count.AsKecaknoahInteger());
+            }
+            return base.GetMemberReference(name);
         }
 
         /// <summary>
@@ -93,33 +85,12 @@ namespace Kecaknoah.Standard
         /// <returns>返す参照</returns>
         protected internal override KecaknoahReference GetIndexerReference(KecaknoahObject[] indices)
         {
-            return base.GetIndexerReference(indices);
+            if (!dict.ContainsKey(indices[0]))
+            {
+                dict[indices[0]] = new KecaknoahReference { IsLeftValue = true };
+            }
+            return dict[indices[0]];
         }
-
-        /// <summary>
-        /// 二項演算をします。
-        /// 実際には単項演算子でも適用されるため、-(<see cref="KecaknoahILCodeType.Negative"/>)と
-        /// !(<see cref="KecaknoahILCodeType.Not"/>)にも対応出来ます。
-        /// <see cref="KecaknoahILCodeType"/>内にはその他の演算も含まれていますが、
-        /// 複合演算子はILレベルで処理されるので対応する意味はありません。
-        /// ちなみに<see cref="KecaknoahObject"/>との演算方法はどのように実装しても構いません。
-        /// Kecaknoah内部では<see cref="KecaknoahObject.Type"/>の比較と内部のValueプロパティによる比較となっています。
-        /// thisで比較すると99%falseになってしまうので注意してください。
-        /// </summary>
-        /// <param name="op">演算子</param>
-        /// <param name="target">対象のインスタンス</param>
-        /// <returns></returns>
-        protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
-        {
-            return base.ExpressionOperation(op, target);
-        }
-
-        /// <summary>
-        /// 値渡しの際に渡すオブジェクトを生成します。
-        /// 値型の場合は必ずこれをオーバーライドしてください。それ以外の場合は原則的に挙動が参照型になります。
-        /// </summary>
-        /// <returns>クローン</returns>
-        public override KecaknoahObject AsByValValue() => base.AsByValValue();
 
         /// <summary>
         /// 値的に等価であるか比較します。
@@ -134,8 +105,8 @@ namespace Kecaknoah.Standard
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            var t = obj as KecaknoahInteropClassBase;
-            return t != null && t.Value == Value;
+            var t = obj as KecaknoahDictionary;
+            return t != null && t.dict.Equals(dict);
         }
 
         /// <summary>
@@ -144,18 +115,40 @@ namespace Kecaknoah.Standard
         /// 同じ値を表すように振る舞いましょう。
         /// </summary>
         /// <returns></returns>
-        public override int GetHashCode() => Value.GetHashCode();
+        public override int GetHashCode() => dict.GetHashCode();
         #endregion
 
 
         #region インスタンスメソッド
         //nameof使おうな
-        KecaknoahReference instance_method;
+        KecaknoahReference
+            each, remove, has_key;
 
         private void RegisterInstanceFunction()
         {
-
+            each = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceEach));
+            remove = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceRemove));
+            has_key = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceHasKey));
         }
+
+        private KecaknoahFunctionResult InstanceHasKey(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
+        {
+            dict.ContainsKey(args[0]);
+            return dict.ContainsKey(args[0]).AsKecaknoahBoolean().NoResume();
+        }
+
+        private KecaknoahFunctionResult InstanceRemove(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
+        {
+            dict.Remove(args[0]);
+            return KecaknoahNil.Instance.NoResume();
+        }
+
+        private KecaknoahFunctionResult InstanceEach(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
+        {
+            foreach (var i in dict) args[0].Call(ctx, new[] { i.Key, i.Value.RawObject });
+            return KecaknoahNil.Instance.NoResume();
+        }
+
         #endregion
 
         #region クラスメソッド
@@ -164,10 +157,12 @@ namespace Kecaknoah.Standard
         selfに代入するのではなく生成したのをNoResumeで返却します。
         */
 
-        private static KecaknoahFunctionResult ClassNew(KecaknoahContext ctx,KecaknoahObject self,KecaknoahObject[] args)
+        private static KecaknoahFunctionResult ClassNew(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
         {
-            return new KecaknoahInteropClassBase().NoResume();
+            return new KecaknoahDictionary().NoResume();
         }
         #endregion
     }
+
+
 }

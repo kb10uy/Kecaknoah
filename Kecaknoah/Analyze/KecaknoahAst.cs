@@ -159,6 +159,11 @@ namespace Kecaknoah.Analyze
         /// break文
         /// </summary>
         BreakStatement,
+
+        /// <summary>
+        /// foreach文
+        /// </summary>
+        ForeachStatement,
     }
 
 }

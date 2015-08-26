@@ -1,4 +1,6 @@
-﻿namespace Kecaknoah.Type
+﻿using Kecaknoah.Type;
+
+namespace Kecaknoah
 {
     /// <summary>
     /// Kecaknoahで利用されるメソッドの規定を定義します。

@@ -98,12 +98,6 @@ namespace Kecaknoah.Type
         }
 
         /// <summary>
-        /// 現在の以下略。
-        /// </summary>
-        /// <returns>知るか</returns>
-        public override string ToString() => Value;
-
-        /// <summary>
         /// 新しいインスタンスを生成します。
         /// </summary>
         public KecaknoahString()
@@ -140,6 +134,14 @@ namespace Kecaknoah.Type
 
 #pragma warning disable 1591
         public override object Clone() => Value.AsKecaknoahString();
+        public override string ToString() => Value;
+        public override KecaknoahObject AsByValValue() => Value.AsKecaknoahString();
+        public override bool Equals(object obj)
+        {
+            var t = obj as KecaknoahString;
+            return t != null && t.Value == Value;
+        }
+        public override int GetHashCode() => Value.GetHashCode();
 #pragma warning restore 1591
     }
 }

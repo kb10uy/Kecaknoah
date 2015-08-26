@@ -246,11 +246,11 @@ namespace Kecaknoah
                     //特殊----------------------------------------------------------------------------
                     case KecaknoahILCodeType.StartCoroutine:
                         args = new Stack<KecaknoahObject>();
-                        for (int i = 0; i < c.IntegerValue; i++) args.Push(ReferenceStack.Pop().RawObject);
+                        for (int i = 0; i < c.IntegerValue; i++) args.Push(ReferenceStack.Pop().RawObject.AsByValValue());
                         var ct = ReferenceStack.Peek().RawObject as KecaknoahScriptFunction;
                         var ict = ReferenceStack.Peek().RawObject as KecaknoahInteropFunction;
                         ReferenceStack.Pop();
-                        if (ct.Equals(null) && ict.Equals(null)) throw new InvalidOperationException("スクリプト上のメソッド以外はコルーチン化出来ません");
+                        if (ct == null && ict == null) throw new InvalidOperationException("スクリプト上のメソッド以外はコルーチン化出来ません");
                         if (!ct.Equals(null))
                         {
                             cors[c.StringValue] = new KecaknoahScriptCoroutineFrame(RunningContext, ct, args.ToArray());
@@ -264,6 +264,7 @@ namespace Kecaknoah
                         var cobj = cors[c.StringValue];
                         if (cobj == null)
                         {
+                            if (c.BooleanValue) ReferenceStack.Pop();
                             ReferenceStack.Push(KecaknoahNil.Reference);
                             break;
                         }
@@ -321,13 +322,13 @@ namespace Kecaknoah
                     case KecaknoahILCodeType.Call:
                         args = new Stack<KecaknoahObject>();
                         for (int i = 0; i < c.IntegerValue; i++) args.Push(ReferenceStack.Pop().RawObject);
-                        v1 = ReferenceStack.Pop().RawObject;
+                        v1 = ReferenceStack.Pop().RawObject.AsByValValue();
                         ReferenceStack.Push(KecaknoahReference.CreateRightReference(v1.Call(RunningContext, args.ToArray()).ReturningObject));
                         break;
                     case KecaknoahILCodeType.IndexerCall:
                         args = new Stack<KecaknoahObject>();
                         for (int i = 0; i < c.IntegerValue; i++) args.Push(ReferenceStack.Pop().RawObject);
-                        v1 = ReferenceStack.Pop().RawObject;
+                        v1 = ReferenceStack.Pop().RawObject.AsByValValue();
                         ReferenceStack.Push(v1.GetIndexerReference(args.ToArray()));
                         break;
                     case KecaknoahILCodeType.PushArgument:
@@ -347,7 +348,7 @@ namespace Kecaknoah
                         ReferenceStack.Push(KecaknoahReference.CreateRightReference(VariableArguments[(int)args.Pop().ToInt64()]));
                         break;
                     case KecaknoahILCodeType.AsValue:
-                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(ReferenceStack.Pop().RawObject.Clone() as KecaknoahObject));
+                        ReferenceStack.Push(KecaknoahReference.CreateRightReference(ReferenceStack.Pop().RawObject.AsByValValue()));
                         break;
                 }
                 ProgramCounter++;

@@ -242,6 +242,10 @@ namespace Kecaknoah
                 {
                     result.PushCodes(PrecompileFor(i as KecaknoahForAstNode));
                 }
+                else if (i is KecaknoahForeachAstNode)
+                {
+                    result.PushCodes(PrecompileForeach(i as KecaknoahForeachAstNode));
+                }
                 else if (i is KecaknoahLoopAstNode)
                 {
                     result.PushCodes(PrecompileWhile(i as KecaknoahLoopAstNode));
@@ -309,6 +313,68 @@ namespace Kecaknoah
             var result = new List<KecaknoahILCode>();
             result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"{id}" });
             result.AddRange(PrecompileExpression(fn.Condition));
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.FalseJump, StringValue = $"{id}-End" });
+            result.AddRange(PrecompileBlock(fn.Children, id));
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Jump, StringValue = $"{id}" });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"{id}-End" });
+            return result;
+        }
+
+        private IList<KecaknoahILCode> PrecompileForeach(KecaknoahForeachAstNode fn)
+        {
+            if (fn.IsCoroutineSource)
+            {
+                return PrecompileCoroutineForeach(fn);
+            }
+            else
+            {
+                return PrecompileNormalForeach(fn);
+            }
+        }
+
+        private IList<KecaknoahILCode> PrecompileNormalForeach(KecaknoahForeachAstNode fn)
+        {
+            var id = Guid.NewGuid().ToString().Substring(0, 8);
+            var result = new List<KecaknoahILCode>();
+            var cntn = $"{id}-Counter";
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = cntn });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PushInteger, IntegerValue = 0 });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Assign });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Pop });
+
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"{id}-Next" });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = cntn });
+            result.AddRange(PrecompileExpression(fn.Source));
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadMember, StringValue = "length" });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Lesser });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.FalseJump, StringValue = $"{id}-End" });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = fn.ElementVariableName });
+            result.AddRange(PrecompileExpression(fn.Source));
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = cntn });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.IndexerCall, IntegerValue = 1 });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Assign });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Pop });
+            result.AddRange(PrecompileBlock(fn.Children, id));
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"{id}-Continue" });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = cntn });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PushInteger, IntegerValue = 1 });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PlusAssign });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Pop });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Jump, StringValue = $"{id}-Next" });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"{id}-End" });
+            return result;
+        }
+
+        private IList<KecaknoahILCode> PrecompileCoroutineForeach(KecaknoahForeachAstNode fn)
+        {
+            var id = Guid.NewGuid().ToString().Substring(0, 8);
+            var result = new List<KecaknoahILCode>();
+            result.AddRange(PrecompileExpression(fn.Source));
+            foreach (var pe in fn.CoroutineArguments) result.AddRange(PrecompileExpression(pe));
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.StartCoroutine, StringValue = $"{id}-Coroutine", IntegerValue = fn.CoroutineArguments.Count });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"{id}" });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = fn.ElementVariableName });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.ResumeCoroutine, StringValue = $"{id}-Coroutine", BooleanValue = true });
             result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.FalseJump, StringValue = $"{id}-End" });
             result.AddRange(PrecompileBlock(fn.Children, id));
             result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Jump, StringValue = $"{id}" });

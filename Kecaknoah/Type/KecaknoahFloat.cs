@@ -136,24 +136,6 @@ namespace Kecaknoah.Type
         }
 
         /// <summary>
-        /// 現在の以下略。
-        /// </summary>
-        /// <returns>知るか</returns>
-        public override string ToString() => Value.ToString();
-
-        /// <summary>
-        /// 可能ならば<see cref="long"/>型に変換します。
-        /// </summary>
-        /// <returns></returns>
-        public override long ToInt64() => (long)Value;
-
-        /// <summary>
-        /// 可能ならば<see cref="double"/>型に変換します。
-        /// </summary>
-        /// <returns></returns>
-        public override double ToDouble() => Value;
-
-        /// <summary>
         /// 新しいインスタンスを生成します。
         /// </summary>
         public KecaknoahFloat()
@@ -163,6 +145,16 @@ namespace Kecaknoah.Type
 
 #pragma warning disable 1591
         public override object Clone() => Value.AsKecaknoahFloat();
+        public override KecaknoahObject AsByValValue() => Value.AsKecaknoahFloat();
+        public override bool Equals(object obj)
+        {
+            var t = obj as KecaknoahFloat;
+            return t != null && t.Value == Value;
+        }
+        public override int GetHashCode() => Value.GetHashCode();
+        public override string ToString() => Value.ToString();
+        public override long ToInt64() => (long)Value;
+        public override double ToDouble() => Value;
 #pragma warning restore 1591
     }
 }

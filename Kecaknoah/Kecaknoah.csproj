@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Kecaknoah</RootNamespace>
     <AssemblyName>Kecaknoah</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -62,22 +63,24 @@
     <Compile Include="KecaknoahSource.cs" />
     <Compile Include="Analyze\KecaknoahToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Standard\KecaknoahDictionary.cs" />
+    <Compile Include="Standard\KecaknoahList.cs" />
     <Compile Include="Standard\KecaknoahInteropClassBase.cs" />
-    <Compile Include="Standard\KecaknoahValueTypeBase.cs" />
     <Compile Include="Type\KecaknoahArray.cs" />
     <Compile Include="Type\KecaknoahBoolean.cs" />
-    <Compile Include="Type\KecaknoahClassInfo.cs" />
+    <Compile Include="KecaknoahClassInfo.cs" />
     <Compile Include="Type\KecaknoahClassObject.cs" />
+    <Compile Include="Type\KecaknoahDynamicObject.cs" />
     <Compile Include="Type\KecaknoahInteropFunction.cs" />
-    <Compile Include="Type\KecaknoahInteropMethodInfo.cs" />
-    <Compile Include="Type\KecaknoahMethodInfo.cs" />
-    <Compile Include="Type\KecaknoahScriptClassInfo.cs" />
+    <Compile Include="KecaknoahInteropMethodInfo.cs" />
+    <Compile Include="KecaknoahMethodInfo.cs" />
+    <Compile Include="KecaknoahScriptClassInfo.cs" />
     <Compile Include="Type\KecaknoahFloat.cs" />
     <Compile Include="Type\KecaknoahScriptFunction.cs" />
     <Compile Include="Type\KecaknoahInstance.cs" />
     <Compile Include="Type\KecaknoahInteger.cs" />
-    <Compile Include="Type\KecaknoahInteropClassInfo.cs" />
-    <Compile Include="Type\KecaknoahScriptMethodInfo.cs" />
+    <Compile Include="KecaknoahInteropClassInfo.cs" />
+    <Compile Include="KecaknoahScriptMethodInfo.cs" />
     <Compile Include="Type\KecaknoahNil.cs" />
     <Compile Include="Type\KecaknoahObject.cs" />
     <Compile Include="KecaknoahStackFrame.cs" />

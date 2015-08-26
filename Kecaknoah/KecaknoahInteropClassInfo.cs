@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Kecaknoah.Type
+namespace Kecaknoah
 {
     /// <summary>
     /// .NET連携クラスの規定を提供します。
@@ -78,6 +78,15 @@ namespace Kecaknoah.Type
         internal void AddLocal(string local)
         {
             locals.Add(local);
+        }
+
+        /// <summary>
+        /// クラス名を指定して新しいインスタンスを初期化します。
+        /// </summary>
+        /// <param name="name">クラス名</param>
+        public KecaknoahInteropClassInfo(string name)
+        {
+            Name = name;
         }
     }
 }

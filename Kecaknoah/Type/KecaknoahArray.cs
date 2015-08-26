@@ -12,11 +12,12 @@ namespace Kecaknoah.Type
         internal List<KecaknoahReference> array;
 
         private KecaknoahReference length;
-        private KecaknoahReference find, each, filter, map, reduce, first, last;
+        private KecaknoahReference find, each, filter, map, reduce;//, first, last;
 
         internal KecaknoahArray(int[] dim)
         {
             Type = TypeCode.Object;
+            ExtraType = "Array";
             array = new List<KecaknoahReference>();
             length = KecaknoahReference.CreateRightReference(dim[0]);
             InitializeMembers();
@@ -125,10 +126,15 @@ namespace Kecaknoah.Type
             return result.RawObject.NoResume();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
+#pragma warning disable 1591
         public override string ToString() => $"Array: {array.Count} elements";
+        public override bool Equals(object obj)
+        {
+            var ar = obj as KecaknoahArray;
+            if (ar == null) return false;
+            return ar.array == array;
+        }
+        public override int GetHashCode() => array.GetHashCode();
+#pragma warning restore 1591
     }
 }

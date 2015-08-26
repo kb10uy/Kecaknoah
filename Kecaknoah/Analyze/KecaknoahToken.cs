@@ -140,6 +140,18 @@ namespace Kecaknoah.Analyze
         /// </summary>
         DoKeyword,
         /// <summary>
+        /// foreach
+        /// </summary>
+        ForeachKeyword,
+        /// <summary>
+        /// in
+        /// </summary>
+        InKeyword,
+        /// <summary>
+        /// of
+        /// </summary>
+        OfKeyword,
+        /// <summary>
         /// local
         /// </summary>
         LocalKeyword,

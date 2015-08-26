@@ -45,7 +45,12 @@ namespace KecaknoahConsole
             module.RegisterSource(src);
             var ctx = module.CreateContext();
             var il = module["main"];
-            if (il != KecaknoahNil.Instance) ctx.Execute(il);
+            var kargs = new List<KecaknoahString>();
+            if (args.Length > 2)
+            {
+                kargs.AddRange(args.Skip(1).Select(p => p.AsKecaknoahString()));
+            }
+            if (il != KecaknoahNil.Instance) ctx.Execute(il, kargs.ToArray());
             /*
             var sw = new Stopwatch();
             sw.Start();
