@@ -8,20 +8,6 @@ namespace Kecaknoah
     /// </summary>
     public sealed class KecaknoahScriptMethodInfo : KecaknoahMethodInfo
     {
-        /// <summary>
-        /// このメソッドの名前を取得します。
-        /// </summary>
-        public override string Name { get; }
-
-        /// <summary>
-        /// 引数の数を取得します。
-        /// </summary>
-        public override int ArgumentLength { get; }
-
-        /// <summary>
-        /// 可変長引数メソッドかどうかを取得します。
-        /// </summary>
-        public override bool VariableArgument { get; }
 
         /// <summary>
         /// このメソッドの<see cref="KecaknoahIL"/>を取得します。
@@ -50,15 +36,6 @@ namespace Kecaknoah
             Name = name;
             ArgumentLength = 0;
             VariableArgument = false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public override KecaknoahObject CreateFunctionObject()
-        {
-            throw new NotImplementedException();
         }
     }
 }

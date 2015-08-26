@@ -9,39 +9,10 @@ namespace Kecaknoah
     /// </summary>
     public sealed class KecaknoahScriptClassInfo : KecaknoahClassInfo
     {
-        /// <summary>
-        /// このクラスの名前を取得します。
-        /// </summary>
-        public override string Name { get; }
-
         internal List<KecaknoahScriptClassInfo> inners = new List<KecaknoahScriptClassInfo>();
-        /// <summary>
-        /// このクラスのインナークラスを取得します。
-        /// </summary>
-        public override IReadOnlyList<KecaknoahClassInfo> InnerClasses { get; }
-
         internal List<KecaknoahScriptMethodInfo> methods = new List<KecaknoahScriptMethodInfo>();
-        /// <summary>
-        /// このクラスのインスタンスメソッドを取得します。
-        /// </summary>
-        public override IReadOnlyList<KecaknoahMethodInfo> InstanceMethods => methods;
-
         internal List<KecaknoahScriptMethodInfo> classMethods = new List<KecaknoahScriptMethodInfo>();
-        /// <summary>
-        /// このクラスのクラスメソッドを取得します。
-        /// </summary>
-        public override IReadOnlyList<KecaknoahMethodInfo> ClassMethods => classMethods;
-
         private List<string> locals = new List<string>();
-        /// <summary>
-        /// このクラスのフィールドを取得します。
-        /// </summary>
-        public override IReadOnlyList<string> Locals => locals;
-
-        /// <summary>
-        /// 継承元のクラスを取得・設定します。
-        /// </summary>
-        public override string BaseClass { get; }
 
         /// <summary>
         /// 新しいインスタンスを初期化します。
@@ -50,6 +21,9 @@ namespace Kecaknoah
         public KecaknoahScriptClassInfo(string name)
         {
             Name = name;
+            InnerClasses = inners;
+            InstanceMethods = methods;
+            ClassMethods = classMethods;
         }
 
         /// <summary>

@@ -8,20 +8,6 @@ namespace Kecaknoah
     /// </summary>
     public sealed class KecaknoahInteropMethodInfo : KecaknoahMethodInfo
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public override int ArgumentLength { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public override string Name { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public override bool VariableArgument => false;
 
         /// <summary>
         /// 実行される<see cref="KecaknoahInteropDelegate"/>を取得します。
@@ -48,15 +34,7 @@ namespace Kecaknoah
         /// <param name="bd">メソッドのデリゲート</param>
         public KecaknoahInteropMethodInfo(string name, KecaknoahInteropDelegate bd) : this(name, 0, bd)
         {
-        }
 
-        /// <summary>
-        /// Callできる<see cref="KecaknoahObject"/>を生成します。
-        /// </summary>
-        /// <returns></returns>
-        public override KecaknoahObject CreateFunctionObject()
-        {
-            throw new NotImplementedException();
         }
     }
 }

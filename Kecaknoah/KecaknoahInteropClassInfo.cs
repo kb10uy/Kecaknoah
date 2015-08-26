@@ -9,39 +9,26 @@ namespace Kecaknoah
     /// </summary>
     public sealed class KecaknoahInteropClassInfo : KecaknoahClassInfo
     {
-        /// <summary>
-        /// クラス名を取得します。
-        /// </summary>
-        public override string Name { get; }
-
         internal List<KecaknoahInteropClassInfo> inners = new List<KecaknoahInteropClassInfo>();
-        /// <summary>
-        /// インナークラスを取得します。
-        /// </summary>
-        public override IReadOnlyList<KecaknoahClassInfo> InnerClasses => inners;
 
         internal List<KecaknoahInteropMethodInfo> methods = new List<KecaknoahInteropMethodInfo>();
-        /// <summary>
-        /// インスタンスメソッドを取得します。
-        /// </summary>
-        public override IReadOnlyList<KecaknoahMethodInfo> InstanceMethods => methods;
 
         internal List<KecaknoahInteropMethodInfo> classMethods = new List<KecaknoahInteropMethodInfo>();
-        /// <summary>
-        /// クラスメソッドを取得します。
-        /// </summary>
-        public override IReadOnlyList<KecaknoahMethodInfo> ClassMethods => classMethods;
 
         private List<string> locals = new List<string>();
-        /// <summary>
-        /// フィールドの名前を取得します。
-        /// </summary>
-        public override IReadOnlyList<string> Locals => locals;
 
         /// <summary>
-        /// 継承元クラスを取得します。
+        /// 新しいインスタンスを初期化します。
         /// </summary>
-        public override string BaseClass { get; }
+        /// <param name="name">クラス名</param>
+        public KecaknoahInteropClassInfo(string name)
+        {
+            Name = name;
+            InnerClasses = inners;
+            InstanceMethods = methods;
+            ClassMethods = ClassMethods;
+            BaseClass = "";
+        }
 
         /// <summary>
         /// インナークラスを追加します。
@@ -78,15 +65,6 @@ namespace Kecaknoah
         internal void AddLocal(string local)
         {
             locals.Add(local);
-        }
-
-        /// <summary>
-        /// クラス名を指定して新しいインスタンスを初期化します。
-        /// </summary>
-        /// <param name="name">クラス名</param>
-        public KecaknoahInteropClassInfo(string name)
-        {
-            Name = name;
         }
     }
 }

@@ -10,31 +10,31 @@ namespace Kecaknoah
         /// <summary>
         /// クラス名を取得します。
         /// </summary>
-        public abstract string Name { get; }
+        public string Name { get; protected set; }
 
         /// <summary>
         /// インナークラスを取得します。
         /// </summary>
-        public abstract IReadOnlyList<KecaknoahClassInfo> InnerClasses { get; }
+        public IReadOnlyList<KecaknoahClassInfo> InnerClasses { get; protected set; }
 
         /// <summary>
         /// インスタンスメソッドを取得します。
         /// </summary>
-        public abstract IReadOnlyList<KecaknoahMethodInfo> InstanceMethods { get; }
+        public IReadOnlyList<KecaknoahMethodInfo> InstanceMethods { get; protected set; }
 
         /// <summary>
         /// クラスメソッドを取得します。
         /// </summary>
-        public abstract IReadOnlyList<KecaknoahMethodInfo> ClassMethods { get; }
+        public IReadOnlyList<KecaknoahMethodInfo> ClassMethods { get; protected set; }
 
         /// <summary>
         /// 予め定義されるフィールドを定義します。
         /// </summary>
-        public abstract IReadOnlyList<string> Locals { get; }
+        public IReadOnlyList<string> Locals { get; protected set; }
 
         /// <summary>
         /// 継承元クラスの名前を取得します。
         /// </summary>
-        public abstract string BaseClass { get; }
+        public string BaseClass { get; protected set; }
     }
 }
