@@ -114,7 +114,7 @@ namespace Kecaknoah.Analyze
         /// <summary>
         /// endcase
         /// </summary>
-        EndcaseKeyword,
+        EndCaseKeyword,
         /// <summary>
         /// for
         /// </summary>

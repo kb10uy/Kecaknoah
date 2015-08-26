@@ -28,7 +28,7 @@ namespace Kecaknoah.Analyze
             new Tuple<string, KecaknoahTokenType>("case", KecaknoahTokenType.CaseKeyword),
             new Tuple<string, KecaknoahTokenType>("when", KecaknoahTokenType.WhenKeyword),
             new Tuple<string, KecaknoahTokenType>("default", KecaknoahTokenType.DefaultKeyword),
-            new Tuple<string, KecaknoahTokenType>("endcase", KecaknoahTokenType.EndcaseKeyword),
+            new Tuple<string, KecaknoahTokenType>("endcase", KecaknoahTokenType.EndCaseKeyword),
             new Tuple<string, KecaknoahTokenType>("for", KecaknoahTokenType.ForKeyword),
             new Tuple<string, KecaknoahTokenType>("continue", KecaknoahTokenType.ContinueKeyword),
             new Tuple<string, KecaknoahTokenType>("break", KecaknoahTokenType.BreakKeyword),

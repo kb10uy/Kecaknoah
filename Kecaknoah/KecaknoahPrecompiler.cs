@@ -90,6 +90,10 @@ namespace Kecaknoah
                 i.IntegerValue = b.FindIndex(p => p.Type == KecaknoahILCodeType.Label && p.StringValue == i.StringValue);
             }
             foreach (var i in b.Where(p => p.Type == KecaknoahILCodeType.Label)) i.Type = KecaknoahILCodeType.Nop;
+            if (b.Any(p => (p.Type == KecaknoahILCodeType.Jump || p.Type == KecaknoahILCodeType.FalseJump || p.Type == KecaknoahILCodeType.TrueJump) && p.IntegerValue == -1))
+            {
+                throw new InvalidOperationException("対応していないラベルがあります");
+            }
             result.Codes.PushCodes(b);
             foreach (var i in result.Codes.Codes)
             {
@@ -232,7 +236,8 @@ namespace Kecaknoah
                 else if (i is KecaknoahContinueAstNode)
                 {
                     var ca = i as KecaknoahContinueAstNode;
-                    result.PushCode(KecaknoahILCodeType.Jump, $"{loopId}-" + (i.Type == KecaknoahAstNodeType.ContinueStatement ? "Continue" : "End"));
+                    var ln = ca.Label != "" ? ca.Label : loopId;
+                    result.PushCode(KecaknoahILCodeType.Jump, $"{ln}-" + (i.Type == KecaknoahAstNodeType.ContinueStatement ? "Continue" : "End"));
                 }
                 else if (i is KecaknoahIfAstNode)
                 {
@@ -284,7 +289,7 @@ namespace Kecaknoah
 
         private IList<KecaknoahILCode> PrecompileFor(KecaknoahForAstNode fn)
         {
-            var id = Guid.NewGuid().ToString().Substring(0, 8);
+            var id = fn.Name;
             var result = new List<KecaknoahILCode>();
             foreach (var i in fn.InitializeExpressions)
             {
@@ -334,7 +339,7 @@ namespace Kecaknoah
 
         private IList<KecaknoahILCode> PrecompileNormalForeach(KecaknoahForeachAstNode fn)
         {
-            var id = Guid.NewGuid().ToString().Substring(0, 8);
+            var id = fn.Name;
             var result = new List<KecaknoahILCode>();
             var cntn = $"{id}-Counter";
             result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = cntn });
@@ -367,7 +372,7 @@ namespace Kecaknoah
 
         private IList<KecaknoahILCode> PrecompileCoroutineForeach(KecaknoahForeachAstNode fn)
         {
-            var id = Guid.NewGuid().ToString().Substring(0, 8);
+            var id = fn.Name;
             var result = new List<KecaknoahILCode>();
             result.AddRange(PrecompileExpression(fn.Source));
             foreach (var pe in fn.CoroutineArguments) result.AddRange(PrecompileExpression(pe));

@@ -145,7 +145,7 @@ namespace Kecaknoah
         /// </summary>
         /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
         /// <param name="name">メソッド名</param>
-        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], int> func, string name)
+        public void RegisterInt32Function(Func<KecaknoahObject, KecaknoahObject[], int> func, string name)
         {
             KecaknoahInteropDelegate wp =
                 (ctx, self, args) => func(self, args).AsKecaknoahInteger().NoResume();
@@ -159,7 +159,7 @@ namespace Kecaknoah
         /// </summary>
         /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
         /// <param name="name">メソッド名</param>
-        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], long> func, string name)
+        public void RegisterInt64Function(Func<KecaknoahObject, KecaknoahObject[], long> func, string name)
         {
             KecaknoahInteropDelegate wp =
                 (ctx, self, args) => func(self, args).AsKecaknoahInteger().NoResume();
@@ -173,7 +173,7 @@ namespace Kecaknoah
         /// </summary>
         /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
         /// <param name="name">メソッド名</param>
-        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], float> func, string name)
+        public void RegisterSingleFunction(Func<KecaknoahObject, KecaknoahObject[], float> func, string name)
         {
             KecaknoahInteropDelegate wp =
                 (ctx, self, args) => ((double)func(self, args)).AsKecaknoahFloat().NoResume();
@@ -187,7 +187,7 @@ namespace Kecaknoah
         /// </summary>
         /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
         /// <param name="name">メソッド名</param>
-        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], double> func, string name)
+        public void RegisterDoubleFunction(Func<KecaknoahObject, KecaknoahObject[], double> func, string name)
         {
             KecaknoahInteropDelegate wp =
                 (ctx, self, args) => func(self, args).AsKecaknoahFloat().NoResume();
@@ -201,7 +201,7 @@ namespace Kecaknoah
         /// </summary>
         /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
         /// <param name="name">メソッド名</param>
-        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], bool> func, string name)
+        public void RegisterBooleanFunction(Func<KecaknoahObject, KecaknoahObject[], bool> func, string name)
         {
             KecaknoahInteropDelegate wp =
                 (ctx, self, args) => func(self, args).AsKecaknoahBoolean().NoResume();
@@ -215,7 +215,7 @@ namespace Kecaknoah
         /// </summary>
         /// <param name="func">登録する<see cref="Func{T1, T2, TResult}"/>形式のメソッド</param>
         /// <param name="name">メソッド名</param>
-        public void RegisterFunction(Func<KecaknoahObject, KecaknoahObject[], string> func, string name)
+        public void RegisterStringFunction(Func<KecaknoahObject, KecaknoahObject[], string> func, string name)
         {
             KecaknoahInteropDelegate wp =
                 (ctx, self, args) => func(self, args).AsKecaknoahString().NoResume();

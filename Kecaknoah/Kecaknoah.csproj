@@ -63,6 +63,7 @@
     <Compile Include="KecaknoahSource.cs" />
     <Compile Include="Analyze\KecaknoahToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Standard\KecaknoahConvert.cs" />
     <Compile Include="Standard\KecaknoahDictionary.cs" />
     <Compile Include="Standard\KecaknoahList.cs" />
     <Compile Include="Standard\KecaknoahInteropClassBase.cs" />

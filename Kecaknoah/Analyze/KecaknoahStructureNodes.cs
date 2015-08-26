@@ -329,6 +329,11 @@ namespace Kecaknoah.Analyze
         public KecaknoahExpressionAstNode Condition { get; protected internal set; }
 
         /// <summary>
+        /// このループの名前を取得します。
+        /// </summary>
+        public string Name { get; protected internal set; }
+
+        /// <summary>
         /// 
         /// </summary>
         public KecaknoahLoopAstNode()

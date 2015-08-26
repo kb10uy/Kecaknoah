@@ -30,7 +30,10 @@ namespace Kecaknoah
 
             result.RegisterClass(KecaknoahList.Information);
             result.RegisterClass(KecaknoahDictionary.Information);
+            result.RegisterClass(KecaknoahConvert.Information);
+
             result.RegisterFunction(CreateArray, "array");
+            result.RegisterFunction(ReadLine, "readln");
             result.RegisterFunction(WriteLine, "println");
             result.RegisterFunction(Write, "print");
             result.RegisterFunction(Format, "format");
@@ -61,6 +64,8 @@ namespace Kecaknoah
 
             return KecaknoahNil.Instance.NoResume();
         }
+
+        private KecaknoahFunctionResult ReadLine(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => Console.ReadLine().AsKecaknoahString().NoResume();
 
         private KecaknoahFunctionResult Format(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {

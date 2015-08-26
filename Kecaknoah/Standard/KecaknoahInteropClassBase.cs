@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Kecaknoah.Standard
 {
     /// <summary>
-    /// Kecaknoahと.NET連携の値型の基底を提供します。
+    /// Kecaknoahと.NET連携の型の基底を提供します。
     /// 実際に作成する際はこのクラスをコピーするといいかもしれません。
     /// というかこの他にもオーバーロードできるメソッドはあるので適当にどうにかしてください。
     /// </summary>

@@ -129,7 +129,7 @@ namespace Kecaknoah.Type
         /// 登録するメソッドのデリゲート。
         /// インスタンスと引数が渡されます。
         /// </param>
-        public void AddFunction(string name, Func<KecaknoahObject, KecaknoahObject[], int> func)
+        public void AddInt32Function(string name, Func<KecaknoahObject, KecaknoahObject[], int> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s, a).AsKecaknoahInteger().NoResume();
             funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
@@ -143,7 +143,7 @@ namespace Kecaknoah.Type
         /// 登録するメソッドのデリゲート。
         /// インスタンスと引数が渡されます。
         /// </param>
-        public void AddFunction(string name, Func<KecaknoahObject, KecaknoahObject[], long> func)
+        public void AddInt64Function(string name, Func<KecaknoahObject, KecaknoahObject[], long> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s, a).AsKecaknoahInteger().NoResume();
             funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
@@ -157,7 +157,7 @@ namespace Kecaknoah.Type
         /// 登録するメソッドのデリゲート。
         /// インスタンスと引数が渡されます。
         /// </param>
-        public void AddFunction(string name, Func<KecaknoahObject, KecaknoahObject[], float> func)
+        public void AddSingleFunction(string name, Func<KecaknoahObject, KecaknoahObject[], float> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => ((double)func(s, a)).AsKecaknoahFloat().NoResume();
             funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
@@ -171,7 +171,7 @@ namespace Kecaknoah.Type
         /// 登録するメソッドのデリゲート。
         /// インスタンスと引数が渡されます。
         /// </param>
-        public void AddFunction(string name, Func<KecaknoahObject, KecaknoahObject[], double> func)
+        public void AddDoubleFunction(string name, Func<KecaknoahObject, KecaknoahObject[], double> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s, a).AsKecaknoahFloat().NoResume();
             funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
@@ -185,7 +185,7 @@ namespace Kecaknoah.Type
         /// 登録するメソッドのデリゲート。
         /// インスタンスと引数が渡されます。
         /// </param>
-        public void AddFunction(string name, Func<KecaknoahObject, KecaknoahObject[], bool> func)
+        public void AddBooleanFunction(string name, Func<KecaknoahObject, KecaknoahObject[], bool> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s, a).AsKecaknoahBoolean().NoResume();
             funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
@@ -199,7 +199,7 @@ namespace Kecaknoah.Type
         /// 登録するメソッドのデリゲート。
         /// インスタンスと引数が渡されます。
         /// </param>
-        public void AddFunction(string name, Func<KecaknoahObject, KecaknoahObject[], string> func)
+        public void AddStringFunction(string name, Func<KecaknoahObject, KecaknoahObject[], string> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s, a).AsKecaknoahString().NoResume();
             funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));

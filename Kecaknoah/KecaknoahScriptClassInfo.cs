@@ -21,6 +21,7 @@ namespace Kecaknoah
         public KecaknoahScriptClassInfo(string name)
         {
             Name = name;
+            Locals = locals;
             InnerClasses = inners;
             InstanceMethods = methods;
             ClassMethods = classMethods;
