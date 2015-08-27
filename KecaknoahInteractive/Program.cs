@@ -64,6 +64,7 @@ namespace KecaknoahInteractive
                         try
                         {
                             var sf = ctx.ExecuteExpressionIL(il);
+                            Console.WriteLine(sf.ToString());
                         }
                         catch (Exception e)
                         {
