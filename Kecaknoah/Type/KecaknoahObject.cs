@@ -89,7 +89,8 @@ namespace Kecaknoah.Type
         /// </summary>
         public KecaknoahObject()
         {
-            Type = TypeCode.Empty;
+            Type = TypeCode.Object;
+            ExtraType = "Array";
         }
 
         private static KecaknoahReference InstanceToString(KecaknoahObject self) => KecaknoahReference.CreateRightReference(self, (ctx, s, args) => s.ToString().AsKecaknoahString().NoResume());

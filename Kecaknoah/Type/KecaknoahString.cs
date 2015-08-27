@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Kecaknoah.Type
 {
@@ -19,6 +20,13 @@ namespace Kecaknoah.Type
                 raw = value;
                 Length.RawObject = raw.Length.AsKecaknoahInteger();
             }
+        }
+
+        internal static KecaknoahInteropClassInfo Information { get; } = new KecaknoahInteropClassInfo("String");
+
+        static KecaknoahString()
+        {
+            Information.AddClassMethod(new KecaknoahInteropMethodInfo("join", ClassJoin));
         }
 
         /// <summary>
@@ -114,6 +122,7 @@ namespace Kecaknoah.Type
         public KecaknoahString(bool st)
         {
             Type = TypeCode.String;
+            ExtraType = "String";
         }
 
         private KecaknoahFunctionResult InstanceSubstring(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
@@ -130,7 +139,47 @@ namespace Kecaknoah.Type
             }
         }
 
-        private KecaknoahFunctionResult InstanceReplace(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => self.ToString().Replace(args[0].ToString(), args[1].ToString()).AsKecaknoahString().NoResume();
+        private KecaknoahFunctionResult InstanceReplace(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => raw.Replace(args[0].ToString(), args[1].ToString()).AsKecaknoahString().NoResume();
+
+        private KecaknoahFunctionResult InstanceSplit(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
+        {
+            var l = args[0];
+            var op = StringSplitOptions.None;
+            if (args.Length >= 2)
+            {
+                var flag = args[1].ToBoolean();
+                if (flag) op = StringSplitOptions.RemoveEmptyEntries;
+            }
+            if (l.ExtraType == "Array")
+            {
+                var list = l.ToStringArray();
+                var result = raw.Split(list.ToArray(), op);
+                return new KecaknoahArray(result.Select(p => p.AsKecaknoahString())).NoResume();
+            }
+            else
+            {
+                var str = l.ToString();
+                var result = raw.Split(new[] { str }, op);
+                return new KecaknoahArray(result.Select(p => p.AsKecaknoahString())).NoResume();
+            }
+        }
+
+        private KecaknoahFunctionResult InstanceStartsWith(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => raw.StartsWith(args[0].ToString()).AsKecaknoahBoolean().NoResume();
+
+        private KecaknoahFunctionResult InstanceEndsWith(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => raw.EndsWith(args[0].ToString()).AsKecaknoahBoolean().NoResume();
+
+        private KecaknoahFunctionResult InstancePadLeft(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => raw.PadLeft(args[0].ToInt32()).AsKecaknoahString().NoResume();
+
+        private KecaknoahFunctionResult InstancePadRight(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => raw.PadRight(args[0].ToInt32()).AsKecaknoahString().NoResume();
+
+
+        private static KecaknoahFunctionResult ClassJoin(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
+        {
+            var ls = args[1].ToStringArray();
+            var s = args[0].ToString();
+            var result = string.Join(s, ls);
+            return result.AsKecaknoahString().NoResume();
+        }
 
 #pragma warning disable 1591
         public override object Clone() => Value.AsKecaknoahString();

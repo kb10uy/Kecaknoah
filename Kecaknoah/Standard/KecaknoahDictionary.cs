@@ -157,10 +157,7 @@ namespace Kecaknoah.Standard
         selfに代入するのではなく生成したのをNoResumeで返却します。
         */
 
-        private static KecaknoahFunctionResult ClassNew(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
-        {
-            return new KecaknoahDictionary().NoResume();
-        }
+        private static KecaknoahFunctionResult ClassNew(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahDictionary().NoResume();
         #endregion
     }
 

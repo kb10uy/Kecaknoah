@@ -39,6 +39,7 @@ namespace KecaknoahConsole
 
             var environment = new KecaknoahEnvironment();
             var module = environment.CreateModule("Main");
+            module.RegisterStandardLibraries();
             module.RegisterSource(src);
             var ctx = module.CreateContext();
             var il = module["main"];

@@ -63,10 +63,7 @@ namespace Kecaknoah.Standard
         /// </summary>
         /// <param name="name">メンバー名</param>
         /// <returns></returns>
-        protected internal override KecaknoahReference GetMemberReference(string name)
-        {
-            return base.GetMemberReference(name);
-        }
+        protected internal override KecaknoahReference GetMemberReference(string name) => base.GetMemberReference(name);
 
         /// <summary>
         /// この<see cref="KecaknoahObject"/>を「呼び出し」ます。
@@ -79,10 +76,7 @@ namespace Kecaknoah.Standard
         /// 返り値。基本的にはresumeできないと思うので適当な<see cref="KecaknoahObject"/>に<see cref="TypeExtensions.NoResume(KecaknoahObject)"/>してください。
         /// 参考にしてください。
         /// </returns>
-        protected internal override KecaknoahFunctionResult Call(KecaknoahContext context, KecaknoahObject[] args)
-        {
-            return base.Call(context, args);
-        }
+        protected internal override KecaknoahFunctionResult Call(KecaknoahContext context, KecaknoahObject[] args) => base.Call(context, args);
 
         /// <summary>
         /// インデクサーの参照を得ます。
@@ -91,10 +85,7 @@ namespace Kecaknoah.Standard
         /// </summary>
         /// <param name="indices">インデックス</param>
         /// <returns>返す参照</returns>
-        protected internal override KecaknoahReference GetIndexerReference(KecaknoahObject[] indices)
-        {
-            return base.GetIndexerReference(indices);
-        }
+        protected internal override KecaknoahReference GetIndexerReference(KecaknoahObject[] indices) => base.GetIndexerReference(indices);
 
         /// <summary>
         /// 二項演算をします。
@@ -109,10 +100,7 @@ namespace Kecaknoah.Standard
         /// <param name="op">演算子</param>
         /// <param name="target">対象のインスタンス</param>
         /// <returns></returns>
-        protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
-        {
-            return base.ExpressionOperation(op, target);
-        }
+        protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target) => base.ExpressionOperation(op, target);
 
         /// <summary>
         /// 値渡しの際に渡すオブジェクトを生成します。
@@ -164,10 +152,7 @@ namespace Kecaknoah.Standard
         selfに代入するのではなく生成したのをNoResumeで返却します。
         */
 
-        private static KecaknoahFunctionResult ClassNew(KecaknoahContext ctx,KecaknoahObject self,KecaknoahObject[] args)
-        {
-            return new KecaknoahInteropClassBase().NoResume();
-        }
+        private static KecaknoahFunctionResult ClassNew(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahInteropClassBase().NoResume();
         #endregion
     }
 }

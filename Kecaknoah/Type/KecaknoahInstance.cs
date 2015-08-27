@@ -32,6 +32,7 @@ namespace Kecaknoah.Type
         public KecaknoahInstance(KecaknoahScriptClassInfo klass)
         {
             Class = klass;
+            ExtraType = klass.Name;
             LocalFieldReferences = localReferences;
             InstanceMethodReferences = methodReferences;
             foreach (var i in klass.Locals) localReferences[i] = new KecaknoahReference() { IsLeftValue = true };
@@ -50,6 +51,7 @@ namespace Kecaknoah.Type
         public KecaknoahInstance(KecaknoahInteropClassInfo klass)
         {
             Class = klass;
+            ExtraType = klass.Name;
             LocalFieldReferences = localReferences;
             InstanceMethodReferences = methodReferences;
             foreach (var i in klass.Locals) localReferences[i] = new KecaknoahReference() { IsLeftValue = true };

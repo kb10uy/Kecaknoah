@@ -1,0 +1,4 @@
+func main
+  list = ["ココア", "チノ", "リゼ"]
+  println(String.join(",", list))
+endfunc

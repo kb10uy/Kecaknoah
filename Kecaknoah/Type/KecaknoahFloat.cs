@@ -141,6 +141,7 @@ namespace Kecaknoah.Type
         public KecaknoahFloat()
         {
             Type = TypeCode.Double;
+            ExtraType = "Float";
         }
 
 #pragma warning disable 1591

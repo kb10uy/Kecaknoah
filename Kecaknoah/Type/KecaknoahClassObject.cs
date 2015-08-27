@@ -25,6 +25,7 @@ namespace Kecaknoah.Type
         public KecaknoahScriptClassObject(KecaknoahScriptClassInfo info)
         {
             Class = info;
+            ExtraType = "ScriptClass";
             Constructor = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, CreateInstance));
             foreach (var i in Class.classMethods)
             {

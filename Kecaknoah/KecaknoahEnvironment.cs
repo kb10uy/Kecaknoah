@@ -1,4 +1,5 @@
-﻿using Kecaknoah.Standard;
+﻿using Kecaknoah.Analyze;
+using Kecaknoah.Standard;
 using Kecaknoah.Type;
 using System;
 using System.Collections.Generic;
@@ -28,10 +29,6 @@ namespace Kecaknoah
             result.Environment = this;
             modules[name] = result;
 
-            result.RegisterClass(KecaknoahList.Information);
-            result.RegisterClass(KecaknoahDictionary.Information);
-            result.RegisterClass(KecaknoahConvert.Information);
-
             result.RegisterFunction(CreateArray, "array");
             result.RegisterFunction(ReadLine, "readln");
             result.RegisterFunction(WriteLine, "println");
@@ -42,7 +39,7 @@ namespace Kecaknoah
             return result;
         }
 
-        private KecaknoahFunctionResult CreateArray(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
+        private static KecaknoahFunctionResult CreateArray(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
             if (args.Length == 0) throw new ArgumentException("次元数が不正です");
             if (args.Length >= 5) throw new ArgumentException("次元数が多すぎます");
@@ -51,7 +48,7 @@ namespace Kecaknoah
             return result.NoResume();
         }
 
-        private KecaknoahFunctionResult WriteLine(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
+        private static KecaknoahFunctionResult WriteLine(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
             if (args.Length == 0)
             {
@@ -65,22 +62,22 @@ namespace Kecaknoah
             return KecaknoahNil.Instance.NoResume();
         }
 
-        private KecaknoahFunctionResult ReadLine(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => Console.ReadLine().AsKecaknoahString().NoResume();
+        private static KecaknoahFunctionResult ReadLine(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => Console.ReadLine().AsKecaknoahString().NoResume();
 
-        private KecaknoahFunctionResult Format(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
+        private static KecaknoahFunctionResult Format(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
             var b = args[0].ToString();
             var ar = args.Skip(1).Select(p => p.ToString()).ToArray();
             return string.Format(b, ar).AsKecaknoahString().NoResume();
         }
 
-        private KecaknoahFunctionResult Write(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
+        private static KecaknoahFunctionResult Write(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
             Console.Write(args[0]);
             return KecaknoahNil.Instance.NoResume();
         }
 
-        private KecaknoahFunctionResult Exit(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
+        private static KecaknoahFunctionResult Exit(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
             Environment.Exit(args.Length > 0 ? (int)args[0].ToInt64() : 0);
             return KecaknoahNil.Instance.NoResume();

@@ -1,4 +1,6 @@
-﻿namespace Kecaknoah.Type
+﻿using System;
+
+namespace Kecaknoah.Type
 {
     /// <summary>
     /// Kecaknoahのnil(null)を定義します。
@@ -18,7 +20,8 @@
 
         private KecaknoahNil()
         {
-
+            Type = TypeCode.Empty;
+            ExtraType = "Nil";
         }
 
         /// <summary>

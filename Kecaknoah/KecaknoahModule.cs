@@ -1,4 +1,6 @@
-﻿using Kecaknoah.Type;
+﻿using Kecaknoah.Analyze;
+using Kecaknoah.Standard;
+using Kecaknoah.Type;
 using System;
 using System.Collections.Generic;
 
@@ -52,6 +54,7 @@ namespace Kecaknoah
         internal KecaknoahModule(string name)
         {
             Name = name;
+            RegisterFunction(Eval, "eval");
         }
 
         /// <summary>
@@ -59,6 +62,19 @@ namespace Kecaknoah
         /// </summary>
         /// <returns>生成</returns>
         public KecaknoahContext CreateContext() => new KecaknoahContext(this);
+
+        /// <summary>
+        /// 標準ライブラリを登録します。
+        /// </summary>
+        public void RegisterStandardLibraries()
+        {
+            RegisterClass(KecaknoahString.Information);
+            RegisterClass(KecaknoahConvert.Information);
+            RegisterClass(KecaknoahList.Information);
+            RegisterClass(KecaknoahDictionary.Information);
+            RegisterClass(KecaknoahDirectory.Information);
+            RegisterClass(KecaknoahFile.Information);
+        }
 
         /// <summary>
         /// 定義されているオブジェクト・メソッド・クラスの中から検索し、参照を取得・設定します。
@@ -74,7 +90,9 @@ namespace Kecaknoah
             return KecaknoahNil.Reference;
         }
 
+        private KecaknoahFunctionResult Eval(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahContext(this).ExecuteExpressionIL(new KecaknoahPrecompiler().PrecompileExpression(new KecaknoahParser().ParseAsExpression(new KecaknoahLexer().AnalyzeFromSource(args[0].ToString())))).NoResume();
 
+        #region Registerers
         /// <summary>
         /// プリコンパイルしたソースコードを登録します。
         /// </summary>
@@ -223,5 +241,6 @@ namespace Kecaknoah
             topMethods.Add(fo);
             methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
         }
+        #endregion
     }
 }

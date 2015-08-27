@@ -34,12 +34,16 @@ namespace Kecaknoah.Type
             InitializeMembers();
         }
 
-        internal KecaknoahArray(List<KecaknoahObject> arr)
+        /// <summary>
+        /// 配列の新しいインスタンスを生成します。
+        /// </summary>
+        /// <param name="arr">生成する対象の<see cref="KecaknoahObject"/>のリスト</param>
+        public KecaknoahArray(IEnumerable<KecaknoahObject> arr)
         {
             Type = TypeCode.Object;
             array = new List<KecaknoahReference>();
             foreach (var i in arr) array.Add(new KecaknoahReference { IsLeftValue = true, RawObject = i });
-            length = KecaknoahReference.CreateRightReference(arr.Count);
+            length = KecaknoahReference.CreateRightReference(arr.Count());
             InitializeMembers();
         }
 

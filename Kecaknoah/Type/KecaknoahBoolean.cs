@@ -69,6 +69,7 @@ namespace Kecaknoah.Type
         public KecaknoahBoolean()
         {
             Type = TypeCode.Boolean;
+            ExtraType = "Boolean";
         }
 
         /// <summary>

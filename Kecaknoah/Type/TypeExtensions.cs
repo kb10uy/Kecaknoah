@@ -220,7 +220,7 @@ namespace Kecaknoah.Type
             foreach (var i in codes)
             {
                 var obj = q.Dequeue();
-                switch(i)
+                switch (i)
                 {
                     case TypeCode.Int32:
                         result.Add(obj.ToInt32());
@@ -280,5 +280,90 @@ namespace Kecaknoah.Type
         /// </param>
         /// <returns>変換結果</returns>
         public static IList<object> ExpectTypes(this IList<KecaknoahObject> arr, int length, params TypeCode[] codes) => ExpectTypes(arr, length, codes, false);
+
+        /// <summary>
+        /// この<see cref="KecaknoahObject"/>が配列・リストなどの列挙オブジェクトであるとみなし、
+        /// lengthと[]を用いて<see cref="string"/>のリストに変換します。
+        /// </summary>
+        /// <param name="obj">対象</param>
+        /// <returns>結果</returns>
+        public static IList<string> ToStringArray(this KecaknoahObject obj)
+        {
+            var len = obj["length"].ToInt64();
+            var result = new List<string>();
+            for (int i = 0; i < len; i++)
+            {
+                result.Add(obj.GetIndexerReference(new[] { i.AsKecaknoahInteger() }).RawObject.ToString());
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// この<see cref="KecaknoahObject"/>が配列・リストなどの列挙オブジェクトであるとみなし、
+        /// lengthと[]を用いて<see cref="int"/>のリストに変換します。
+        /// </summary>
+        /// <param name="obj">対象</param>
+        /// <returns>結果</returns>
+        public static IList<int> ToInt32Array(this KecaknoahObject obj)
+        {
+            var len = obj["length"].ToInt64();
+            var result = new List<int>();
+            for (int i = 0; i < len; i++)
+            {
+                result.Add(obj.GetIndexerReference(new[] { i.AsKecaknoahInteger() }).RawObject.ToInt32());
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// この<see cref="KecaknoahObject"/>が配列・リストなどの列挙オブジェクトであるとみなし、
+        /// lengthと[]を用いて文<see cref="long"/>のリストに変換します。
+        /// </summary>
+        /// <param name="obj">対象</param>
+        /// <returns>結果</returns>
+        public static IList<long> ToInt64Array(this KecaknoahObject obj)
+        {
+            var len = obj["length"].ToInt64();
+            var result = new List<long>();
+            for (int i = 0; i < len; i++)
+            {
+                result.Add(obj.GetIndexerReference(new[] { i.AsKecaknoahInteger() }).RawObject.ToInt64());
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// この<see cref="KecaknoahObject"/>が配列・リストなどの列挙オブジェクトであるとみなし、
+        /// lengthと[]を用いて文<see cref="double"/>のリストに変換します。
+        /// </summary>
+        /// <param name="obj">対象</param>
+        /// <returns>結果</returns>
+        public static IList<double> ToDoubleArray(this KecaknoahObject obj)
+        {
+            var len = obj["length"].ToInt64();
+            var result = new List<double>();
+            for (int i = 0; i < len; i++)
+            {
+                result.Add(obj.GetIndexerReference(new[] { i.AsKecaknoahInteger() }).RawObject.ToDouble());
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// この<see cref="KecaknoahObject"/>が配列・リストなどの列挙オブジェクトであるとみなし、
+        /// lengthと[]を用いて文<see cref="bool"/>のリストに変換します。
+        /// </summary>
+        /// <param name="obj">対象</param>
+        /// <returns>結果</returns>
+        public static IList<bool> ToBooelanArray(this KecaknoahObject obj)
+        {
+            var len = obj["length"].ToInt64();
+            var result = new List<bool>();
+            for (int i = 0; i < len; i++)
+            {
+                result.Add(obj.GetIndexerReference(new[] { i.AsKecaknoahInteger() }).RawObject.ToBoolean());
+            }
+            return result;
+        }
     }
 }

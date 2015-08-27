@@ -30,6 +30,7 @@ namespace Kecaknoah.Type
         /// <param name="method">メソッド</param>
         public KecaknoahScriptFunction(KecaknoahObject inst, KecaknoahScriptMethodInfo method)
         {
+            ExtraType = "ScriptFunction";
             Instance = inst ?? KecaknoahNil.Instance;
             BaseMethod = method;
         }

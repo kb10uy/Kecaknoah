@@ -1,0 +1,3 @@
+func main
+  foreach(i in Directory.get_files(Directory.current())) println(i)
+endfunc

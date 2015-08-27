@@ -32,6 +32,7 @@
         {
             Instance = inst;
             Function = method;
+            ExtraType = "InteropFunction";
         }
     }
 

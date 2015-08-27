@@ -161,6 +161,7 @@ namespace Kecaknoah.Type
         public KecaknoahInteger()
         {
             Type = TypeCode.Int64;
+            ExtraType = "Integer";
         }
 
 #pragma warning disable 1591
