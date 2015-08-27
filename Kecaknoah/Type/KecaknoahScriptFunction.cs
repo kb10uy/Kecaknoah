@@ -6,7 +6,7 @@ namespace Kecaknoah.Type
     /// <summary>
     /// Kecaknoahで定義されたメソッドのオブジェクトを定義します。
     /// </summary>
-    public class KecaknoahScriptFunction : KecaknoahObject
+    public sealed class KecaknoahScriptFunction : KecaknoahObject
     {
         /// <summary>
         /// 基となるメソッドを取得します。
@@ -19,13 +19,18 @@ namespace Kecaknoah.Type
         public KecaknoahObject Instance { get; }
 
         /// <summary>
+        /// このメソッドの現在のフレームを取得します。
+        /// </summary>
+        public KecaknoahStackFrame CurrentFrame { get; private set; }
+
+        /// <summary>
         /// 新しいインスタンスを生成します。
         /// </summary>
         /// <param name="inst">インスタンス</param>
         /// <param name="method">メソッド</param>
         public KecaknoahScriptFunction(KecaknoahObject inst, KecaknoahScriptMethodInfo method)
         {
-            Instance = inst;
+            Instance = inst ?? KecaknoahNil.Instance;
             BaseMethod = method;
         }
 
@@ -37,11 +42,14 @@ namespace Kecaknoah.Type
         /// <returns>返り値</returns>
         protected internal override KecaknoahFunctionResult Call(KecaknoahContext context, KecaknoahObject[] args)
         {
-            var sf = new KecaknoahStackFrame(context, BaseMethod.Codes);
-            sf.Locals["self"] = KecaknoahReference.CreateRightReference(Instance);
-            sf.Arguments = args;
-            var r = sf.Resume();
-            return new KecaknoahFunctionResult(sf.ReturningObject, r);
+            if (args != null)
+            {
+                CurrentFrame = new KecaknoahStackFrame(context, BaseMethod.Codes);
+                CurrentFrame.Locals["self"] = KecaknoahReference.CreateRightReference(Instance);
+                CurrentFrame.Arguments = args;
+            }
+            var r = CurrentFrame.Resume();
+            return new KecaknoahFunctionResult(CurrentFrame.ReturningObject, r);
         }
     }
 }

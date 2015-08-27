@@ -63,24 +63,7 @@ namespace KecaknoahInteractive
                         Console.WriteLine("実行結果------------------------");
                         try
                         {
-                            var sf = ctx.ExecuteWithStackFrame(il);
-                            Console.WriteLine(sf.ReturningObject);
-                            /*
-                            Console.ForegroundColor = ConsoleColor.DarkRed;
-                            Console.WriteLine("環境情報------------------------");
-                            foreach (var i in sf.Locals)
-                            {
-                                Console.WriteLine($"{i.Key} : {i.Value.RawObject.ToString()}");
-                            }
-                            sw.Reset();
-                            sw.Start();
-                            for (int i = 0; i < 1048576; i++)
-                            {
-                                var val = ctx.Execute(il);
-                            }
-                            sw.Stop();
-                            Console.WriteLine($"{sw.ElapsedMilliseconds / 1048576.0 }ms/call");
-                            */
+                            var sf = ctx.ExecuteExpressionIL(il);
                         }
                         catch (Exception e)
                         {
@@ -88,9 +71,6 @@ namespace KecaknoahInteractive
                             Console.WriteLine("実行時エラー");
                             Console.WriteLine($"{nameof(e)}: {e.Message}");
                         }
-
-
-
                     }
                     else
                     {

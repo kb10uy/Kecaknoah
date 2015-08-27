@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Kecaknoah;
 using Kecaknoah.Analyze;
 using Kecaknoah.Type;
-using System.Diagnostics;
 
 namespace KecaknoahConsole
 {
@@ -45,22 +42,16 @@ namespace KecaknoahConsole
             module.RegisterSource(src);
             var ctx = module.CreateContext();
             var il = module["main"];
-            var kargs = new List<KecaknoahString>();
+            var kargs = new List<KecaknoahObject>();
             if (args.Length > 2)
             {
                 kargs.AddRange(args.Skip(1).Select(p => p.AsKecaknoahString()));
             }
-            if (il != KecaknoahNil.Instance) ctx.Execute(il, kargs.ToArray());
-            /*
-            var sw = new Stopwatch();
-            sw.Start();
-            for (int i = 0; i < 10; i++)
+            if (il != KecaknoahNil.Instance)
             {
-                ctx.Execute(il);
+                ctx.Initialize(il, kargs);
+                while(ctx.MoveNext());
             }
-            sw.Stop();
-            Console.WriteLine($"{sw.ElapsedMilliseconds}");
-            */
             var asm = AssembleSource(src);
             File.WriteAllLines(args[0] + ".asm", asm);
             Console.ReadLine();

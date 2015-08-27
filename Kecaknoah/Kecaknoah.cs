@@ -68,7 +68,7 @@ namespace Kecaknoah
             CurrentModule.RegisterSource(src);
             if (CurrentModule["main"] != KecaknoahNil.Instance)
             {
-                return new KecaknoahContext(CurrentModule).Execute(CurrentModule["main"]);
+                return new KecaknoahContext(CurrentModule).CallInstant(CurrentModule["main"]);
             }
             else
             {
@@ -90,7 +90,7 @@ namespace Kecaknoah
             CurrentModule.RegisterSource(src);
             if (CurrentModule["main"] != KecaknoahNil.Instance)
             {
-                return new KecaknoahContext(CurrentModule).Execute(CurrentModule["main"]);
+                return new KecaknoahContext(CurrentModule).CallInstant(CurrentModule["main"]);
             }
             else
             {
@@ -109,7 +109,7 @@ namespace Kecaknoah
             var ast = Parser.ParseAsExpression(le);
             if (!ast.Success) throw new KecaknoahException(le.Error);
             var src = Precompiler.PrecompileExpression(ast);
-            return new KecaknoahContext(CurrentModule).Execute(src);
+            return new KecaknoahContext(CurrentModule).ExecuteExpressionIL(src);
         }
     }
 
