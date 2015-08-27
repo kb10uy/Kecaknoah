@@ -16,12 +16,12 @@ namespace Kecaknoah.Type
         /// <summary>
         /// 最大値のインスタンスを取得します。
         /// </summary>
-        public static KecaknoahReference MaxValue = KecaknoahReference.CreateRightReference(double.MaxValue);
+        public static KecaknoahReference MaxValue = KecaknoahReference.Right(double.MaxValue);
 
         /// <summary>
         /// 最小値のインスタンスを取得します。
         /// </summary>
-        public static KecaknoahReference MinValue = KecaknoahReference.CreateRightReference(double.MinValue);
+        public static KecaknoahReference MinValue = KecaknoahReference.Right(double.MinValue);
         /// <summary>
         /// 
         /// </summary>

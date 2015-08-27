@@ -52,7 +52,7 @@ namespace Kecaknoah.Type
         /// <param name="func">登録するメソッドのデリゲート</param>
         public void AddFunction(string name, KecaknoahInteropDelegate func)
         {
-            funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, func));
+            funcs[name] = KecaknoahReference.Right(this, func);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Kecaknoah.Type
                     func(s);
                     return KecaknoahNil.Instance.NoResume();
                 };
-            funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
+            funcs[name] = KecaknoahReference.Right(this, wp);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Kecaknoah.Type
                     func(s, a);
                     return KecaknoahNil.Instance.NoResume();
                 };
-            funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
+            funcs[name] = KecaknoahReference.Right(this, wp);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Kecaknoah.Type
         public void AddFunction(string name, Func<KecaknoahObject, KecaknoahObject> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s).NoResume();
-            funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
+            funcs[name] = KecaknoahReference.Right(this, wp);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Kecaknoah.Type
         public void AddFunction(string name, Func<KecaknoahObject, KecaknoahObject[], KecaknoahObject> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s, a).NoResume();
-            funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
+            funcs[name] = KecaknoahReference.Right(this, wp);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Kecaknoah.Type
         public void AddInt32Function(string name, Func<KecaknoahObject, KecaknoahObject[], int> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s, a).AsKecaknoahInteger().NoResume();
-            funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
+            funcs[name] = KecaknoahReference.Right(this, wp);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace Kecaknoah.Type
         public void AddInt64Function(string name, Func<KecaknoahObject, KecaknoahObject[], long> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s, a).AsKecaknoahInteger().NoResume();
-            funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
+            funcs[name] = KecaknoahReference.Right(this, wp);
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace Kecaknoah.Type
         public void AddSingleFunction(string name, Func<KecaknoahObject, KecaknoahObject[], float> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => ((double)func(s, a)).AsKecaknoahFloat().NoResume();
-            funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
+            funcs[name] = KecaknoahReference.Right(this, wp);
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace Kecaknoah.Type
         public void AddDoubleFunction(string name, Func<KecaknoahObject, KecaknoahObject[], double> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s, a).AsKecaknoahFloat().NoResume();
-            funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
+            funcs[name] = KecaknoahReference.Right(this, wp);
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace Kecaknoah.Type
         public void AddBooleanFunction(string name, Func<KecaknoahObject, KecaknoahObject[], bool> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s, a).AsKecaknoahBoolean().NoResume();
-            funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
+            funcs[name] = KecaknoahReference.Right(this, wp);
         }
 
         /// <summary>
@@ -202,7 +202,7 @@ namespace Kecaknoah.Type
         public void AddStringFunction(string name, Func<KecaknoahObject, KecaknoahObject[], string> func)
         {
             KecaknoahInteropDelegate wp = (c, s, a) => func(s, a).AsKecaknoahString().NoResume();
-            funcs[name] = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, wp));
+            funcs[name] = KecaknoahReference.Right(this, wp);
         }
         #endregion
 

@@ -49,9 +49,13 @@ namespace Kecaknoah.Standard
             RegisterInstanceFunction();
         }
 
-        private KecaknoahList(IEnumerable<KecaknoahObject> refs) : base()
+        /// <summary>
+        /// 要素を指定して新しいインスタンスを初期化します。
+        /// </summary>
+        /// <param name="refs">追加する要素</param>
+        public KecaknoahList(IEnumerable<KecaknoahObject> refs) : base()
         {
-            foreach (var i in refs) list.Add(new KecaknoahReference { IsLeftValue = true, RawObject = i });
+            foreach (var i in refs) list.Add(KecaknoahReference.Left(i));
         }
 
         private KecaknoahList(IEnumerable<KecaknoahReference> refs) : base()
@@ -84,7 +88,7 @@ namespace Kecaknoah.Standard
                 case nameof(reduce): return reduce;
                 case nameof(filter): return filter;
 
-                case "length": return KecaknoahReference.CreateRightReference(list.Count.AsKecaknoahInteger());
+                case "length": return KecaknoahReference.Right(list.Count);
             }
             return base.GetMemberReference(name);
         }
@@ -108,14 +112,14 @@ namespace Kecaknoah.Standard
 
         private void RegisterInstanceFunction()
         {
-            add = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceAdd));
-            insert = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceInsert));
-            each = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceEach));
-            remove_at = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceRemoveAt));
-            remove_by = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceRemoveBy));
-            filter = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceFilter));
-            map = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceMap));
-            reduce = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceReduce));
+            add = KecaknoahReference.Right(this, InstanceAdd);
+            insert = KecaknoahReference.Right(this, InstanceInsert);
+            each = KecaknoahReference.Right(this, InstanceEach);
+            remove_at = KecaknoahReference.Right(this, InstanceRemoveAt);
+            remove_by = KecaknoahReference.Right(this, InstanceRemoveBy);
+            filter = KecaknoahReference.Right(this, InstanceFilter);
+            map = KecaknoahReference.Right(this, InstanceMap);
+            reduce = KecaknoahReference.Right(this, InstanceReduce);
         }
 
         private KecaknoahFunctionResult InstanceAdd(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)

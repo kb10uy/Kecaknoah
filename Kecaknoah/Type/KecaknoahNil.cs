@@ -16,7 +16,7 @@ namespace Kecaknoah.Type
         /// <summary>
         /// <see cref="Instance"/>への参照を取得します。
         /// </summary>
-        public static KecaknoahReference Reference { get; } = KecaknoahReference.CreateRightReference(Instance);
+        public static KecaknoahReference Reference { get; } = KecaknoahReference.Right(Instance);
 
         private KecaknoahNil()
         {

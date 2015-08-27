@@ -71,7 +71,7 @@ namespace Kecaknoah.Standard
                 case nameof(remove): return remove;
                 case nameof(has_key): return has_key;
 
-                case "length": return KecaknoahReference.CreateRightReference(dict.Count.AsKecaknoahInteger());
+                case "length": return KecaknoahReference.Right(dict.Count);
             }
             return base.GetMemberReference(name);
         }
@@ -87,7 +87,7 @@ namespace Kecaknoah.Standard
         {
             if (!dict.ContainsKey(indices[0]))
             {
-                dict[indices[0]] = new KecaknoahReference { IsLeftValue = true };
+                dict[indices[0]] = KecaknoahReference.Left(KecaknoahNil.Instance);
             }
             return dict[indices[0]];
         }
@@ -126,9 +126,9 @@ namespace Kecaknoah.Standard
 
         private void RegisterInstanceFunction()
         {
-            each = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceEach));
-            remove = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceRemove));
-            has_key = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceHasKey));
+            each = KecaknoahReference.Right(this, InstanceEach);
+            remove = KecaknoahReference.Right(this, InstanceRemove);
+            has_key = KecaknoahReference.Right(this, InstanceHasKey);
         }
 
         private KecaknoahFunctionResult InstanceHasKey(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)

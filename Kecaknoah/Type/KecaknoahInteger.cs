@@ -15,12 +15,12 @@ namespace Kecaknoah.Type
         /// <summary>
         /// 最大値のインスタンスを取得します。
         /// </summary>
-        public static KecaknoahReference MaxValue = KecaknoahReference.CreateRightReference(long.MaxValue);
+        public static KecaknoahReference MaxValue = KecaknoahReference.Right(long.MaxValue);
 
         /// <summary>
         /// 最小値のインスタンスを取得します。
         /// </summary>
-        public static KecaknoahReference MinValue = KecaknoahReference.CreateRightReference(long.MaxValue);
+        public static KecaknoahReference MinValue = KecaknoahReference.Right(long.MaxValue);
 
         /// <summary>
         /// 

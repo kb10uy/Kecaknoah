@@ -138,7 +138,7 @@ namespace Kecaknoah.Standard
 
         #region インスタンスメソッド
         //nameof使おうな
-        KecaknoahReference instance_method;
+        //KecaknoahReference instance_method;
 
         private void RegisterInstanceFunction()
         {

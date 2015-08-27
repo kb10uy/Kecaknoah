@@ -46,7 +46,7 @@ namespace Kecaknoah.Type
             if (args != null)
             {
                 CurrentFrame = new KecaknoahStackFrame(context, BaseMethod.Codes);
-                CurrentFrame.Locals["self"] = KecaknoahReference.CreateRightReference(Instance);
+                CurrentFrame.Locals["self"] = KecaknoahReference.Right(Instance);
                 CurrentFrame.Arguments = args;
             }
             var r = CurrentFrame.Resume();

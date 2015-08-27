@@ -46,12 +46,16 @@ namespace KecaknoahConsole
             var kargs = new List<KecaknoahObject>();
             if (args.Length > 2)
             {
-                kargs.AddRange(args.Skip(1).Select(p => p.AsKecaknoahString()));
+                kargs.Add(new KecaknoahArray(args.Skip(1).Select(p => p.AsKecaknoahString())));
+            }
+            else
+            {
+                kargs.Add(new KecaknoahArray(new List<KecaknoahObject>()));
             }
             if (il != KecaknoahNil.Instance)
             {
                 ctx.Initialize(il, kargs);
-                while(ctx.MoveNext());
+                while (ctx.MoveNext()) ;
             }
             var asm = AssembleSource(src);
             File.WriteAllLines(args[0] + ".asm", asm);

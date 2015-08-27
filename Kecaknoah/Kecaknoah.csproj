@@ -92,9 +92,9 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>mkdir $(SolutionDir)releases
-copy $(TargetPath) $(SolutionDir)releases\$(TargetFileName)
-copy $(TargetDir)$(TargetName).xml $(SolutionDir)releases\$(TargetName).xml</PostBuildEvent>
+    <PostBuildEvent>mkdir $(SolutionDir)releases\$(ConfigurationName)
+copy $(TargetPath) $(SolutionDir)releases\$(ConfigurationName)\$(TargetFileName)
+copy $(TargetDir)$(TargetName).xml $(SolutionDir)releases\$(ConfigurationName)\$(TargetName).xml</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

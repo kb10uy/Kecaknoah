@@ -19,18 +19,18 @@ namespace Kecaknoah.Type
             Type = TypeCode.Object;
             ExtraType = "Array";
             array = new List<KecaknoahReference>();
-            length = KecaknoahReference.CreateRightReference(dim[0]);
+            length = KecaknoahReference.Right(dim[0]);
             InitializeMembers();
-            for (int i = 0; i < dim[0]; i++) array.Add(new KecaknoahReference { IsLeftValue = true, RawObject = KecaknoahNil.Instance });
+            for (int i = 0; i < dim[0]; i++) array.Add(KecaknoahReference.Left(KecaknoahNil.Instance));
             if (dim.Length == 1) return;
-            for (int i = 0; i < array.Count; i++) array[i] = new KecaknoahReference { IsLeftValue = true, RawObject = new KecaknoahArray(dim.Skip(1).ToArray()) };
+            for (int i = 0; i < array.Count; i++) array[i] = KecaknoahReference.Left(new KecaknoahArray(dim.Skip(1).ToArray()));
         }
 
         internal KecaknoahArray(List<KecaknoahReference> arr)
         {
             Type = TypeCode.Object;
             array = arr;
-            length = KecaknoahReference.CreateRightReference(arr.Count);
+            length = KecaknoahReference.Right(arr.Count);
             InitializeMembers();
         }
 
@@ -42,18 +42,18 @@ namespace Kecaknoah.Type
         {
             Type = TypeCode.Object;
             array = new List<KecaknoahReference>();
-            foreach (var i in arr) array.Add(new KecaknoahReference { IsLeftValue = true, RawObject = i });
-            length = KecaknoahReference.CreateRightReference(arr.Count());
+            foreach (var i in arr) array.Add(KecaknoahReference.Left(i));
+            length = KecaknoahReference.Right(arr.Count());
             InitializeMembers();
         }
 
         private void InitializeMembers()
         {
-            each = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceEach));
-            find = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceFind));
-            filter = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceFilter));
-            map = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceMap));
-            reduce = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, InstanceReduce));
+            each = KecaknoahReference.Right(this, InstanceEach);
+            find = KecaknoahReference.Right(this, InstanceFind);
+            filter = KecaknoahReference.Right(this, InstanceFilter);
+            map = KecaknoahReference.Right(this, InstanceMap);
+            reduce = KecaknoahReference.Right(this, InstanceReduce);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace Kecaknoah.Type
 
         private KecaknoahFunctionResult InstanceReduce(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
         {
-            var result = array.Aggregate((p, q) => KecaknoahReference.CreateRightReference(args[0].Call(ctx, new[] { p.RawObject, q.RawObject }).ReturningObject));
+            var result = array.Aggregate((p, q) => KecaknoahReference.Right(args[0].Call(ctx, new[] { p.RawObject, q.RawObject }).ReturningObject));
             return result.RawObject.NoResume();
         }
 

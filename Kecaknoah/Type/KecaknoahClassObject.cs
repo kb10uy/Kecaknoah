@@ -26,10 +26,10 @@ namespace Kecaknoah.Type
         {
             Class = info;
             ExtraType = "ScriptClass";
-            Constructor = KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(this, CreateInstance));
+            Constructor = KecaknoahReference.Right(this, CreateInstance);
             foreach (var i in Class.classMethods)
             {
-                methods[i.Name] = (KecaknoahReference.CreateRightReference(new KecaknoahScriptFunction(KecaknoahNil.Instance, i)));
+                methods[i.Name] = (KecaknoahReference.Right(new KecaknoahScriptFunction(KecaknoahNil.Instance, i)));
             }
         }
 
@@ -82,7 +82,7 @@ namespace Kecaknoah.Type
             Class = info;
             foreach (var i in Class.classMethods)
             {
-                methods[i.Name] = (KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(KecaknoahNil.Instance, i.Body)));
+                methods[i.Name] = (KecaknoahReference.Right(KecaknoahNil.Instance, i.Body));
             }
         }
 

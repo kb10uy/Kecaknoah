@@ -93,9 +93,9 @@ namespace Kecaknoah.Type
             ExtraType = "Array";
         }
 
-        private static KecaknoahReference InstanceToString(KecaknoahObject self) => KecaknoahReference.CreateRightReference(self, (ctx, s, args) => s.ToString().AsKecaknoahString().NoResume());
+        private static KecaknoahReference InstanceToString(KecaknoahObject self) => KecaknoahReference.Right(self, (ctx, s, args) => s.ToString().AsKecaknoahString().NoResume());
 
-        private static KecaknoahReference InstanceHash(KecaknoahObject self) => KecaknoahReference.CreateRightReference(self, (ctx, s, args) => s.GetHashCode().AsKecaknoahInteger().NoResume());
+        private static KecaknoahReference InstanceHash(KecaknoahObject self) => KecaknoahReference.Right(self, (ctx, s, args) => s.GetHashCode().AsKecaknoahInteger().NoResume());
 
         /// <summary>
         /// 現在の以下略。

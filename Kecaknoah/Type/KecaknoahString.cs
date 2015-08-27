@@ -111,8 +111,8 @@ namespace Kecaknoah.Type
         public KecaknoahString()
         {
             Type = TypeCode.String;
-            Replace = KecaknoahReference.CreateRightReference(this, InstanceReplace);
-            Substring = KecaknoahReference.CreateRightReference(this, InstanceSubstring);
+            Replace = KecaknoahReference.Right(this, InstanceReplace);
+            Substring = KecaknoahReference.Right(this, InstanceSubstring);
         }
 
         /// <summary>

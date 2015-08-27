@@ -102,12 +102,12 @@ namespace Kecaknoah
             foreach (var c in src.Classes)
             {
                 classes.Add(c);
-                classReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahScriptClassObject(c)));
+                classReferences.Add(KecaknoahReference.Right(new KecaknoahScriptClassObject(c)));
             }
             foreach (var m in src.TopLevelMethods)
             {
                 topMethods.Add(m);
-                methodReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahScriptFunction(KecaknoahNil.Instance, m)));
+                methodReferences.Add(KecaknoahReference.Right(new KecaknoahScriptFunction(KecaknoahNil.Instance, m)));
             }
         }
 
@@ -118,7 +118,7 @@ namespace Kecaknoah
         public void RegisterClass(KecaknoahInteropClassInfo klass)
         {
             classes.Add(klass);
-            classReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahInteropClassObject(klass)));
+            classReferences.Add(KecaknoahReference.Right(new KecaknoahInteropClassObject(klass)));
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Kecaknoah
         public void RegisterMethod(KecaknoahInteropMethodInfo method)
         {
             topMethods.Add(method);
-            methodReferences.Add(KecaknoahReference.CreateRightReference(new KecaknoahInteropFunction(null, method.Body)));
+            methodReferences.Add(KecaknoahReference.Right(KecaknoahNil.Instance, method.Body));
         }
 
 
@@ -141,7 +141,7 @@ namespace Kecaknoah
         {
             var fo = new KecaknoahInteropMethodInfo(name, func);
             topMethods.Add(fo);
-            methodReferences.Add(KecaknoahReference.CreateRightReference(null, func));
+            methodReferences.Add(KecaknoahReference.Right(KecaknoahNil.Instance, func));
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace Kecaknoah
                 (ctx, self, args) => func(self, args).NoResume();
             var fo = new KecaknoahInteropMethodInfo(name, wp);
             topMethods.Add(fo);
-            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+            methodReferences.Add(KecaknoahReference.Right(KecaknoahNil.Instance, wp));
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace Kecaknoah
                 (ctx, self, args) => func(self, args).AsKecaknoahInteger().NoResume();
             var fo = new KecaknoahInteropMethodInfo(name, wp);
             topMethods.Add(fo);
-            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+            methodReferences.Add(KecaknoahReference.Right(KecaknoahNil.Instance, wp));
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace Kecaknoah
                 (ctx, self, args) => func(self, args).AsKecaknoahInteger().NoResume();
             var fo = new KecaknoahInteropMethodInfo(name, wp);
             topMethods.Add(fo);
-            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+            methodReferences.Add(KecaknoahReference.Right(KecaknoahNil.Instance, wp));
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace Kecaknoah
                 (ctx, self, args) => ((double)func(self, args)).AsKecaknoahFloat().NoResume();
             var fo = new KecaknoahInteropMethodInfo(name, wp);
             topMethods.Add(fo);
-            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+            methodReferences.Add(KecaknoahReference.Right(KecaknoahNil.Instance, wp));
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace Kecaknoah
                 (ctx, self, args) => func(self, args).AsKecaknoahFloat().NoResume();
             var fo = new KecaknoahInteropMethodInfo(name, wp);
             topMethods.Add(fo);
-            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+            methodReferences.Add(KecaknoahReference.Right(KecaknoahNil.Instance, wp));
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace Kecaknoah
                 (ctx, self, args) => func(self, args).AsKecaknoahBoolean().NoResume();
             var fo = new KecaknoahInteropMethodInfo(name, wp);
             topMethods.Add(fo);
-            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+            methodReferences.Add(KecaknoahReference.Right(KecaknoahNil.Instance, wp));
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Kecaknoah
                 (ctx, self, args) => func(self, args).AsKecaknoahString().NoResume();
             var fo = new KecaknoahInteropMethodInfo(name, wp);
             topMethods.Add(fo);
-            methodReferences.Add(KecaknoahReference.CreateRightReference(null, wp));
+            methodReferences.Add(KecaknoahReference.Right(KecaknoahNil.Instance, wp));
         }
         #endregion
     }
