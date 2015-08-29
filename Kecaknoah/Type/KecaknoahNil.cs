@@ -57,9 +57,9 @@ namespace Kecaknoah.Type
             switch (op)
             {
                 case KecaknoahILCodeType.Equal:
-                    return (dynamic)this == (dynamic)target;
+                    return TypeExtensions.AsKecaknoahBoolean((dynamic)this == (dynamic)target);
                 case KecaknoahILCodeType.NotEqual:
-                    return (dynamic)this != (dynamic)target;
+                    return TypeExtensions.AsKecaknoahBoolean((dynamic)this != (dynamic)target);
                 default:
                     return KecaknoahNil.Instance;
             }

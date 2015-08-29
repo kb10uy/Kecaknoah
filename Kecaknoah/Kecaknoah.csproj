@@ -49,6 +49,7 @@
     <Compile Include="Analyze\KecaknoahStructureNodes.cs" />
     <Compile Include="Kecaknoah.cs" />
     <Compile Include="Analyze\KecaknoahAst.cs" />
+    <Compile Include="KecaknoahBytecode.cs" />
     <Compile Include="KecaknoahContext.cs" />
     <Compile Include="KecaknoahCoroutineFrame.cs" />
     <Compile Include="KecaknoahPrecompiler.cs" />
