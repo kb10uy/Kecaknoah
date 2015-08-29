@@ -61,7 +61,7 @@ namespace KecaknoahConsole
             if (il != KecaknoahNil.Instance)
             {
                 ctx.Initialize(il, kargs);
-                while (ctx.MoveNext());
+                while (ctx.MoveNext()) ;
             }
         }
 
@@ -117,6 +117,11 @@ namespace KecaknoahConsole
                 result.Add("  " + i.ToString());
             }
             return result;
+        }
+
+        public void MakeUnko(int val)
+        {
+            Console.WriteLine("うんこが{0}つ", val);
         }
     }
 }

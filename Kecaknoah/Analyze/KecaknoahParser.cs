@@ -800,6 +800,7 @@ namespace Kecaknoah.Analyze
                     break;
                 }
                 var nt = tokens.Peek();
+                if (!OperatorPriorities.ContainsKey(nt.Type)) throw new KecaknoahParseException(nt.CreateErrorAt($"演算子ではなく{nt.Type}が検出されました。"));
                 if (OperatorPriorities[nt.Type] != priority) break;
                 tokens.Dequeue();
                 tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
@@ -1093,7 +1094,7 @@ namespace Kecaknoah.Analyze
                         return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.IntegerValue, IntegerValue = r ? v : long.MaxValue };
                     }
                 default:
-                    throw new KecaknoahParseException(t.CreateErrorAt("意味不明なfactorが検出されました。"));
+                    throw new KecaknoahParseException(t.CreateErrorAt($"Factorが検出されるべきですが{t.Type}が検出されました。"));
 
             }
         }

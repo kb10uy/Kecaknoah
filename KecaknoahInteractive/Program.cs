@@ -20,6 +20,7 @@ namespace KecaknoahInteractive
             var environment = new KecaknoahEnvironment();
             var sw = new Stopwatch();
             var module = environment.CreateModule("Himanoa");
+            module.RegisterStandardLibraries();
             var ctx = module.CreateContext();
             lexer.DefaultSourceName = "himanoa";
             var input = "";
@@ -70,7 +71,7 @@ namespace KecaknoahInteractive
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("実行時エラー");
-                            Console.WriteLine($"{nameof(e)}: {e.Message}");
+                            Console.WriteLine($"{e.GetType().Name}: {e.Message}");
                         }
                     }
                     else

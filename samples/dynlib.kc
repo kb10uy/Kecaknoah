@@ -1,0 +1,8 @@
+# Kecakcと同じディレクトリで実行してください
+func main
+  asm = DynamicLibrary.load_file("Kecakc.exe")
+  ty = asm["KecaknoahConsole.Program"]
+  obj = ty.create()
+  obj.MakeUnko(1048576)
+  readln()
+endfunc

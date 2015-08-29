@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Kecaknoah.Standard
 {
+#pragma warning disable 1591
     /// <summary>
     /// Kecaknoahと.NET連携の型の基底を提供します。
     /// 実際に作成する際はこのクラスをコピーするといいかもしれません。
@@ -155,4 +156,5 @@ namespace Kecaknoah.Standard
         private static KecaknoahFunctionResult ClassNew(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahInteropClassBase().NoResume();
         #endregion
     }
+#pragma warning restore 1591
 }

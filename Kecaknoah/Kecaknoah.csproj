@@ -66,6 +66,7 @@
     <Compile Include="Standard\KecaknoahConvert.cs" />
     <Compile Include="Standard\KecaknoahDictionary.cs" />
     <Compile Include="Standard\KecaknoahFileSystem.cs" />
+    <Compile Include="Standard\KecaknoahHash.cs" />
     <Compile Include="Standard\KecaknoahList.cs" />
     <Compile Include="Standard\KecaknoahInteropClassBase.cs" />
     <Compile Include="Standard\KecaknoahMatch.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="KecaknoahMethodInfo.cs" />
     <Compile Include="KecaknoahScriptClassInfo.cs" />
     <Compile Include="Type\KecaknoahFloat.cs" />
+    <Compile Include="Standard\KecaknoahInteropLibrary.cs" />
     <Compile Include="Type\KecaknoahScriptFunction.cs" />
     <Compile Include="Type\KecaknoahInstance.cs" />
     <Compile Include="Type\KecaknoahInteger.cs" />

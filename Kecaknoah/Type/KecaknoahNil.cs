@@ -25,28 +25,6 @@ namespace Kecaknoah.Type
         }
 
         /// <summary>
-        /// 特定の名前を持つメンバーに対してアクセスを試み、値を取得しようとしてもnilです。
-        /// </summary>
-        /// <param name="name">メンバー名</param>
-        /// <returns>アクセスできる場合は対象のオブジェクト</returns>
-        protected internal override KecaknoahReference GetMemberReference(string name) => Reference;
-
-        /// <summary>
-        /// このオブジェクトに対してメソッドとしての呼び出しをしようとしてもnilです。
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="args">引数</param>
-        /// <returns>返り値</returns>
-        protected internal override KecaknoahFunctionResult Call(KecaknoahContext context, KecaknoahObject[] args) => Instance.NoResume();
-
-        /// <summary>
-        /// このオブジェクトに対してインデクサーアクセスを試みようとしてもnilです。 
-        /// </summary>
-        /// <param name="indices">インデックス引数</param>
-        /// <returns></returns>
-        protected internal override KecaknoahReference GetIndexerReference(KecaknoahObject[] indices) => Reference;
-
-        /// <summary>
         /// このオブジェクトに対して二項式としての演算をしようとしても大体nilです。
         /// </summary>
         /// <param name="op">演算子</param>
