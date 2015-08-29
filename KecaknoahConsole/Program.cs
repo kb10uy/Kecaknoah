@@ -18,25 +18,36 @@ namespace KecaknoahConsole
                 return;
             }
 
-            var txt = File.ReadAllText(args[0]);
-            var lexer = new KecaknoahLexer();
-            var parser = new KecaknoahParser();
-            var lr = lexer.AnalyzeFromSource(txt);
-            if (!lr.Success)
+            KecaknoahSource src;
+            if (Path.GetExtension(args[0]).Equals(".kcb", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine($"字句解析エラー ({lr.Error.Column}, {lr.Error.Line}): {lr.Error.Message}");
-                Console.ReadLine();
-                Environment.Exit(1);
+                src = KecaknoahBytecode.Load(File.OpenRead(args[0]));
             }
-            var ast = parser.Parse(lr);
-            if (!ast.Success)
+            else
             {
-                Console.WriteLine($"構文解析エラー ({ast.Error.Column}, {ast.Error.Line}): {ast.Error.Message}");
-                Console.ReadLine();
-                Environment.Exit(1);
+                var txt = File.ReadAllText(args[0]);
+                var lexer = new KecaknoahLexer();
+                var parser = new KecaknoahParser();
+                var lr = lexer.AnalyzeFromSource(txt);
+                if (!lr.Success)
+                {
+                    Console.WriteLine($"字句解析エラー ({lr.Error.Column}, {lr.Error.Line}): {lr.Error.Message}");
+                    Console.ReadLine();
+                    Environment.Exit(1);
+                }
+                var ast = parser.Parse(lr);
+                if (!ast.Success)
+                {
+                    Console.WriteLine($"構文解析エラー ({ast.Error.Column}, {ast.Error.Line}): {ast.Error.Message}");
+                    Console.ReadLine();
+                    Environment.Exit(1);
+                }
+                var prc = new KecaknoahPrecompiler();
+                src = prc.PrecompileAll(ast);
+#if DEBUG
+                KecaknoahBytecode.Save(src, File.OpenWrite(args[0] + ".kcb"));
+#endif
             }
-            var prc = new KecaknoahPrecompiler();
-            var src = prc.PrecompileAll(ast);
 #if DEBUG
             var asm = AssembleSource(src);
             File.WriteAllLines(args[0] + ".asm", asm);
