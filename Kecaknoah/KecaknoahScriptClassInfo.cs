@@ -12,8 +12,8 @@ namespace Kecaknoah
         internal List<KecaknoahScriptClassInfo> inners = new List<KecaknoahScriptClassInfo>();
         internal List<KecaknoahScriptMethodInfo> methods = new List<KecaknoahScriptMethodInfo>();
         internal List<KecaknoahScriptMethodInfo> classMethods = new List<KecaknoahScriptMethodInfo>();
-        private List<string> locals = new List<string>();
-
+        private List<string> localnames = new List<string>();
+        internal IList<KecaknoahScriptLocalInfo> LocalInfos { get; } = new List<KecaknoahScriptLocalInfo>();
         /// <summary>
         /// 新しいインスタンスを初期化します。
         /// </summary>
@@ -21,7 +21,7 @@ namespace Kecaknoah
         public KecaknoahScriptClassInfo(string name)
         {
             Name = name;
-            Locals = locals;
+            Locals = localnames;
             InnerClasses = inners;
             InstanceMethods = methods;
             ClassMethods = classMethods;
@@ -59,9 +59,27 @@ namespace Kecaknoah
         /// フィールドを追加します。
         /// </summary>
         /// <param name="local">追加するメソッド</param>
-        internal void AddLocal(string local)
+        /// <param name="exp">初期化式を定義する<see cref="KecaknoahIL"/></param>
+        internal void AddLocal(string local, KecaknoahIL exp)
         {
-            locals.Add(local);
+            LocalInfos.Add(new KecaknoahScriptLocalInfo { Name = local, InitializeIL = exp });
+            localnames.Add(local);
+        }
+
+        /// <summary>
+        /// スクリプトのlocal宣言の情報を定義します。
+        /// </summary>
+        internal sealed class KecaknoahScriptLocalInfo
+        {
+            /// <summary>
+            /// 名前を取得します。
+            /// </summary>
+            public string Name { get; internal set; }
+
+            /// <summary>
+            /// 初期化式の<see cref="KecaknoahIL"/>を取得します。
+            /// </summary>
+            public KecaknoahIL InitializeIL { get; internal set; }
         }
     }
 }

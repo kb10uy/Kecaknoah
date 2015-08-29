@@ -68,6 +68,9 @@
     <Compile Include="Standard\KecaknoahFileSystem.cs" />
     <Compile Include="Standard\KecaknoahList.cs" />
     <Compile Include="Standard\KecaknoahInteropClassBase.cs" />
+    <Compile Include="Standard\KecaknoahMatch.cs" />
+    <Compile Include="Standard\KecaknoahMath.cs" />
+    <Compile Include="Standard\KecaknoahRegex.cs" />
     <Compile Include="Type\KecaknoahArray.cs" />
     <Compile Include="Type\KecaknoahBoolean.cs" />
     <Compile Include="KecaknoahClassInfo.cs" />

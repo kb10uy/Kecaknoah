@@ -72,6 +72,7 @@ namespace Kecaknoah.Type
         public KecaknoahInteropClassInfo Class { get; }
 
         private Dictionary<string, KecaknoahReference> methods = new Dictionary<string, KecaknoahReference>();
+        private Dictionary<string, KecaknoahReference> consts = new Dictionary<string, KecaknoahReference>();
 
         /// <summary>
         /// 新しいインスタンスを初期化します。
@@ -80,10 +81,8 @@ namespace Kecaknoah.Type
         public KecaknoahInteropClassObject(KecaknoahInteropClassInfo info)
         {
             Class = info;
-            foreach (var i in Class.classMethods)
-            {
-                methods[i.Name] = (KecaknoahReference.Right(KecaknoahNil.Instance, i.Body));
-            }
+            foreach (var i in Class.classMethods) methods[i.Name] = KecaknoahReference.Right(KecaknoahNil.Instance, i.Body);
+            foreach (var i in Class.ConstInfos) consts[i.Name] = KecaknoahReference.Right(i.Value);
         }
 
         /// <summary>
@@ -101,10 +100,11 @@ namespace Kecaknoah.Type
                 */
                 default:
                     if (methods.ContainsKey(name)) return methods[name];
+                    if (consts.ContainsKey(name)) return methods[name];
                     return KecaknoahNil.Reference;
             }
         }
 
-        private KecaknoahFunctionResult CreateInstance(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahInstance(Class).NoResume();
+        //private KecaknoahFunctionResult CreateInstance(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahInstance(Class, context, args).NoResume();
     }
 }

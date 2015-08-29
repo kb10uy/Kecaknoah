@@ -73,7 +73,16 @@ namespace Kecaknoah
             }
             foreach (var i in ast.Locals)
             {
-                result.AddLocal(i.Name);
+                if (i.InitialExpression != null)
+                {
+                    var il = new KecaknoahIL();
+                    il.PushCodes(PrecompileExpression(i.InitialExpression));
+                    result.AddLocal(i.Name, il);
+                }
+                else
+                {
+                    result.AddLocal(i.Name, null);
+                }
             }
             cuc.Pop();
             return result;

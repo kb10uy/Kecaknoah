@@ -74,6 +74,7 @@ namespace Kecaknoah
             RegisterClass(KecaknoahDictionary.Information);
             RegisterClass(KecaknoahDirectory.Information);
             RegisterClass(KecaknoahFile.Information);
+            RegisterClass(KecaknoahMath.Information);
         }
 
         /// <summary>

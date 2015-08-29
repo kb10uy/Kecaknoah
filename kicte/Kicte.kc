@@ -1,6 +1,6 @@
 func main(args)
   # ------------------------------------------------------------
-  version = "1.0.0"
+  version = "1.0.1"
   # ------------------------------------------------------------
   println(format("Kicte Version {0}", version))
   if (args.length < 1) then
@@ -74,9 +74,9 @@ func generate(filename)
   out.add("        {")
   out.add("            switch(name) ")
   out.add("            {")
-  foreach(i in im) out.add(format("                case \"{0}\": return i_{0}", i.name))
+  foreach(i in im) out.add(format("                case \"{0}\": return i_{0};", i.name))
   out.add("                ")
-  foreach(i in lc) out.add(format("                case \"{0}\": return f_{0}", i.name))
+  foreach(i in lc) out.add(format("                case \"{0}\": return f_{0};", i.name))
   out.add("                default: return base.GetMemberReference(name);")
   out.add("            }")
   out.add("        }")
@@ -84,7 +84,7 @@ func generate(filename)
   out.add("        #endregion")
   out.add("        ")
   out.add("        #region インスタンスメンバー")
-  if (im.length > 0) then out.add(format("        private KecaknoahReference {0};", String.join(", ", lc.map(&(p)=>"f_" + p.name))))
+  if (lc.length > 0) then out.add(format("        private KecaknoahReference {0};", String.join(", ", lc.map(&(p)=>"f_" + p.name))))
   if (im.length > 0) then out.add(format("        private KecaknoahReference {0};", String.join(", ", im.map(&(p)=>"i_" + p.name))))
   out.add("        ")
   out.add("        private void RegisterInstanceMembers()")
@@ -98,8 +98,9 @@ func generate(filename)
   out.add("        #endregion")
   out.add("        #region クラスメソッド")
   out.add("        ")
-  out.add(format("        private static KecaknoahFunctionResult ClassNew(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args) => new {0}().NoResume();", cstn))
+  if (ctor) then out.add(format("        private static KecaknoahFunctionResult ClassNew(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args) => new {0}().NoResume();", cstn))
   out.add("        ")
+  add_method_strings(cm, out, true)
   out.add("        #endregion")
   out.add("    }")
   out.add("}")
@@ -138,6 +139,7 @@ func add_method_strings(list, out, st)
         out.add("            return result.NoResume();")
     endcase
     out.add("        }")
+    out.add("        ")
   next
 endfunc
 

@@ -27,54 +27,34 @@ namespace Kecaknoah.Type
 
         /// <summary>
         /// 特定の<see cref="KecaknoahScriptClassInfo"/>を元にして、インスタンスを生成します。
+        /// コンストラクタがあった場合、呼び出します。
         /// </summary>
         /// <param name="klass">クラス</param>
-        public KecaknoahInstance(KecaknoahScriptClassInfo klass)
+        /// <param name="ctx">コンテキスト</param>
+        /// <param name="ctorArgs">コンストラクタ引数</param>
+        public KecaknoahInstance(KecaknoahScriptClassInfo klass, KecaknoahContext ctx, KecaknoahObject[] ctorArgs)
         {
             Class = klass;
             ExtraType = klass.Name;
             LocalFieldReferences = localReferences;
             InstanceMethodReferences = methodReferences;
-            foreach (var i in klass.Locals) localReferences[i] = new KecaknoahReference() { IsLeftValue = true };
+            foreach (var i in klass.LocalInfos)
+            {
+                localReferences[i.Name] = new KecaknoahReference() { IsLeftValue = true };
+                if (i.InitializeIL != null)
+                {
+                    localReferences[i.Name].RawObject = ctx.ExecuteExpressionIL(i.InitializeIL);
+                }
+            }
             foreach (var i in klass.methods)
                 methodReferences[i.Name] = new KecaknoahReference()
                 {
                     IsLeftValue = true,
                     RawObject = new KecaknoahScriptFunction(this, i)
                 };
-        }
-
-        /// <summary>
-        /// 特定の<see cref="KecaknoahInteropClassInfo"/>を元にして、インスタンスを生成します。
-        /// </summary>
-        /// <param name="klass">クラス</param>
-        public KecaknoahInstance(KecaknoahInteropClassInfo klass)
-        {
-            Class = klass;
-            ExtraType = klass.Name;
-            LocalFieldReferences = localReferences;
-            InstanceMethodReferences = methodReferences;
-            foreach (var i in klass.Locals) localReferences[i] = new KecaknoahReference() { IsLeftValue = true };
-            foreach (var i in klass.methods)
-                methodReferences[i.Name] = new KecaknoahReference()
-                {
-                    IsLeftValue = true,
-                    RawObject = new KecaknoahInteropFunction(this, i.Body)
-                };
-        }
-
-        /// <summary>
-        /// 特定の<see cref="KecaknoahScriptClassInfo"/>を元にして、インスタンスを生成します。
-        /// コンストラクタがあった場合、呼び出します。
-        /// </summary>
-        /// <param name="klass">クラス</param>
-        /// <param name="ctx">コンテキスト</param>
-        /// <param name="ctorArgs">コンストラクタ引数</param>
-        public KecaknoahInstance(KecaknoahScriptClassInfo klass, KecaknoahContext ctx, KecaknoahObject[] ctorArgs) : this(klass)
-        {
-            if (klass.classMethods.Any(p => p.Name == "new"))
+            var ctor = klass.classMethods.FirstOrDefault(p => p.Name == "new");
+            if (ctor != null)
             {
-                var ctor = klass.classMethods.First(p => p.Name == "new");
                 new KecaknoahScriptFunction(this, ctor).Call(ctx, ctorArgs);
             }
         }
@@ -86,18 +66,24 @@ namespace Kecaknoah.Type
         /// <param name="klass">クラス</param>
         /// <param name="ctx">コンテキスト</param>
         /// <param name="ctorArgs">コンストラクタ引数</param>
-        public KecaknoahInstance(KecaknoahInteropClassInfo klass, KecaknoahContext ctx, KecaknoahObject[] ctorArgs) : this(klass)
+        public KecaknoahInstance(KecaknoahInteropClassInfo klass, KecaknoahContext ctx, KecaknoahObject[] ctorArgs)
         {
-            if (klass.classMethods.Any(p => p.Name == "new"))
+            Class = klass;
+            ExtraType = klass.Name;
+            LocalFieldReferences = localReferences;
+            InstanceMethodReferences = methodReferences;
+            foreach (var i in klass.LocalInfos)
             {
-                var ctor = klass.classMethods.First(p => p.Name == "new");
-                ctor.Body(ctx, this, ctorArgs);
+                localReferences[i.Name] = KecaknoahReference.Left(i.Value.AsByValValue());
             }
-        }
-
-        private void TryCallConstructor(KecaknoahObject[] args)
-        {
-
+            foreach (var i in klass.methods)
+                methodReferences[i.Name] = new KecaknoahReference()
+                {
+                    IsLeftValue = true,
+                    RawObject = new KecaknoahInteropFunction(this, i.Body)
+                };
+            var ctor = klass.classMethods.FirstOrDefault(p => p.Name == "new");
+            if (ctor != null) ctor.Body(ctx, this, ctorArgs);
         }
 
         /// <summary>

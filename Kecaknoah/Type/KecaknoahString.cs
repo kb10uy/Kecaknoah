@@ -49,7 +49,7 @@ namespace Kecaknoah.Type
 
                 case nameof(replace): return replace;
                 case nameof(substring): return substring;
-                case nameof(split):return split;
+                case nameof(split): return split;
                 case nameof(to_upper): return to_upper;
                 case nameof(to_lower): return to_lower;
                 case nameof(starts): return starts;
@@ -106,6 +106,17 @@ namespace Kecaknoah.Type
         }
 
         /// <summary>
+        /// 文字を参照します。
+        /// </summary>
+        /// <param name="indices">引数。Integer以外禁止。</param>
+        /// <returns></returns>
+        protected internal override KecaknoahReference GetIndexerReference(KecaknoahObject[] indices)
+        {
+            var i = indices[0].ToInt32();
+            return KecaknoahReference.Right(raw[i].ToString().AsKecaknoahString());
+        }
+
+        /// <summary>
         /// 新しいインスタンスを生成します。
         /// </summary>
         public KecaknoahString()
@@ -124,7 +135,7 @@ namespace Kecaknoah.Type
             pad_right = KecaknoahReference.Right(this, InstancePadRight);
         }
 
-        private KecaknoahReference to_upper, to_lower, starts, ends, pad_left, pad_right, replace, substring,split;
+        private KecaknoahReference to_upper, to_lower, starts, ends, pad_left, pad_right, replace, substring, split;
 
         private KecaknoahFunctionResult InstanceSubstring(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
