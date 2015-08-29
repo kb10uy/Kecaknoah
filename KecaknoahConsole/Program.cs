@@ -50,7 +50,7 @@ namespace KecaknoahConsole
             }
 #if DEBUG
             var asm = AssembleSource(src);
-            File.WriteAllLines(args[0] + ".asm", asm);
+            File.WriteAllLines(args[0] + ".kca", asm);
             Console.WriteLine("Assembled source was generated.");
             Console.ReadLine();
 #endif
@@ -98,7 +98,7 @@ namespace KecaknoahConsole
             result.Add($".class {info.Name}");
             foreach (var i in info.Locals)
             {
-                result.Add("  .local" + i);
+                result.Add("  .local " + i);
             }
             result.Add("  ");
             foreach (var i in info.InstanceMethods)

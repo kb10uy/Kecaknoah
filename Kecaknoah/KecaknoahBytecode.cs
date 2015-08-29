@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Kecaknoah
 {
+    /// <summary>
+    /// Kecaknoahのバイトコード関連の機能を提供します。
+    /// </summary>
     public static class KecaknoahBytecode
     {
         private static readonly Encoding stringEncoding = new UTF8Encoding(false, true);
@@ -38,6 +41,11 @@ namespace Kecaknoah
             VariableArgument = 3
         }
 
+        /// <summary>
+        /// <see cref="KecaknoahSource"/>から指定の<see cref="Stream"/>にバイトコードを出力します。
+        /// </summary>
+        /// <param name="source">対象の<see cref="KecaknoahSource"/></param>
+        /// <param name="output">出力先</param>
         public static void Save(KecaknoahSource source, Stream output)
         {
             using (var writer = new BinaryWriter(output, stringEncoding, true))
@@ -303,6 +311,11 @@ namespace Kecaknoah
             }
         }
 
+        /// <summary>
+        /// バイトコードを読み込み、<see cref="KecaknoahSource"/>に変換します。
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static KecaknoahSource Load(Stream input)
         {
             using (var reader = new BinaryReader(input, stringEncoding, true))
@@ -363,7 +376,7 @@ namespace Kecaknoah
                                     klass.AddInstanceMethod(ReadMethod(reader));
                                     break;
                                 case ClassBlockType.Local:
-                                    klass.AddLocal(reader.ReadString());
+                                    klass.AddLocal(reader.ReadString(), null);
                                     break;
                                 default:
                                     throw new InvalidDataException("やめて");
