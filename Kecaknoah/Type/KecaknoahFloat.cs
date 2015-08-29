@@ -47,6 +47,7 @@ namespace Kecaknoah.Type
         /// <returns></returns>
         protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
+            if (op == KecaknoahILCodeType.Negative) return (-Value).AsKecaknoahFloat();
             if (target.Type == TypeCode.Int64)
             {
                 return ExpressionOperation(op, (KecaknoahInteger)target);

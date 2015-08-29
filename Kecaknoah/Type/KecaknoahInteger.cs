@@ -47,6 +47,7 @@ namespace Kecaknoah.Type
         /// <returns></returns>
         protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
+            if (op == KecaknoahILCodeType.Negative) return (-Value).AsKecaknoahInteger();
             if (target.Type == TypeCode.Int64)
             {
                 return ExpressionOperation(op, (KecaknoahInteger)target);
@@ -73,8 +74,6 @@ namespace Kecaknoah.Type
         {
             switch (op)
             {
-                case KecaknoahILCodeType.Negative:
-                    return (-Value).AsKecaknoahInteger();
                 case KecaknoahILCodeType.Plus:
                     return (Value + target.Value).AsKecaknoahInteger();
                 case KecaknoahILCodeType.Minus:

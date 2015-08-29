@@ -20,13 +20,12 @@ namespace Kecaknoah.Type
         /// <returns></returns>
         protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
+            if (op==KecaknoahILCodeType.Not) return (!Value).AsKecaknoahBoolean();
             if (target.Type == TypeCode.Boolean)
             {
                 var t = (KecaknoahBoolean)target;
                 switch (op)
                 {
-                    case KecaknoahILCodeType.Not:
-                        return (!Value).AsKecaknoahBoolean();
                     case KecaknoahILCodeType.AndAlso:
                         return (Value && t.Value).AsKecaknoahBoolean();
                     case KecaknoahILCodeType.OrElse:

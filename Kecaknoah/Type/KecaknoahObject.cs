@@ -35,6 +35,8 @@ namespace Kecaknoah.Type
                     return InstanceToString(this);
                 case "hash":
                     return InstanceHash(this);
+                case "type":
+                    return KecaknoahReference.Right(ExtraType);
                 default:
                     return KecaknoahNil.Reference;
             }

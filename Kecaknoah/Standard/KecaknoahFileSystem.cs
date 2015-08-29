@@ -176,7 +176,7 @@ namespace Kecaknoah.Standard
         private static KecaknoahFunctionResult ClassExists(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
         {
             var sarg = args.ExpectString(1, false);
-            return Directory.Exists(sarg[0]).AsKecaknoahBoolean().NoResume();
+            return File.Exists(sarg[0]).AsKecaknoahBoolean().NoResume();
         }
 
         private static KecaknoahFunctionResult ClassDeleteFile(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)

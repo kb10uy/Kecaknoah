@@ -70,18 +70,8 @@ namespace Kecaknoah.Type
         /// <param name="klass">クラス</param>
         /// <param name="ctx">コンテキスト</param>
         /// <param name="ctorArgs">コンストラクタ引数</param>
-        public KecaknoahInstance(KecaknoahScriptClassInfo klass, KecaknoahContext ctx, KecaknoahObject[] ctorArgs)
+        public KecaknoahInstance(KecaknoahScriptClassInfo klass, KecaknoahContext ctx, KecaknoahObject[] ctorArgs) : this(klass)
         {
-            Class = klass;
-            LocalFieldReferences = localReferences;
-            InstanceMethodReferences = methodReferences;
-            foreach (var i in klass.Locals) localReferences[i] = new KecaknoahReference() { IsLeftValue = true };
-            foreach (var i in klass.methods)
-                methodReferences[i.Name] = new KecaknoahReference()
-                {
-                    IsLeftValue = true,
-                    RawObject = new KecaknoahScriptFunction(this, i)
-                };
             if (klass.classMethods.Any(p => p.Name == "new"))
             {
                 var ctor = klass.classMethods.First(p => p.Name == "new");
@@ -96,18 +86,8 @@ namespace Kecaknoah.Type
         /// <param name="klass">クラス</param>
         /// <param name="ctx">コンテキスト</param>
         /// <param name="ctorArgs">コンストラクタ引数</param>
-        public KecaknoahInstance(KecaknoahInteropClassInfo klass, KecaknoahContext ctx, KecaknoahObject[] ctorArgs)
+        public KecaknoahInstance(KecaknoahInteropClassInfo klass, KecaknoahContext ctx, KecaknoahObject[] ctorArgs) : this(klass)
         {
-            Class = klass;
-            LocalFieldReferences = localReferences;
-            InstanceMethodReferences = methodReferences;
-            foreach (var i in klass.Locals) localReferences[i] = new KecaknoahReference() { IsLeftValue = true };
-            foreach (var i in klass.methods)
-                methodReferences[i.Name] = new KecaknoahReference()
-                {
-                    IsLeftValue = true,
-                    RawObject = new KecaknoahInteropFunction(this, i.Body)
-                };
             if (klass.classMethods.Any(p => p.Name == "new"))
             {
                 var ctor = klass.classMethods.First(p => p.Name == "new");

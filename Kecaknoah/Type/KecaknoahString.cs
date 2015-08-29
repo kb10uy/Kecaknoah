@@ -33,14 +33,8 @@ namespace Kecaknoah.Type
         /// 長さへの参照を取得します。
         /// </summary>
         public KecaknoahReference Length { get; } = new KecaknoahReference { IsLeftValue = true, RawObject = 0.AsKecaknoahInteger() };
-        /// <summary>
-        /// replaceメソッドの参照を取得します。
-        /// </summary>
-        public KecaknoahReference Replace { get; }
-        /// <summary>
-        /// Substringメソッドの参照を取得します。
-        /// </summary>
-        public KecaknoahReference Substring { get; }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -52,10 +46,16 @@ namespace Kecaknoah.Type
             {
                 case "length":
                     return Length;
-                case "replace":
-                    return Replace;
-                case "substring":
-                    return Substring;
+
+                case nameof(replace): return replace;
+                case nameof(substring): return substring;
+                case nameof(split):return split;
+                case nameof(to_upper): return to_upper;
+                case nameof(to_lower): return to_lower;
+                case nameof(starts): return starts;
+                case nameof(ends): return ends;
+                case nameof(pad_left): return pad_left;
+                case nameof(pad_right): return pad_right;
             }
             return base.GetMemberReference(name);
         }
@@ -111,19 +111,20 @@ namespace Kecaknoah.Type
         public KecaknoahString()
         {
             Type = TypeCode.String;
-            Replace = KecaknoahReference.Right(this, InstanceReplace);
-            Substring = KecaknoahReference.Right(this, InstanceSubstring);
+            ExtraType = "String";
+
+            split = KecaknoahReference.Right(this, InstanceSplit);
+            replace = KecaknoahReference.Right(this, InstanceReplace);
+            substring = KecaknoahReference.Right(this, InstanceSubstring);
+            to_upper = KecaknoahReference.Right(this, InstanceToUpper);
+            to_lower = KecaknoahReference.Right(this, InstanceToLower);
+            starts = KecaknoahReference.Right(this, InstanceStartsWith);
+            ends = KecaknoahReference.Right(this, InstanceEndsWith);
+            pad_left = KecaknoahReference.Right(this, InstancePadLeft);
+            pad_right = KecaknoahReference.Right(this, InstancePadRight);
         }
 
-        /// <summary>
-        /// 性的なインスタンスを生成します。
-        /// </summary>
-        /// <param name="st"></param>
-        public KecaknoahString(bool st)
-        {
-            Type = TypeCode.String;
-            ExtraType = "String";
-        }
+        private KecaknoahReference to_upper, to_lower, starts, ends, pad_left, pad_right, replace, substring,split;
 
         private KecaknoahFunctionResult InstanceSubstring(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
@@ -172,6 +173,9 @@ namespace Kecaknoah.Type
 
         private KecaknoahFunctionResult InstancePadRight(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => raw.PadRight(args[0].ToInt32()).AsKecaknoahString().NoResume();
 
+        private KecaknoahFunctionResult InstanceToUpper(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => raw.ToUpper().AsKecaknoahString().NoResume();
+
+        private KecaknoahFunctionResult InstanceToLower(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args) => raw.ToLower().AsKecaknoahString().NoResume();
 
         private static KecaknoahFunctionResult ClassJoin(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {

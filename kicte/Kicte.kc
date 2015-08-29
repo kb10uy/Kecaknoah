@@ -1,0 +1,246 @@
+func main(args)
+  # ------------------------------------------------------------
+  version = "1.0.0"
+  # ------------------------------------------------------------
+  println(format("Kicte Version {0}", version))
+  if (args.length < 1) then
+    println("Usage: Kecakc Kicte.kt <input>")
+    exit()
+  endif
+  
+  filename = args[0]
+  if (!File.exists(filename)) then
+    println("Error: input file not found")
+    exit()
+  endif
+  generate(filename)
+endfunc
+
+func generate(filename)
+  file = File.read_lines(filename)
+  cn = ""
+  lc = List.new()
+  im = List.new()
+  cm = List.new()
+  ctor = true
+  foreach(l in file)
+    l = l.replace(" ","")
+    args = l.split("=")
+    if (args.length < 2 || args[1] == "") then continue
+    case(args[0])
+      when "ClassName":
+        cn = args[1]
+      when "InstanceMethods":
+        im.add_range(parse_methods(args[1].split(","), false))
+      when "ClassMethods":
+        cm.add_range(parse_methods(args[1].split(","), true))
+      when "Fields":
+        lc.add_range(parse_locals(args[1].split(",")))
+      when "HasConstructor":
+        ctor = Convert.to_bool(args[1])
+    endcase
+  next
+  out = List.new()
+  cstn = "Kecaknoah" + cn
+  out.add("using System;")
+  out.add("using System.Collections.Generic;")
+  out.add("using System.Text;")
+  out.add("using System.Linq;")
+  out.add("using Kecaknoah.Type;")
+  out.add("")
+  out.add("namespace Kecaknoah.Standard")
+  out.add("{")
+  out.add(format("    public sealed class {0} : KecaknoahObject", cstn))
+  out.add("    {")
+  out.add(format("        public static readonly string ClassName = \"{0}\";", cn))
+  out.add("        internal static KecaknoahInteropClassInfo Information { get; } = new KecaknoahInteropClassInfo(ClassName);")
+  out.add("        ")
+  out.add("        #region overrideメンバー")
+  out.add(format("        static {0}()", cstn))
+  out.add("        {")
+  if (ctor) then out.add("            Information.AddClassMethod(new KecaknoahInteropMethodInfo(\"new\", ClassNew));")
+  foreach(i in cm) out.add(format("            Information.AddClassMethod(new KecaknoahInteropMethodInfo(\"{0}\", Class{1}));", i.name, i.capital_name))
+  out.add("        }")
+  out.add("        ")
+  out.add("        ")
+  out.add(format("        public {0}()", cstn))
+  out.add("        {")
+  out.add("            ExtraType = ClassName;")
+  add_local_strings(lc, out)
+  out.add("            RegisterInstanceMembers();")
+  out.add("        }")
+  out.add("        ")
+  out.add("        protected internal override KecaknoahReference GetMemberReference(string name)")
+  out.add("        {")
+  out.add("            switch(name) ")
+  out.add("            {")
+  foreach(i in im) out.add(format("                case \"{0}\": return i_{0}", i.name))
+  out.add("                ")
+  foreach(i in lc) out.add(format("                case \"{0}\": return f_{0}", i.name))
+  out.add("                default: return base.GetMemberReference(name);")
+  out.add("            }")
+  out.add("        }")
+  out.add("        ")
+  out.add("        #endregion")
+  out.add("        ")
+  out.add("        #region インスタンスメンバー")
+  if (im.length > 0) then out.add(format("        private KecaknoahReference {0};", String.join(", ", lc.map(&(p)=>"f_" + p.name))))
+  if (im.length > 0) then out.add(format("        private KecaknoahReference {0};", String.join(", ", im.map(&(p)=>"i_" + p.name))))
+  out.add("        ")
+  out.add("        private void RegisterInstanceMembers()")
+  out.add("        {")
+  foreach(i in im) out.add(format("            i_{0} = KecaknoahReference.Right(this, Instance{1});", i.name, i.capital_name))
+  out.add("            ")
+  add_field_strings(im, out)
+  out.add("        }")
+  out.add("        ")
+  add_method_strings(im, out, false)
+  out.add("        #endregion")
+  out.add("        #region クラスメソッド")
+  out.add("        ")
+  out.add(format("        private static KecaknoahFunctionResult ClassNew(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args) => new {0}().NoResume();", cstn))
+  out.add("        ")
+  out.add("        #endregion")
+  out.add("    }")
+  out.add("}")
+  
+  println(format("{0} Class: {1} fields, {2} instance methods, {3} class methods", cn, lc.length, im.length, cm.length))
+  File.write_lines(cstn + ".cs", out)
+  println(format("{0} generated.", cstn + ".cs"))
+endfunc
+
+func add_method_strings(list, out, st)
+  foreach(i in list)
+    if (st) then
+      out.add(format("        private static KecaknoahFunctionResult Class{0}(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)", i.capital_name))
+    else
+      out.add(format("        private KecaknoahFunctionResult Instance{0}(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)", i.capital_name))
+    endif
+    out.add("        {")
+    out.add(format("            //TODO: {0}メソッドの処理を記述してください", i.name))
+    case(i.type)
+      when "void":
+        out.add("            return KecaknoahNil.Instance.NoResume();")
+      when "int":
+        out.add("            var result = 0;")
+        out.add("            return result.AsKecaknoahInteger().NoResume();")
+      when "float":
+        out.add("            var result = 0.0;")
+        out.add("            return result.AsKecaknoahFloat().NoResume();")
+      when "bool":
+        out.add("            var result = false;")
+        out.add("            return result.AsKecaknoahBoolean().NoResume();")
+      when "string":
+        out.add("            var result = \"\";")
+        out.add("            return result.AsKecaknoahString().NoResume();")
+      when "object":
+        out.add("            var result = new KecaknoahObject();")
+        out.add("            return result.NoResume();")
+    endcase
+    out.add("        }")
+  next
+endfunc
+
+func add_local_strings(list, out)
+  foreach(i in list)
+    case(i.type)
+      when "int":
+        valstr = "0"
+      when "float":
+        valstr = "0.0"
+      when "bool":
+        valstr = "false"
+      when "string":
+        valstr = "\"\""
+      when "object":
+        valstr = "new KecaknoahObject()"
+    endcase
+    if (i.is_left) then
+      out.add(format("            f_{0} = KecaknoahReference.Left({1});", i.name, valstr))
+    else
+      out.add(format("            f_{0} = KecaknoahReference.Right({1});", i.name, valstr))
+    endif
+  next
+endfunc
+
+func parse_methods(dl, st)
+  result = List.new()
+  foreach(i in dl)
+    e = i.split(":")
+    mi = MethodInfo.new()
+    mi.is_static = st
+    mi.name = e[0]
+    mi.capital_name = snake_to_upper_camel(e[0])
+    if (e.length == 2) then
+      case(e[1])
+        when "void":
+        when "int":
+        when "float":
+        when "bool":
+        when "string":
+        when "object":
+        when "array":
+          mi.type = e[1]
+        default:
+          print(format("Error: wrong type \"{0}\"", e[1]))
+          exit()
+      endcase
+    else
+      mi.type = "void"
+    endif
+    result.add(mi)
+  next
+  return result
+endfunc
+
+func parse_locals(dl)
+  result = List.new()
+  foreach(i in dl)
+    e = i.split(":")
+    mi = LocalInfo.new()
+    if (e[0].starts("*")) then
+      mi.is_left = true
+      mi.name = e[0].substring(1)
+    else
+      mi.is_left = false
+      mi.name = e[0]
+    endif
+    if (e.length == 2) then
+      case(e[1])
+        when "int":
+        when "float":
+        when "bool":
+        when "string":
+        when "object":
+          mi.type = e[1]
+        default:
+          print(format("Error: wrong type \"{0}\"", e[1]))
+          exit()
+      endcase
+    else
+      mi.type = "int"
+    endif
+    result.add(mi)
+  next
+  return result
+endfunc
+
+func snake_to_upper_camel(name)
+  ml = name.split("_")
+  result = ""
+  foreach(i in ml) result += capitalize(i)
+  return result
+endfunc
+
+func capitalize(str) 
+  if (str.length == 1) then return str.to_upper()
+  return str.substring(0, 1).to_upper() + str.substring(1)
+endfunc
+
+class MethodInfo
+  local is_static, name, capital_name, type
+endclass
+
+class LocalInfo
+  local name, type, is_left
+endclass

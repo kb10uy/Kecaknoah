@@ -80,6 +80,7 @@ namespace Kecaknoah.Standard
             switch (name)
             {
                 case nameof(add): return add;
+                case nameof(add_range): return add_range;
                 case nameof(insert): return insert;
                 case nameof(each): return each;
                 case nameof(remove_at): return remove_at;
@@ -107,12 +108,13 @@ namespace Kecaknoah.Standard
         #region インスタンスメソッド
         //Dictionary解決でもいいかも
         KecaknoahReference
-            add, insert, each, remove_at, remove_by,
+            add, add_range, insert, each, remove_at, remove_by,
             filter, map, reduce;
 
         private void RegisterInstanceFunction()
         {
             add = KecaknoahReference.Right(this, InstanceAdd);
+            add_range = KecaknoahReference.Right(this, InstanceAddRange);
             insert = KecaknoahReference.Right(this, InstanceInsert);
             each = KecaknoahReference.Right(this, InstanceEach);
             remove_at = KecaknoahReference.Right(this, InstanceRemoveAt);
@@ -125,7 +127,14 @@ namespace Kecaknoah.Standard
         private KecaknoahFunctionResult InstanceAdd(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
         {
             foreach (var i in args)
-                list.Add(new KecaknoahReference { IsLeftValue = true, RawObject = i });
+                list.Add(KecaknoahReference.Left(i));
+            return KecaknoahNil.Instance.NoResume();
+        }
+
+        private KecaknoahFunctionResult InstanceAddRange(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
+        {
+            var al = args[0].AsArray();
+            list.AddRange(al.Select(p => KecaknoahReference.Left(p)));
             return KecaknoahNil.Instance.NoResume();
         }
 
