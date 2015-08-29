@@ -57,11 +57,11 @@ namespace Kecaknoah.Type
             switch (op)
             {
                 case KecaknoahILCodeType.Equal:
-                    return (dynamic)this == (dynamic)target;
+                    return (ExtraType == target.ExtraType).AsKecaknoahBoolean();
                 case KecaknoahILCodeType.NotEqual:
-                    return (dynamic)this != (dynamic)target;
+                    return (ExtraType != target.ExtraType).AsKecaknoahBoolean();
                 default:
-                    return KecaknoahNil.Instance;
+                    return Instance;
             }
         }
 
