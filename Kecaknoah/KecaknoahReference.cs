@@ -12,7 +12,7 @@ namespace Kecaknoah
         /// <summary>
         /// 内部的に保持する<see cref="KecaknoahObject"/>を取得します。
         /// </summary>
-        public KecaknoahObject RawObject
+        public virtual KecaknoahObject RawObject
         {
             get { return obj; }
             set

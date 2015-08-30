@@ -353,7 +353,7 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <param name="obj">対象</param>
         /// <returns>結果</returns>
-        public static IList<bool> ToBooelanArray(this KecaknoahObject obj)
+        public static IList<bool> ToBooleanArray(this KecaknoahObject obj)
         {
             var len = obj["length"].ToInt64();
             var result = new List<bool>();

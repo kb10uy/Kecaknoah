@@ -257,6 +257,8 @@ namespace Kecaknoah
             RegisterClass(KecaknoahHash.Information);
             RegisterClass(KecaknoahRegex.Information);
             RegisterClass(KecaknoahExtensionLibrary.Information);
+            RegisterClass(KecaknoahDateTime.Information);
+            RegisterClass(KecaknoahTimeSpan.Information);
         }
         #endregion
 

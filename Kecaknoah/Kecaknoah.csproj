@@ -67,6 +67,7 @@
     <Compile Include="Analyze\KecaknoahToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Standard\KecaknoahConvert.cs" />
+    <Compile Include="Standard\KecaknoahDateTime.cs" />
     <Compile Include="Standard\KecaknoahDictionary.cs" />
     <Compile Include="Standard\KecaknoahExtensionLibrary.cs" />
     <Compile Include="Standard\KecaknoahFileSystem.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Standard\KecaknoahMath.cs" />
     <Compile Include="Standard\KecaknoahRegex.cs" />
     <Compile Include="Standard\KecaknoahSystem.cs" />
+    <Compile Include="Standard\KecaknoahTimeSpan.cs" />
     <Compile Include="Type\KecaknoahArray.cs" />
     <Compile Include="Type\KecaknoahBoolean.cs" />
     <Compile Include="KecaknoahClassInfo.cs" />

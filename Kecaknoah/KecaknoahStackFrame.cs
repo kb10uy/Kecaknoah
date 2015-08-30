@@ -162,7 +162,7 @@ namespace Kecaknoah
                     case KecaknoahILCodeType.Assign:
                         v1 = ReferenceStack.Pop().RawObject;
                         rfr = ReferenceStack.Pop();
-                        rfr.RawObject = v1;
+                        rfr.RawObject = v1.AsByValValue();
                         ReferenceStack.Push(KecaknoahReference.Right(v1));
                         break;
                     case KecaknoahILCodeType.PlusAssign:
@@ -322,13 +322,15 @@ namespace Kecaknoah
                     case KecaknoahILCodeType.Call:
                         args = new Stack<KecaknoahObject>();
                         for (int i = 0; i < c.IntegerValue; i++) args.Push(ReferenceStack.Pop().RawObject);
-                        v1 = ReferenceStack.Pop().RawObject.AsByValValue();
+                        v1 = ReferenceStack.Pop().RawObject;
+                        if (v1 == KecaknoahNil.Instance) throw new InvalidOperationException("nilに対してメソッド呼び出し出来ません。名前を間違っていませんか？");
                         ReferenceStack.Push(KecaknoahReference.Right(v1.Call(RunningContext, args.ToArray()).ReturningObject));
                         break;
                     case KecaknoahILCodeType.IndexerCall:
                         args = new Stack<KecaknoahObject>();
                         for (int i = 0; i < c.IntegerValue; i++) args.Push(ReferenceStack.Pop().RawObject);
-                        v1 = ReferenceStack.Pop().RawObject.AsByValValue();
+                        v1 = ReferenceStack.Pop().RawObject;
+                        if (v1 == KecaknoahNil.Instance) throw new InvalidOperationException("nilに対してインデクサ呼び出し出来ません。名前を間違っていませんか？");
                         ReferenceStack.Push(v1.GetIndexerReference(args.ToArray()));
                         break;
                     case KecaknoahILCodeType.PushArgument:
@@ -340,6 +342,7 @@ namespace Kecaknoah
                         break;
                     case KecaknoahILCodeType.LoadMember:
                         var or = ReferenceStack.Pop();
+                        if (or.RawObject == KecaknoahNil.Instance) throw new InvalidOperationException("nilに対してメンバーアクセス出来ません。名前を間違っていませんか？");
                         ReferenceStack.Push(or.GetMemberReference(c.StringValue));
                         break;
                     case KecaknoahILCodeType.LoadVarg:

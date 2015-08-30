@@ -558,6 +558,7 @@ namespace Kecaknoah
             //ショートサーキット
             switch (node.ExpressionType)
             {
+                /*
                 case KecaknoahOperatorType.AndAlso:
                     var aid = Guid.NewGuid().ToString().Substring(0, 8);
                     result.AddRange(PrecompileExpression(node.FirstNode));
@@ -570,10 +571,11 @@ namespace Kecaknoah
                     var eid = Guid.NewGuid().ToString().Substring(0, 8);
                     result.AddRange(PrecompileExpression(node.FirstNode));
                     result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.AsValue });
-                    result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.TrueJump, StringValue = $"AndAlso-{eid}" });
+                    result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.TrueJump, StringValue = $"OrElse-{eid}" });
                     result.AddRange(PrecompileExpression(node.SecondNode));
-                    result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"AndAlso-{eid}" });
+                    result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"OrElse-{eid}" });
                     break;
+                */
                 default:
                     result.AddRange(PrecompileExpression(node.FirstNode));
                     result.AddRange(PrecompileExpression(node.SecondNode));
