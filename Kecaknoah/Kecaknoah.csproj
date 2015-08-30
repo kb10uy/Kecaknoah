@@ -76,6 +76,7 @@
     <Compile Include="Standard\KecaknoahMatch.cs" />
     <Compile Include="Standard\KecaknoahMath.cs" />
     <Compile Include="Standard\KecaknoahRegex.cs" />
+    <Compile Include="Standard\KecaknoahSystem.cs" />
     <Compile Include="Type\KecaknoahArray.cs" />
     <Compile Include="Type\KecaknoahBoolean.cs" />
     <Compile Include="KecaknoahClassInfo.cs" />

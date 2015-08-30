@@ -175,7 +175,7 @@ namespace Kecaknoah.Analyze
                             result.AddNode(ParseFunction(tokens, true));
                             break;
                         default:
-                            throw new KecaknoahParseException(t.CreateErrorAt("トップレベルにはクラスとメソッド以外は定義できません。"));
+                            throw new KecaknoahParseException(t.CreateErrorAt("トップレベルにはクラスとメソッド、use文以外は定義できません。"));
                     }
                     tokens.SkipLogicalLineBreak();
                 }

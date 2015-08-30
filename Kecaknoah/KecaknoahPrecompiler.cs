@@ -46,7 +46,7 @@ namespace Kecaknoah
                 {
                     result.methods.Add(PrecompileFunction(i as KecaknoahFunctionAstNode));
                 }
-                if (i is KecaknoahUseAstNode)
+                else if (i is KecaknoahUseAstNode)
                 {
                     result.uses.Add((i as KecaknoahUseAstNode).Target);
                 }

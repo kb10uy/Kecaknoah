@@ -3,6 +3,7 @@ using Kecaknoah.Standard;
 using Kecaknoah.Type;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
 using System.IO;
 
 namespace Kecaknoah
@@ -94,7 +95,7 @@ namespace Kecaknoah
         /// <param name="src">登録する<see cref="KecaknoahSource"/></param>
         public void RegisterSource(KecaknoahSource src)
         {
-            ProcessUseDirective(src.Uses);
+            ProcessUseDirective(src);
             foreach (var c in src.Classes)
             {
                 classes.Add(c);
@@ -259,15 +260,15 @@ namespace Kecaknoah
         }
         #endregion
 
-        private void ProcessUseDirective(IEnumerable<string> list)
+        private void ProcessUseDirective(KecaknoahSource src)
         {
             var cur = Directory.GetCurrentDirectory();
             var lex = new KecaknoahLexer();
             var par = new KecaknoahParser();
             var prc = new KecaknoahPrecompiler();
-            foreach (var text in list)
+            foreach (var text in src.Uses)
             {
-                var arg = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var arg = text.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 switch (arg[0])
                 {
                     case "import":
@@ -275,13 +276,6 @@ namespace Kecaknoah
                         Directory.SetCurrentDirectory(Path.GetDirectoryName(it));
                         var s = prc.PrecompileAll(par.Parse(lex.AnalyzeFromFile(it)));
                         RegisterSource(s);
-                        Directory.SetCurrentDirectory(cur);
-                        break;
-                    case "exlib":
-                        var et = Path.Combine(BaseDirectory, arg[1]);
-                        Directory.SetCurrentDirectory(et);
-                        var s2 = prc.PrecompileAll(par.Parse(lex.AnalyzeFromFile(Path.Combine(et, $"{arg[1]}.kt"))));
-                        RegisterSource(s2);
                         Directory.SetCurrentDirectory(cur);
                         break;
                 }
