@@ -163,6 +163,11 @@ namespace Kecaknoah.Analyze
                     var t = tokens.Dequeue();
                     switch (t.Type)
                     {
+                        case KecaknoahTokenType.UseKeyword:
+                            t = tokens.Dequeue();
+                            if (t.Type != KecaknoahTokenType.StringLiteral) throw new KecaknoahParseException(t.CreateErrorAt("use文には文字列を指定してください。"));
+                            result.AddNode(new KecaknoahUseAstNode { Target = t.TokenString });
+                            break;
                         case KecaknoahTokenType.ClassKeyword:
                             result.AddNode(ParseClass(tokens));
                             break;
@@ -435,10 +440,10 @@ namespace Kecaknoah.Analyze
                         lan.InitialExpression = ParseExpression(tokens);
                         if (tokens.SkipLogicalLineBreak()) return result;
                         if (!tokens.CheckSkipToken(KecaknoahTokenType.Comma)) throw new KecaknoahParseException(nt.CreateErrorAt("無効なlocal宣言です。"));
-                        tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                        tokens.SkipLogicalLineBreak();
                         break;
                     case KecaknoahTokenType.Comma:
-                        tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                        tokens.SkipLogicalLineBreak();
                         continue;
                     default:
                         throw new KecaknoahParseException(nt.CreateErrorAt("無効なlocal宣言です。"));
@@ -463,13 +468,13 @@ namespace Kecaknoah.Analyze
                 {
                     //引数
                     if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(nt.CreateErrorAt("coroutine宣言の引数リストが不正です。"));
-                    tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                    tokens.SkipLogicalLineBreak();
                     while (true)
                     {
                         lan.ParameterExpressions.Add(ParseExpression(tokens));
                         if (tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) break;
                         if (!tokens.CheckSkipToken(KecaknoahTokenType.Comma)) throw new KecaknoahParseException(nt.CreateErrorAt("coroutine宣言の引数リストが閉じていません。"));
-                        tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                        tokens.SkipLogicalLineBreak();
                     }
                 }
                 result.Add(lan);
@@ -491,9 +496,9 @@ namespace Kecaknoah.Analyze
         {
             var result = new KecaknoahIfAstNode();
             if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("if文の条件式はカッコでくくってください。"));
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             var cnd = ParseExpression(tokens);
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             var ifb = new KecaknoahIfBlockAstNode();
             ifb.Condition = cnd;
             if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("if文の条件式が閉じていません。"));
@@ -514,10 +519,10 @@ namespace Kecaknoah.Analyze
                     else if (nt.Type == KecaknoahTokenType.ElifKeyword)
                     {
                         if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("elif文の条件式はカッコでくくってください。"));
-                        tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                        tokens.SkipLogicalLineBreak();
                         cnd = ParseExpression(tokens);
                         var elb = new KecaknoahIfBlockAstNode();
-                        tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                        tokens.SkipLogicalLineBreak();
                         elb.Condition = cnd;
                         if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("elif文の条件式が閉じていません。"));
                         if (!tokens.CheckSkipToken(KecaknoahTokenType.ThenKeyword)) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("thenキーワードをおいてください。"));
@@ -562,9 +567,9 @@ namespace Kecaknoah.Analyze
             ifb.Condition = new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.BooleanValue, BooleanValue = false };
             result.IfBlock = ifb;
             if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("case文の判定式はカッコでくくってください。"));
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             var target = ParseExpression(tokens);
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("case文の判定式はカッコでくくってください。"));
             if (!tokens.SkipLogicalLineBreak()) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("case文の判定式の後は改行してください。"));
             var wls = new List<KecaknoahExpressionAstNode>();
@@ -650,27 +655,27 @@ namespace Kecaknoah.Analyze
                 result.Name = Guid.NewGuid().ToString().Substring(0, 8);
             }
             if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("forの各式は全体をカッコでくくってください。"));
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             while (true)
             {
                 var exp = ParseExpression(tokens);
                 result.InitializeExpressions.Add(exp);
                 if (tokens.CheckSkipToken(KecaknoahTokenType.Semicolon)) break;
                 if (!tokens.CheckSkipToken(KecaknoahTokenType.Comma)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("初期化式はコンマで区切ってください。"));
-                tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                tokens.SkipLogicalLineBreak();
             }
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             result.Condition = ParseExpression(tokens);
             if (!tokens.CheckSkipToken(KecaknoahTokenType.Semicolon)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("セミコロンで区切ってください。"));
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             while (true)
             {
                 var exp = ParseExpression(tokens);
                 result.CounterExpressions.Add(exp);
-                tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                tokens.SkipLogicalLineBreak();
                 if (tokens.CheckToken(KecaknoahTokenType.ParenEnd)) break;
                 if (!tokens.CheckSkipToken(KecaknoahTokenType.Comma)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("初期化式はコンマで区切ってください。"));
-                tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                tokens.SkipLogicalLineBreak();
             }
             if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("forの各式は全体をカッコでくくってください。"));
             if (single || !tokens.SkipLogicalLineBreak())
@@ -700,9 +705,9 @@ namespace Kecaknoah.Analyze
                 result.Name = Guid.NewGuid().ToString().Substring(0, 8);
             }
             if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("whileの条件式はカッコでくくってください。"));
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             result.Condition = ParseExpression(tokens);
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("whileの条件式はカッコでくくってください。"));
             if (single || !tokens.SkipLogicalLineBreak())
             {
@@ -731,13 +736,13 @@ namespace Kecaknoah.Analyze
                 result.Name = Guid.NewGuid().ToString().Substring(0, 8);
             }
             if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("whileの条件式はカッコでくくってください。"));
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             var nt = tokens.Dequeue();
             if (nt.Type != KecaknoahTokenType.Identifer) throw new KecaknoahParseException(nt.CreateErrorAt("foreachのループ変数には識別子を指定してください。"));
             result.ElementVariableName = nt.TokenString;
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             nt = tokens.Dequeue();
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             if (nt.Type == KecaknoahTokenType.InKeyword)
             {
                 result.Source = ParseExpression(tokens);
@@ -749,14 +754,14 @@ namespace Kecaknoah.Analyze
                 if (tokens.CheckSkipToken(KecaknoahTokenType.Colon))
                 {
                     if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(nt.CreateErrorAt("コルーチンの引数リストが不正です。"));
-                    tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                    tokens.SkipLogicalLineBreak();
                     while (true)
                     {
                         result.CoroutineArguments.Add(ParseExpression(tokens));
-                        tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                        tokens.SkipLogicalLineBreak();
                         if (tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) break;
                         if (!tokens.CheckSkipToken(KecaknoahTokenType.Comma)) throw new KecaknoahParseException(nt.CreateErrorAt("コルーチンの引数リストが閉じていません。"));
-                        tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                        tokens.SkipLogicalLineBreak();
                     }
                 }
             }
@@ -764,7 +769,7 @@ namespace Kecaknoah.Analyze
             {
                 throw new KecaknoahParseException(nt.CreateErrorAt("foreachにはinかofを指定してください。"));
             }
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("foreachの条件式はカッコでくくってください。"));
             if (single || !tokens.SkipLogicalLineBreak())
             {
@@ -803,7 +808,7 @@ namespace Kecaknoah.Analyze
                 if (!OperatorPriorities.ContainsKey(nt.Type)) throw new KecaknoahParseException(nt.CreateErrorAt($"演算子ではなく{nt.Type}が検出されました。"));
                 if (OperatorPriorities[nt.Type] != priority) break;
                 tokens.Dequeue();
-                tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                tokens.SkipLogicalLineBreak();
                 var right = ParseBinaryExpression(tokens, priority + 1);
 
                 result.SecondNode = right;
@@ -966,13 +971,13 @@ namespace Kecaknoah.Analyze
             var r = new KecaknoahArgumentCallExpressionAstNode();
             r.Target = parent;
             r.ExpressionType = KecaknoahOperatorType.FunctionCall;
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             if (tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) return r;
             while (true)
             {
                 r.Arguments.Add(ParseExpression(tokens));
                 if (tokens.CheckSkipToken(KecaknoahTokenType.Comma)) continue;
-                tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                tokens.SkipLogicalLineBreak();
                 if (tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) break;
                 throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("メソッド呼び出しの引数リストが無効です。"));
             }
@@ -990,13 +995,13 @@ namespace Kecaknoah.Analyze
             var r = new KecaknoahArgumentCallExpressionAstNode();
             r.Target = parent;
             r.ExpressionType = KecaknoahOperatorType.IndexerAccess;
-            tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+            tokens.SkipLogicalLineBreak();
             if (tokens.CheckSkipToken(KecaknoahTokenType.BracketEnd)) return r;
             while (true)
             {
                 r.Arguments.Add(ParseExpression(tokens));
                 if (tokens.CheckSkipToken(KecaknoahTokenType.Comma)) continue;
-                tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                tokens.SkipLogicalLineBreak();
                 if (tokens.CheckSkipToken(KecaknoahTokenType.BracketEnd)) break;
                 throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("メソッド呼び出しの引数リストが無効です。"));
             }
@@ -1037,21 +1042,21 @@ namespace Kecaknoah.Analyze
                     lambda.ExpressionNode = ParseExpression(tokens);
                     return lambda;
                 case KecaknoahTokenType.ParenStart:
-                    tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                    tokens.SkipLogicalLineBreak();
                     var exp = ParseExpression(tokens);
-                    tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                    tokens.SkipLogicalLineBreak();
                     if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("カッコは閉じてください。"));
                     return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.ParenExpression, ExpressionNode = exp };
                 case KecaknoahTokenType.BracketStart:
                     var are = new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.Array };
-                    tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                    tokens.SkipLogicalLineBreak();
                     while (true)
                     {
                         are.ElementNodes.Add(ParseExpression(tokens));
-                        tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                        tokens.SkipLogicalLineBreak();
                         if (tokens.CheckSkipToken(KecaknoahTokenType.BracketEnd)) break;
                         if (!tokens.CheckSkipToken(KecaknoahTokenType.Comma)) throw new KecaknoahParseException(tokens.Peek().CreateErrorAt("配列がカッコで閉じていなません。"));
-                        tokens.SkipLogicalLineBreak();    //TODO: 暗黙改行
+                        tokens.SkipLogicalLineBreak();
                     }
                     return are;
                 case KecaknoahTokenType.TrueKeyword:

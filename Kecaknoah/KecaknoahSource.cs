@@ -8,6 +8,12 @@ namespace Kecaknoah
     /// </summary>
     public sealed class KecaknoahSource
     {
+        internal List<string> uses = new List<string>();
+        /// <summary>
+        /// useによるインポート対象を取得します。
+        /// </summary>
+        public IReadOnlyList<string> Uses => uses;
+
         internal List<KecaknoahScriptClassInfo> classes = new List<KecaknoahScriptClassInfo>();
         /// <summary>
         /// クラスを取得します。
@@ -19,5 +25,6 @@ namespace Kecaknoah
         /// トップレベルに定義されたメソッドを取得します。
         /// </summary>
         public IReadOnlyList<KecaknoahScriptMethodInfo> TopLevelMethods => methods;
+
     }
 }

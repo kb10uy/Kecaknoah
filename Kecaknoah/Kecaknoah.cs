@@ -2,6 +2,7 @@
 using System.Text;
 using Kecaknoah.Type;
 using Kecaknoah.Analyze;
+using System.IO;
 
 namespace Kecaknoah
 {
@@ -60,6 +61,7 @@ namespace Kecaknoah
         /// <param name="enc">読み込む際に利用する<see cref="Encoding"/></param>
         public KecaknoahObject DoFile(string fileName, Encoding enc)
         {
+            var fp = Path.GetFullPath(fileName);
             var le = Lexer.AnalyzeFromFile(fileName, enc);
             if (!le.Success) throw new KecaknoahException(le.Error);
             var ast = Parser.Parse(le);

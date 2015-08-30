@@ -185,6 +185,11 @@ namespace Kecaknoah.Analyze
         CoresumeKeyword,
 
         /// <summary>
+        /// use
+        /// </summary>
+        UseKeyword,
+
+        /// <summary>
         /// (
         /// </summary>
         ParenStart,

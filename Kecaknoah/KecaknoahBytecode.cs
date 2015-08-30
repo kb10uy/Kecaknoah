@@ -11,12 +11,13 @@ namespace Kecaknoah
     {
         private static readonly Encoding stringEncoding = new UTF8Encoding(false, true);
         private static readonly byte[] magicNumber = { (byte)'K', (byte)'C' };
-        private const ushort BytecodeVersion = 1;
+        private const ushort BytecodeVersion = 2;
 
         private enum TopLevelBlockType : byte
         {
             Class = 1,
-            TopLevelMethod = 2
+            TopLevelMethod = 2,
+            Use = 3,
         }
 
         private enum ClassBlockType : byte
@@ -53,7 +54,12 @@ namespace Kecaknoah
                 writer.Write(magicNumber);
                 writer.Write(BytecodeVersion);
 
-                writer.Write(source.Classes.Count + source.TopLevelMethods.Count);
+                writer.Write(source.Uses.Count + source.Classes.Count + source.TopLevelMethods.Count);
+                foreach (var x in source.Uses)
+                {
+                    writer.Write((byte)TopLevelBlockType.Use);
+                    writer.Write(x);
+                }
 
                 foreach (var x in source.Classes)
                 {
@@ -334,6 +340,9 @@ namespace Kecaknoah
                 {
                     switch ((TopLevelBlockType)reader.ReadByte())
                     {
+                        case TopLevelBlockType.Use:
+                            result.uses.Add(reader.ReadString());
+                            break;
                         case TopLevelBlockType.Class:
                             result.classes.Add(ReadClass(reader));
                             break;
@@ -341,7 +350,7 @@ namespace Kecaknoah
                             result.methods.Add(ReadMethod(reader));
                             break;
                         default:
-                            throw new InvalidDataException("変なデータが出たー");
+                            throw new InvalidDataException("変なデータが出ーた！ｗｗｗｗ");
                     }
                 }
 

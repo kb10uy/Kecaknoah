@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Kecaknoah.Analyze;
 using Kecaknoah.Type;
+using System.IO;
 
 namespace Kecaknoah
 {
@@ -45,9 +46,13 @@ namespace Kecaknoah
                 {
                     result.methods.Add(PrecompileFunction(i as KecaknoahFunctionAstNode));
                 }
+                if (i is KecaknoahUseAstNode)
+                {
+                    result.uses.Add((i as KecaknoahUseAstNode).Target);
+                }
                 else
                 {
-                    throw new InvalidOperationException("トップレベルにはクラスとメソッド以外おけません");
+                    throw new InvalidOperationException("トップレベルにはクラスとメソッドとuse文以外おけません");
                 }
             }
             current = null;
@@ -550,9 +555,31 @@ namespace Kecaknoah
         internal IList<KecaknoahILCode> PrecompileBinaryExpression(KecaknoahBinaryExpressionAstNode node)
         {
             var result = new List<KecaknoahILCode>();
-            result.AddRange(PrecompileExpression(node.FirstNode));
-            result.AddRange(PrecompileExpression(node.SecondNode));
-            result.Add(new KecaknoahILCode { Type = (KecaknoahILCodeType)Enum.Parse(typeof(KecaknoahILCodeType), node.ExpressionType.ToString(), true) });
+            //ショートサーキット
+            switch (node.ExpressionType)
+            {
+                case KecaknoahOperatorType.AndAlso:
+                    var aid = Guid.NewGuid().ToString().Substring(0, 8);
+                    result.AddRange(PrecompileExpression(node.FirstNode));
+                    result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.AsValue });
+                    result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.FalseJump, StringValue = $"AndAlso-{aid}" });
+                    result.AddRange(PrecompileExpression(node.SecondNode));
+                    result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"AndAlso-{aid}" });
+                    break;
+                case KecaknoahOperatorType.OrElse:
+                    var eid = Guid.NewGuid().ToString().Substring(0, 8);
+                    result.AddRange(PrecompileExpression(node.FirstNode));
+                    result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.AsValue });
+                    result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.TrueJump, StringValue = $"AndAlso-{eid}" });
+                    result.AddRange(PrecompileExpression(node.SecondNode));
+                    result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"AndAlso-{eid}" });
+                    break;
+                default:
+                    result.AddRange(PrecompileExpression(node.FirstNode));
+                    result.AddRange(PrecompileExpression(node.SecondNode));
+                    result.Add(new KecaknoahILCode { Type = (KecaknoahILCodeType)Enum.Parse(typeof(KecaknoahILCodeType), node.ExpressionType.ToString(), true) });
+                    break;
+            }
             return result;
         }
 

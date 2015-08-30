@@ -12,7 +12,7 @@ namespace Kecaknoah.Type
         internal List<KecaknoahReference> array;
 
         private KecaknoahReference length;
-        private KecaknoahReference find, each, filter, map, reduce;//, first, last;
+        private KecaknoahReference find, each, filter, map, reduce, copy;//, first, last;
 
         internal KecaknoahArray(int[] dim)
         {
@@ -54,6 +54,7 @@ namespace Kecaknoah.Type
             filter = KecaknoahReference.Right(this, InstanceFilter);
             map = KecaknoahReference.Right(this, InstanceMap);
             reduce = KecaknoahReference.Right(this, InstanceReduce);
+            copy = KecaknoahReference.Right(this, InstanceCopy);
         }
 
         /// <summary>
@@ -77,6 +78,8 @@ namespace Kecaknoah.Type
                     return map;
                 case nameof(reduce):
                     return reduce;
+                case nameof(copy):
+                    return copy;
                 /*
             case nameof(first):
                 return first;
@@ -98,6 +101,13 @@ namespace Kecaknoah.Type
         {
             if (indices.Length != 1) throw new ArgumentException("配列のインデックスの数は必ず1です。");
             return array[(int)indices[0].ToInt64()];
+        }
+
+        private KecaknoahFunctionResult InstanceCopy(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
+        {
+            var result = new List<KecaknoahObject>();
+            foreach (var i in array) result.Add(i.RawObject.AsByValValue());
+            return new KecaknoahArray(result).NoResume();
         }
 
         private KecaknoahFunctionResult InstanceEach(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)

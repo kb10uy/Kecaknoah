@@ -48,6 +48,7 @@ namespace Kecaknoah.Analyze
             new Tuple<string, KecaknoahTokenType>("yield", KecaknoahTokenType.YieldKeyword),
             new Tuple<string, KecaknoahTokenType>("coroutine", KecaknoahTokenType.CoroutineKeyword),
             new Tuple<string, KecaknoahTokenType>("coresume", KecaknoahTokenType.CoresumeKeyword),
+            new Tuple<string, KecaknoahTokenType>("use", KecaknoahTokenType.UseKeyword),
         }.OrderByDescending(p => p.Item1.Length).ThenBy(p => p.Item1);
 
         private static IOrderedEnumerable<Tuple<string, KecaknoahTokenType>> Operators = new List<Tuple<string, KecaknoahTokenType>>

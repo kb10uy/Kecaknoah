@@ -95,6 +95,10 @@ namespace Kecaknoah.Analyze
         /// </summary>
         Undefined,
         /// <summary>
+        /// use文
+        /// </summary>
+        Use,
+        /// <summary>
         /// クラス
         /// </summary>
         Class,

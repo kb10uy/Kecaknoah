@@ -3,6 +3,7 @@ using Kecaknoah.Standard;
 using Kecaknoah.Type;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Kecaknoah
 {
@@ -36,10 +37,17 @@ namespace Kecaknoah
 
         internal List<KecaknoahMethodInfo> topMethods = new List<KecaknoahMethodInfo>();
         internal List<KecaknoahReference> methodReferences = new List<KecaknoahReference>();
+
         /// <summary>
-        /// 
+        /// このモジュールで定義されているトップレベルメソッドを取得します。
         /// </summary>
         public IReadOnlyList<KecaknoahMethodInfo> TopLevelMethods => topMethods;
+
+        /// <summary>
+        /// 拡張ライブラリ検索の際のディレクトリを取得します。
+        /// </summary>
+        public string BaseDirectory { get; } =
+            Path.Combine(Path.GetDirectoryName(typeof(KecaknoahModule).Assembly.Location), "kclib");
 
         /// <summary>
         /// 指定した名前を持つトップレベルの<see cref="KecaknoahObject"/>
@@ -64,23 +72,6 @@ namespace Kecaknoah
         public KecaknoahContext CreateContext() => new KecaknoahContext(this);
 
         /// <summary>
-        /// 標準ライブラリを登録します。
-        /// </summary>
-        public void RegisterStandardLibraries()
-        {
-            RegisterClass(KecaknoahString.Information);
-            RegisterClass(KecaknoahConvert.Information);
-            RegisterClass(KecaknoahList.Information);
-            RegisterClass(KecaknoahDictionary.Information);
-            RegisterClass(KecaknoahDirectory.Information);
-            RegisterClass(KecaknoahFile.Information);
-            RegisterClass(KecaknoahMath.Information);
-            RegisterClass(KecaknoahDynamicLibrary.Information);
-            RegisterClass(KecaknoahHash.Information);
-            RegisterClass(KecaknoahRegex.Information);
-        }
-
-        /// <summary>
         /// 定義されているオブジェクト・メソッド・クラスの中から検索し、参照を取得・設定します。
         /// </summary>
         /// <param name="name">キー</param>
@@ -103,6 +94,7 @@ namespace Kecaknoah
         /// <param name="src">登録する<see cref="KecaknoahSource"/></param>
         public void RegisterSource(KecaknoahSource src)
         {
+            ProcessUseDirective(src.Uses);
             foreach (var c in src.Classes)
             {
                 classes.Add(c);
@@ -246,5 +238,54 @@ namespace Kecaknoah
             methodReferences.Add(KecaknoahReference.Right(KecaknoahNil.Instance, wp));
         }
         #endregion
+
+        #region Stdlib Register
+        /// <summary>
+        /// 標準ライブラリを登録します。
+        /// </summary>
+        public void RegisterStandardLibraries()
+        {
+            RegisterClass(KecaknoahString.Information);
+            RegisterClass(KecaknoahConvert.Information);
+            RegisterClass(KecaknoahList.Information);
+            RegisterClass(KecaknoahDictionary.Information);
+            RegisterClass(KecaknoahDirectory.Information);
+            RegisterClass(KecaknoahFile.Information);
+            RegisterClass(KecaknoahMath.Information);
+            RegisterClass(KecaknoahDynamicLibrary.Information);
+            RegisterClass(KecaknoahHash.Information);
+            RegisterClass(KecaknoahRegex.Information);
+            RegisterClass(KecaknoahExtensionLibrary.Information);
+        }
+        #endregion
+
+        private void ProcessUseDirective(IEnumerable<string> list)
+        {
+            var cur = Directory.GetCurrentDirectory();
+            var lex = new KecaknoahLexer();
+            var par = new KecaknoahParser();
+            var prc = new KecaknoahPrecompiler();
+            foreach (var text in list)
+            {
+                var arg = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                switch (arg[0])
+                {
+                    case "import":
+                        var it = Path.Combine(cur, arg[1]);
+                        Directory.SetCurrentDirectory(Path.GetDirectoryName(it));
+                        var s = prc.PrecompileAll(par.Parse(lex.AnalyzeFromFile(it)));
+                        RegisterSource(s);
+                        Directory.SetCurrentDirectory(cur);
+                        break;
+                    case "exlib":
+                        var et = Path.Combine(BaseDirectory, arg[1]);
+                        Directory.SetCurrentDirectory(et);
+                        var s2 = prc.PrecompileAll(par.Parse(lex.AnalyzeFromFile(Path.Combine(et, $"{arg[1]}.kt"))));
+                        RegisterSource(s2);
+                        Directory.SetCurrentDirectory(cur);
+                        break;
+                }
+            }
+        }
     }
 }

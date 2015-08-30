@@ -33,7 +33,7 @@ namespace Kecaknoah
         /// インナークラスを追加します。
         /// </summary>
         /// <param name="klass">追加するクラス</param>
-        internal void AddInnerClass(KecaknoahInteropClassInfo klass)
+        public void AddInnerClass(KecaknoahInteropClassInfo klass)
         {
             if (inners.Any(p => p.Name == klass.Name)) throw new ArgumentException("同じ名前のインナークラスがすでに存在します。");
             inners.Add(klass);
@@ -43,7 +43,7 @@ namespace Kecaknoah
         /// メソッドを追加します。
         /// </summary>
         /// <param name="method">追加するメソッド</param>
-        internal void AddInstanceMethod(KecaknoahInteropMethodInfo method)
+        public void AddInstanceMethod(KecaknoahInteropMethodInfo method)
         {
             methods.Add(method);
         }
@@ -52,7 +52,7 @@ namespace Kecaknoah
         /// クラスメソッドを追加します。
         /// </summary>
         /// <param name="method">追加するメソッド</param>
-        internal void AddClassMethod(KecaknoahInteropMethodInfo method)
+        public void AddClassMethod(KecaknoahInteropMethodInfo method)
         {
             classMethods.Add(method);
         }
@@ -61,7 +61,7 @@ namespace Kecaknoah
         /// フィールドを追加します。
         /// </summary>
         /// <param name="local">追加するメソッド</param>
-        internal void AddLocal(string local)
+        public void AddLocal(string local)
         {
             locals.Add(local);
             LocalInfos.Add(new KecaknoahInteropClassLocalInfo { Name = local, Value = KecaknoahNil.Instance });
@@ -72,7 +72,7 @@ namespace Kecaknoah
         /// </summary>
         /// <param name="local">追加するメソッド</param>
         /// <param name="obj">設定する初期値</param>
-        internal void AddLocal(string local, KecaknoahObject obj)
+        public void AddLocal(string local, KecaknoahObject obj)
         {
             locals.Add(local);
             LocalInfos.Add(new KecaknoahInteropClassLocalInfo { Name = local, Value = obj });
@@ -83,7 +83,7 @@ namespace Kecaknoah
         /// </summary>
         /// <param name="local">名前</param>
         /// <param name="obj">値</param>
-        internal void AddConstant(string local, KecaknoahObject obj)
+        public void AddConstant(string local, KecaknoahObject obj)
         {
             ConstInfos.Add(new KecaknoahInteropClassLocalInfo { Name = local, Value = obj });
         }

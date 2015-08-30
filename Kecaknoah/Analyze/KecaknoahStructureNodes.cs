@@ -4,6 +4,24 @@ using System.Linq;
 namespace Kecaknoah.Analyze
 {
     /// <summary>
+    /// use文のノードを定義します。
+    /// </summary>
+    public sealed class KecaknoahUseAstNode : KecaknoahAstNode
+    {
+        /// <summary>
+        /// 対象を取得します。
+        /// </summary>
+        public string Target { get; internal set; }
+
+        /// <summary>
+        /// 新しいインスタンスを初期化します。
+        /// </summary>
+        public KecaknoahUseAstNode()
+        {
+            Type = KecaknoahAstNodeType.Use;
+        }
+    }
+    /// <summary>
     /// クラスのノードです。
     /// </summary>
     public class KecaknoahClassAstNode : KecaknoahAstNode
