@@ -97,7 +97,18 @@ namespace Kecaknoah.Standard
 
         protected internal override KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
-            if (target.ExtraType == "TimeSpan")
+            if (target.ExtraType == "DateTime")
+            {
+                var t = ((KecaknoahDateTime)target).datetime;
+                switch (op)
+                {
+                    case KecaknoahILCodeType.Minus:
+                        return new KecaknoahTimeSpan(datetime - t);
+                    default:
+                        return KecaknoahNil.Instance;
+                }
+            }
+            else if (target.ExtraType == "TimeSpan")
             {
                 var t = ((KecaknoahTimeSpan)target).timespan;
                 switch (op)
@@ -152,43 +163,43 @@ namespace Kecaknoah.Standard
 
         private KecaknoahFunctionResult InstanceAddDays(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
         {
-            var result = new KecaknoahDateTime(datetime.AddDays(args[0].ToDouble()));
+            var result = new KecaknoahDateTime(datetime.AddDays(args[0].ToInt32()));
             return result.NoResume();
         }
 
         private KecaknoahFunctionResult InstanceAddHours(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
         {
-            var result = new KecaknoahDateTime(datetime.AddDays(args[0].ToDouble()));
+            var result = new KecaknoahDateTime(datetime.AddHours(args[0].ToInt32()));
             return result.NoResume();
         }
 
         private KecaknoahFunctionResult InstanceAddMinutes(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
         {
-            var result = new KecaknoahDateTime(datetime.AddDays(args[0].ToDouble()));
+            var result = new KecaknoahDateTime(datetime.AddMinutes(args[0].ToInt32()));
             return result.NoResume();
         }
 
         private KecaknoahFunctionResult InstanceAddMonths(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
         {
-            var result = new KecaknoahDateTime(datetime.AddDays(args[0].ToDouble()));
+            var result = new KecaknoahDateTime(datetime.AddMonths(args[0].ToInt32()));
             return result.NoResume();
         }
 
         private KecaknoahFunctionResult InstanceAddSeconds(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
         {
-            var result = new KecaknoahDateTime(datetime.AddDays(args[0].ToDouble()));
+            var result = new KecaknoahDateTime(datetime.AddSeconds(args[0].ToInt32()));
             return result.NoResume();
         }
 
         private KecaknoahFunctionResult InstanceAddTicks(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
         {
-            var result = new KecaknoahDateTime(datetime.AddDays(args[0].ToDouble()));
+            var result = new KecaknoahDateTime(datetime.AddTicks(args[0].ToInt32()));
             return result.NoResume();
         }
 
         private KecaknoahFunctionResult InstanceAddYears(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)
         {
-            var result = new KecaknoahDateTime(datetime.AddDays(args[0].ToDouble()));
+            var result = new KecaknoahDateTime(datetime.AddYears(args[0].ToInt32()));
             return result.NoResume();
         }
 

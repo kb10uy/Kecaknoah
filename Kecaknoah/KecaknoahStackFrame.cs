@@ -261,6 +261,7 @@ namespace Kecaknoah
                         }
                         break;
                     case KecaknoahILCodeType.ResumeCoroutine:
+                        if (!cors.ContainsKey(c.StringValue)) throw new KeyNotFoundException($"{c.StringValue}という名前のコルーチンは生成されていません。");
                         var cobj = cors[c.StringValue];
                         if (cobj == null)
                         {

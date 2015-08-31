@@ -1,0 +1,21 @@
+# クロージャもどき
+
+func main
+  obj = Closure.new(10, 100)
+  f = obj.closure
+  for(i = 0; i < 10; i++) println(f())
+endfunc
+
+class Closure
+  local start = 0, add = 0, now = 0;
+  func static new(s, a)
+    self.start = s
+    self.now = self.start
+    self.add = a
+  endfunc
+  
+  func closure
+    self.now += self.add
+    return self.now
+  endfunc
+endclass

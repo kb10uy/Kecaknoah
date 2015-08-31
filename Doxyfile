@@ -1,6 +1,6 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "Kecaknoah"
-PROJECT_NUMBER         = "1.6.1"
+PROJECT_NUMBER         = "1.6.2"
 PROJECT_BRIEF          = "An Emmbeded Dynamic Script Language Library for .NET"
 PROJECT_LOGO           = "godicon.png"
 OUTPUT_DIRECTORY       = "docs"

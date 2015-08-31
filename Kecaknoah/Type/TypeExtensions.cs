@@ -631,7 +631,7 @@ namespace Kecaknoah.Type
         }
 
         /// <summary>
-        /// 列挙可能なリストに対してlastメソッド(Last相当)を生成します。
+        /// 列挙可能なリストに対してallメソッド(all相当)を生成します。
         /// </summary>
         /// <param name="list">対象のリスト</param>
         /// <returns>生成されたDelegate。</returns>

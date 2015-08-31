@@ -110,7 +110,7 @@ namespace Kecaknoah.Standard
         //Dictionary解決でもいいかも
         KecaknoahReference
             add, add_range, insert, each, remove_at, remove_by,
-            filter, map, reduce, clear;
+            filter, map, reduce, clear, any, all;
 
         private void RegisterInstanceFunction()
         {
@@ -124,6 +124,8 @@ namespace Kecaknoah.Standard
             filter = KecaknoahReference.Right(this, InstanceFilter);
             map = KecaknoahReference.Right(this, InstanceMap);
             reduce = KecaknoahReference.Right(this, InstanceReduce);
+            any = KecaknoahReference.Right(this, list.Select(p => p.RawObject).GenerateAnyFunction());
+            all = KecaknoahReference.Right(this, list.Select(p => p.RawObject).GenerateAllFunction());
         }
 
         private KecaknoahFunctionResult InstanceAdd(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args)

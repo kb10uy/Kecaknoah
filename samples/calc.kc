@@ -1,0 +1,129 @@
+# by pakutoma
+func main
+  formula = readln()
+  calc = Calc.new()
+  calc.exec(formula)
+endfunc
+
+class Calc
+  func exec(formula)
+    lexer = LexerClass.new()
+    parser = ParserClass.new()
+    println(parser.parser(lexer.lexer(formula)))
+  endfunc
+endclass
+
+class LexerClass
+  func lexer(formula)
+    bchar = "first"
+    tokens = List.new()
+    foreach (x in self.str_to_list(formula))
+      if (self.is_num(x)) then
+        if (bchar == "first"||bchar == "ope") then
+          token = Convert.to_int(x)
+        elif (bchar == "num") then
+          token = token * 10 + Convert.to_int(x)
+        endif
+        bchar = "num"
+      else
+        if (bchar == "num") then
+          tokens.add(Convert.to_str(token))
+        endif
+        tokens.add(x)
+        bchar = "ope"
+      endif
+    next
+    if (tokens[tokens.length - 1] != ")") then
+      tokens.add(Convert.to_str(token))
+    endif
+    return tokens
+  endfunc
+  
+  func str_to_list(str)
+    res = List.new()
+    for(i = 0;i < str.length;i++)
+      res.add(str.substring(i,1))
+    next
+    return res
+  endfunc
+
+  func is_num(str)
+    num = ["0","1","2","3","4","5","6","7","8","9"]
+    foreach (x in num)
+      if (str == x) then
+        return true
+      endif
+    next
+    return false
+  endfunc
+endclass
+
+class ParserClass
+  func parser(tokens)
+    self.print_tokens2(tokens)
+    return self.add_and_sub(tokens,0,tokens.length)
+  endfunc
+
+  func add_and_sub(tokens,start,length)
+    startcount = start
+    lengthcount = 0
+    bope = "+"
+    res = 0
+    for (i = start;i < start + length;i++)
+      if (tokens[i] == "+"||tokens[i] == "-") then
+        if (bope == "+") then
+          res += self.mul_and_div(tokens,startcount,lengthcount)
+        else
+          res -= self.mul_and_div(tokens,startcount,lengthcount)
+        endif
+        bope = tokens[i]
+        startcount += lengthcount + 1
+        lengthcount = 0
+      else
+        lengthcount += 1
+      endif
+    next
+    if (bope == "+") then
+      res += self.mul_and_div(tokens,startcount,lengthcount)
+    else
+      res -= self.mul_and_div(tokens,startcount,lengthcount)
+    endif
+    return res
+  endfunc
+
+  func mul_and_div(tokens,start,length)
+    startcount = start
+    lengthcount = 0
+    bope = "nil"
+    for (i = start;i < start + length;i++)
+      if (tokens[i] == "*"||tokens[i] == "/") then
+        if (startcount == start) then
+          res = Convert.to_int(tokens[i - 1])
+        elif (bope == "*") then
+          res *= Convert.to_int(tokens[i - 1])
+        else
+          res /= Convert.to_int(tokens[i - 1])
+        endif
+        bope = tokens[i]
+        startcount += lengthcount + 1
+        lengthcount = 0
+      else
+        lengthcount += 1
+      endif
+    next
+    if (bope == "nil") then
+      res = Convert.to_int(tokens[start])
+    elif (bope == "*") then
+      res *= Convert.to_int(tokens[start + length - 1])
+    else
+      res /= Convert.to_int(tokens[start + length - 1])
+    endif
+    return res
+  endfunc
+
+  func print_tokens2(tokens)
+    println("lexer Analyze result ")
+    foreach(x in tokens) print("{" + x + "},")
+    println()
+  endfunc
+endclass

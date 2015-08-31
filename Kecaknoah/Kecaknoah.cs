@@ -63,9 +63,9 @@ namespace Kecaknoah
         {
             var fp = Path.GetFullPath(fileName);
             var le = Lexer.AnalyzeFromFile(fileName, enc);
-            if (!le.Success) throw new KecaknoahException(le.Error);
+            if (!le.Success) throw new KecaknoahCompilingException(le.Error);
             var ast = Parser.Parse(le);
-            if (!ast.Success) throw new KecaknoahException(le.Error);
+            if (!ast.Success) throw new KecaknoahCompilingException(le.Error);
             var src = Precompiler.PrecompileAll(ast);
             CurrentModule.RegisterSource(src);
             if (CurrentModule["main"] != KecaknoahNil.Instance)
@@ -85,9 +85,9 @@ namespace Kecaknoah
         public KecaknoahObject DoString(string source)
         {
             var le = Lexer.AnalyzeFromSource(source);
-            if (!le.Success) throw new KecaknoahException(le.Error);
+            if (!le.Success) throw new KecaknoahCompilingException(le.Error);
             var ast = Parser.Parse(le);
-            if (!ast.Success) throw new KecaknoahException(le.Error);
+            if (!ast.Success) throw new KecaknoahCompilingException(le.Error);
             var src = Precompiler.PrecompileAll(ast);
             CurrentModule.RegisterSource(src);
             if (CurrentModule["main"] != KecaknoahNil.Instance)
@@ -107,9 +107,9 @@ namespace Kecaknoah
         public KecaknoahObject DoExpressionString(string source)
         {
             var le = Lexer.AnalyzeFromSource(source);
-            if (!le.Success) throw new KecaknoahException(le.Error);
+            if (!le.Success) throw new KecaknoahCompilingException(le.Error);
             var ast = Parser.ParseAsExpression(le);
-            if (!ast.Success) throw new KecaknoahException(le.Error);
+            if (!ast.Success) throw new KecaknoahCompilingException(le.Error);
             var src = Precompiler.PrecompileExpression(ast);
             return new KecaknoahContext(CurrentModule).ExecuteExpressionIL(src);
         }
@@ -118,19 +118,19 @@ namespace Kecaknoah
     /// <summary>
     /// Kecaknoah
     /// </summary>
-    public sealed class KecaknoahException : Exception
+    public sealed class KecaknoahCompilingException : Exception
     {
         /// <summary>
         /// 発生したエラーを取得します。
         /// </summary>
         public KecaknoahError Error { get; }
 
-        internal KecaknoahException(KecaknoahError err) : base($"解析中にエラーが発生しました: {err.Message}")
+        internal KecaknoahCompilingException(KecaknoahError err) : base($"解析中にエラーが発生しました: {err.Message}")
         {
             Error = err;
         }
 
-        internal KecaknoahException(string err) : base($"実行中にエラーが発生しました: {err}")
+        internal KecaknoahCompilingException(string err) : base($"実行中にエラーが発生しました: {err}")
         {
 
         }

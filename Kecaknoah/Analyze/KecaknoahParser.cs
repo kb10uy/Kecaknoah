@@ -390,7 +390,7 @@ namespace Kecaknoah.Analyze
                     throw new KecaknoahParseException(nt.CreateErrorAt("ステートメントが空です。"));
                 default:
                     var exp = ParseExpression(tokens);
-                    if (!CheckStatementExpression(exp)) throw new KecaknoahParseException("ステートメントにできない式です。");
+                    if (!CheckStatementExpression(exp)) throw new KecaknoahParseException(nt.CreateErrorAt("ステートメントにできない式です。"));
                     result.Add(exp);
                     break;
             }
@@ -402,6 +402,7 @@ namespace Kecaknoah.Analyze
             if (node is KecaknoahArgumentCallExpressionAstNode &&
                 (node as KecaknoahArgumentCallExpressionAstNode).ExpressionType == KecaknoahOperatorType.FunctionCall)
                 return true;
+
             var bn = node as KecaknoahBinaryExpressionAstNode;
             if (bn == null) return false;
             switch (bn.ExpressionType)

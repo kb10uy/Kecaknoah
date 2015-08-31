@@ -453,27 +453,7 @@ namespace Kecaknoah
                         result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.MakeArray, IntegerValue = exp.ElementNodes.Count });
                         break;
                     case KecaknoahFactorType.Lambda:
-                        var lma = exp.ElementNodes.Select(p => ((KecaknoahFactorExpressionAstNode)p).StringValue).ToList();
-                        var name = $"Lambda-{Guid.NewGuid().ToString().Substring(0, 17)}";
-                        var func = new KecaknoahScriptMethodInfo(name);
-                        var eil = PrecompileExpression(exp.ExpressionNode);
-                        eil.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Return });
-                        foreach (var i in eil.Where(p => p.Type == KecaknoahILCodeType.LoadObject && lma.Contains(p.StringValue)))
-                        {
-                            i.Type = KecaknoahILCodeType.PushArgument;
-                            i.IntegerValue = lma.IndexOf(i.StringValue);
-                        }
-                        func.Codes = new KecaknoahIL();
-                        func.Codes.PushCodes(eil);
-                        if (cuc.Count == 0)
-                        {
-                            current.methods.Add(func);
-                        }
-                        else
-                        {
-                            cuc.Peek().AddInstanceMethod(func);
-                        }
-                        result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = name });
+                        result.AddRange(PrecompileLambda(exp));
                         break;
                 }
             }
@@ -550,6 +530,123 @@ namespace Kecaknoah
                 throw new InvalidOperationException("ごめん何言ってるかさっぱりわかんない");
             }
             return result;
+        }
+
+        private IList<KecaknoahILCode> PrecompileLambda(KecaknoahFactorExpressionAstNode exp)
+        {
+            var il = PrecompileExpression(exp.ExpressionNode);
+            il.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Return });
+            var lma = exp.ElementNodes.Select(p => ((KecaknoahFactorExpressionAstNode)p).StringValue).ToList();
+            var caps = new List<string>();
+            for (int i = 0; i < il.Count; i++)
+            {
+                var c = il[i];
+                if (c.Type == KecaknoahILCodeType.LoadObject)
+                {
+                    var name = c.StringValue;
+                    if (lma.Contains(name))
+                    {
+                        c.Type = KecaknoahILCodeType.PushArgument;
+                        c.IntegerValue = lma.IndexOf(name);
+                    }
+                    else
+                    {
+                        //キャプチャ対象
+                        c.Type = KecaknoahILCodeType.LoadMember;
+                        if (caps.Contains(name))
+                        {
+                            c.StringValue = $"cap_{caps.IndexOf(name)}";
+                        }
+                        else
+                        {
+                            c.StringValue = $"cap_{caps.Count}";
+                            caps.Add(name);
+                        }
+                        il.Insert(i, new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = "self" });
+                    }
+                }
+            }
+            var ln = $"Lambda-{Guid.NewGuid().ToString().Substring(0, 17)}";
+            var cl = new KecaknoahScriptClassInfo(ln);
+            var ctor = new KecaknoahIL();
+            for (int i = 0; i < caps.Count; i++)
+            {
+                cl.AddLocal($"cap_{i}", null);
+                ctor.PushCode(KecaknoahILCodeType.LoadObject, "self");
+                ctor.PushCode(KecaknoahILCodeType.LoadMember, $"cap_{i}");
+                ctor.PushCode(KecaknoahILCodeType.PushArgument, i);
+                ctor.PushCode(KecaknoahILCodeType.Assign);
+            }
+            var ci = new KecaknoahScriptMethodInfo("new", caps.Count, false);
+            ci.Codes = ctor;
+            cl.AddClassMethod(ci);
+            var fi = new KecaknoahScriptMethodInfo("body", lma.Count, false);
+            fi.Codes = new KecaknoahIL();
+            fi.Codes.PushCodes(il);
+            cl.AddInstanceMethod(fi);
+            if (cuc.Count == 0)
+            {
+                current.classes.Add(cl);
+            }
+            else
+            {
+                cuc.Peek().AddInnerClass(cl);
+            }
+
+            var result = new List<KecaknoahILCode>();
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = ln });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadMember, StringValue = "new" });
+            foreach (var i in caps) result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadObject, StringValue = i });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Call, IntegerValue = caps.Count });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.LoadMember, StringValue = "body" });
+            return result;
+        }
+
+        private bool CheckLocalReference(KecaknoahExpressionAstNode exp, IList<string> args)
+        {
+            if (exp is KecaknoahFactorExpressionAstNode)
+            {
+                var fc = (KecaknoahFactorExpressionAstNode)exp;
+                switch (fc.FactorType)
+                {
+                    case KecaknoahFactorType.BooleanValue:
+                    case KecaknoahFactorType.DoubleValue:
+                    case KecaknoahFactorType.IntegerValue:
+                    case KecaknoahFactorType.Nil:
+                    case KecaknoahFactorType.StringValue:
+                    case KecaknoahFactorType.SingleValue:
+                        return true;
+                    case KecaknoahFactorType.CoroutineResume:
+                    case KecaknoahFactorType.VariableArguments:
+                        throw new ArgumentException("ラムダ式はcoresume・VARGSを内包できません。");
+                    case KecaknoahFactorType.Array:
+                        return fc.ElementNodes.Any(p => CheckLocalReference(p, args));
+                    case KecaknoahFactorType.Identifer:
+                        return !args.Contains(fc.StringValue);
+                    case KecaknoahFactorType.Lambda:
+                    case KecaknoahFactorType.ParenExpression:
+                        return CheckLocalReference(fc.ExpressionNode, args);
+                    default:
+                        return false;
+                }
+            }
+            else if (exp is KecaknoahPrimaryExpressionAstNode)
+            {
+                return CheckLocalReference((exp as KecaknoahPrimaryExpressionAstNode).Target, args);
+            }
+            else if (exp is KecaknoahUnaryExpressionAstNode)
+            {
+                return CheckLocalReference((exp as KecaknoahUnaryExpressionAstNode).Target, args);
+            }
+            else if (exp is KecaknoahBinaryExpressionAstNode)
+            {
+                var be = (KecaknoahBinaryExpressionAstNode)exp;
+                return CheckLocalReference(be.FirstNode, args) || CheckLocalReference(be.SecondNode, args);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         internal IList<KecaknoahILCode> PrecompileBinaryExpression(KecaknoahBinaryExpressionAstNode node)

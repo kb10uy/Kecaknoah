@@ -17,6 +17,7 @@ namespace Kecaknoah.Type
         /// </summary>
         public KecaknoahReference Constructor { get; }
 
+        private Dictionary<string, KecaknoahReference> inners = new Dictionary<string, KecaknoahReference>();
         private Dictionary<string, KecaknoahReference> methods = new Dictionary<string, KecaknoahReference>();
         /// <summary>
         /// 新しいインスタンスを初期化します。
@@ -30,6 +31,10 @@ namespace Kecaknoah.Type
             foreach (var i in Class.classMethods)
             {
                 methods[i.Name] = (KecaknoahReference.Right(new KecaknoahScriptFunction(KecaknoahNil.Instance, i)));
+            }
+            foreach (var i in Class.inners)
+            {
+                inners[i.Name] = (KecaknoahReference.Right(new KecaknoahScriptClassObject(i)));
             }
         }
 
@@ -46,6 +51,7 @@ namespace Kecaknoah.Type
                     return Constructor;
                 default:
                     if (methods.ContainsKey(name)) return methods[name];
+                    if (inners.ContainsKey(name)) return inners[name];
                     return KecaknoahNil.Reference;
             }
         }

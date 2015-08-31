@@ -1,0 +1,52 @@
+func main
+  println("abcdeの5文字を好きなだけ空白入れれば成功するはず")
+  input = readln()
+  result = List.new()
+  peg = Peg.new(input)
+  coroutine pegc = peg_test:(peg)
+  while(coresume(pegc, f)) 
+    if (!f) then
+      println("残念！マッチ失敗！")
+      break
+    endif
+  next
+  println(format("残骸: {0}", peg.source))
+  readln()
+endfunc
+
+func peg_test(input)
+  ex = ["a", "b", "c", "d", "e"]
+  foreach(i in ex)
+    input.perhaps_str_many(" ")
+    yield input.expect_str(i)
+  next
+endfunc
+
+#なんかPEGみたいなの
+class Peg
+  local source = "";
+  func static new(src)
+    self.source = src;
+  endfunc
+  
+  func expect_str(str)
+    if (self.source.starts(str)) then
+      self.source = self.source.substring(str.length)
+      return true
+    else
+      return false
+    endif
+  endfunc
+  
+  func perhaps_str(str)
+    if (self.source.starts(str)) then
+      self.source = self.source.substring(str.length)
+    endif
+    return true
+  endfunc
+  
+  func perhaps_str_many(str)
+    while (self.source.starts(str)) self.source = self.source.substring(str.length)
+    return true
+  endfunc
+endclass

@@ -48,6 +48,10 @@ namespace Kecaknoah.Type
                 CurrentFrame = new KecaknoahStackFrame(context, BaseMethod.Codes);
                 CurrentFrame.Locals["self"] = KecaknoahReference.Right(Instance);
                 CurrentFrame.Arguments = args;
+                if (args.Length > BaseMethod.ArgumentLength)
+                {
+                    CurrentFrame.VariableArguments = args.Skip(BaseMethod.ArgumentLength).ToList();
+                }
             }
             var r = CurrentFrame.Resume();
             return new KecaknoahFunctionResult(CurrentFrame.ReturningObject, r);

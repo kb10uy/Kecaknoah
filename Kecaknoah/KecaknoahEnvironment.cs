@@ -35,6 +35,7 @@ namespace Kecaknoah
             result.RegisterFunction(Write, "print");
             result.RegisterFunction(Format, "format");
             result.RegisterFunction(Exit, "exit");
+            result.RegisterFunction(Throw, "throw");
 
             return result;
         }
@@ -82,5 +83,39 @@ namespace Kecaknoah
             Environment.Exit(args.Length > 0 ? (int)args[0].ToInt64() : 0);
             return KecaknoahNil.Instance.NoResume();
         }
+
+        private static KecaknoahFunctionResult Throw(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
+        {
+            var d = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            switch (args[0].ExtraType)
+            {
+                case "String":
+                    Console.WriteLine($"Kecaknoahで例外がスローされました : {args[0].ToString()}");
+                    break;
+                default:
+                    var ex = args[0] as KecaknoahInstance;
+                    if (ex == null) throw new ArgumentException("Kecaknoah上で生成したインスタンス以外渡せません");
+                    var mes = ex["message"].ToString();
+                    Console.WriteLine($"{ex.Class.Name}: {mes}");
+                    break;
+
+            }
+            Console.Write("Enterで終了します...");
+            Console.ReadLine();
+            Environment.Exit(-1);
+            return KecaknoahNil.Instance.NoResume();
+        }
+    }
+
+    /// <summary>
+    /// Kecaknoahの実行中の例外を定義します。
+    /// </summary>
+    public class KecaknoahException : Exception
+    {
+        /// <summary>
+        /// 付与されたオブジェクトを取得します。
+        /// </summary>
+        public KecaknoahObject Object { get; internal set; }
     }
 }
