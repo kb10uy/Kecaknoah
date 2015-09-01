@@ -265,6 +265,7 @@ namespace Kecaknoah
         private void ProcessUseDirective(KecaknoahSource src)
         {
             var cur = Directory.GetCurrentDirectory();
+            var asm = Path.GetDirectoryName(typeof(KecaknoahModule).Assembly.Location);
             var lex = new KecaknoahLexer();
             var par = new KecaknoahParser();
             var prc = new KecaknoahPrecompiler();
@@ -278,6 +279,13 @@ namespace Kecaknoah
                         Directory.SetCurrentDirectory(Path.GetDirectoryName(it));
                         var s = prc.PrecompileAll(par.Parse(lex.AnalyzeFromFile(it)));
                         RegisterSource(s);
+                        Directory.SetCurrentDirectory(cur);
+                        break;
+                    case "stdlib":
+                        var lt = Path.Combine(asm, "lib");
+                        Directory.SetCurrentDirectory(Path.GetDirectoryName(lt));
+                        var s2 = prc.PrecompileAll(par.Parse(lex.AnalyzeFromFile(lt)));
+                        RegisterSource(s2);
                         Directory.SetCurrentDirectory(cur);
                         break;
                 }

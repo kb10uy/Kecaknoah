@@ -16,7 +16,7 @@ namespace Kecaknoah.Analyze
         private static IOrderedEnumerable<Tuple<string, KecaknoahTokenType>> Keywords = new List<Tuple<string, KecaknoahTokenType>>
         {
             new Tuple<string, KecaknoahTokenType>("class", KecaknoahTokenType.ClassKeyword),
-            new Tuple<string, KecaknoahTokenType>("endclass", KecaknoahTokenType.EndclassKeyword),
+            new Tuple<string, KecaknoahTokenType>("endclass", KecaknoahTokenType.EndClassKeyword),
             new Tuple<string, KecaknoahTokenType>("static", KecaknoahTokenType.StaticKeyword),
             new Tuple<string, KecaknoahTokenType>("func", KecaknoahTokenType.FuncKeyword),
             new Tuple<string, KecaknoahTokenType>("endfunc", KecaknoahTokenType.EndFuncKeyword),
@@ -24,7 +24,7 @@ namespace Kecaknoah.Analyze
             new Tuple<string, KecaknoahTokenType>("elif", KecaknoahTokenType.ElifKeyword),
             new Tuple<string, KecaknoahTokenType>("then", KecaknoahTokenType.ThenKeyword),
             new Tuple<string, KecaknoahTokenType>("else", KecaknoahTokenType.ElseKeyword),
-            new Tuple<string, KecaknoahTokenType>("endif", KecaknoahTokenType.EndifKeyword),
+            new Tuple<string, KecaknoahTokenType>("endif", KecaknoahTokenType.EndIfKeyword),
             new Tuple<string, KecaknoahTokenType>("case", KecaknoahTokenType.CaseKeyword),
             new Tuple<string, KecaknoahTokenType>("when", KecaknoahTokenType.WhenKeyword),
             new Tuple<string, KecaknoahTokenType>("default", KecaknoahTokenType.DefaultKeyword),

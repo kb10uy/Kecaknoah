@@ -115,7 +115,7 @@ namespace Kecaknoah.Analyze
                     result.Add($"Array");
                     break;
                 case KecaknoahFactorType.Lambda:
-                    result.Add($"Array");
+                    result.Add($"Lambda");
                     break;
             }
             return result;

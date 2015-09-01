@@ -14,6 +14,11 @@ namespace Kecaknoah.Type
         public KecaknoahScriptMethodInfo BaseMethod { get; }
 
         /// <summary>
+        /// クラスメソッド・インスタンスメソッドの場合、その<see cref="KecaknoahScriptClassInfo"/>を取得します。
+        /// </summary>
+        public KecaknoahScriptClassInfo BelongingClass { get; }
+
+        /// <summary>
         /// インスタンスを取得します。
         /// </summary>
         public KecaknoahObject Instance { get; }

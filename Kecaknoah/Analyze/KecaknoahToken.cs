@@ -66,7 +66,7 @@ namespace Kecaknoah.Analyze
         /// <summary>
         /// endclass
         /// </summary>
-        EndclassKeyword,
+        EndClassKeyword,
         /// <summary>
         /// static
         /// </summary>
@@ -98,7 +98,7 @@ namespace Kecaknoah.Analyze
         /// <summary>
         /// endif
         /// </summary>
-        EndifKeyword,
+        EndIfKeyword,
         /// <summary>
         /// case
         /// </summary>

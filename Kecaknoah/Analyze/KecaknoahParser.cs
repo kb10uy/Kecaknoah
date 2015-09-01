@@ -199,7 +199,7 @@ namespace Kecaknoah.Analyze
             {
                 tokens.SkipLogicalLineBreak();
                 var t = tokens.Dequeue();
-                if (t.Type == KecaknoahTokenType.EndclassKeyword) break;
+                if (t.Type == KecaknoahTokenType.EndClassKeyword) break;
                 switch (t.Type)
                 {
                     case KecaknoahTokenType.FuncKeyword:
@@ -208,6 +208,10 @@ namespace Kecaknoah.Analyze
                     case KecaknoahTokenType.LocalKeyword:
                         result.AddLocalNode(ParseLocal(tokens));
                         break;
+                    case KecaknoahTokenType.EndIfKeyword:
+                    case KecaknoahTokenType.EndCaseKeyword:
+                    case KecaknoahTokenType.EndFuncKeyword:
+                        throw new KecaknoahParseException(nt.CreateErrorAt("endclassが対応していません。"));
                     default:
                         throw new KecaknoahParseException(nt.CreateErrorAt("クラス内にはメソッドかlocal宣言のみ記述出来ます。"));
                 }
@@ -235,7 +239,7 @@ namespace Kecaknoah.Analyze
             ParseFunctionArgumentsList(tokens, result);
             if (!tokens.SkipLogicalLineBreak()) throw new KecaknoahParseException(nt.CreateErrorAt("func宣言の後ろに改行が必要です。"));
             foreach (var n in ParseBlock(tokens)) result.AddNode(n);
-            if (!tokens.CheckSkipToken(KecaknoahTokenType.EndFuncKeyword)) throw new KecaknoahParseException(nt.CreateErrorAt("endfuncがありません。"));
+            if (!tokens.CheckSkipToken(KecaknoahTokenType.EndFuncKeyword)) throw new KecaknoahParseException(nt.CreateErrorAt("endfunc対応していません。"));
             return result;
         }
 
@@ -308,7 +312,7 @@ namespace Kecaknoah.Analyze
                         break;
                     case KecaknoahTokenType.ElifKeyword:
                     case KecaknoahTokenType.ElseKeyword:
-                    case KecaknoahTokenType.EndifKeyword:
+                    case KecaknoahTokenType.EndIfKeyword:
                     case KecaknoahTokenType.WhenKeyword:
                     case KecaknoahTokenType.DefaultKeyword:
                     case KecaknoahTokenType.EndCaseKeyword:
@@ -513,7 +517,7 @@ namespace Kecaknoah.Analyze
                 while (true)
                 {
                     var nt = tokens.Dequeue();
-                    if (nt.Type == KecaknoahTokenType.EndifKeyword)
+                    if (nt.Type == KecaknoahTokenType.EndIfKeyword)
                     {
                         break;
                     }
