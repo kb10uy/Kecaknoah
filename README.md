@@ -1,4 +1,4 @@
-Kecaknoah(ケチャのあ)
+Kecaknoah(ケチャのあ) 
 ================================================================
 An Embedded Script Language for .NET
 .NET向け組み込みスクリプト言語
