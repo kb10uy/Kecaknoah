@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
+using System.Text;
 
 namespace Kecaknoah
 {
@@ -87,6 +88,74 @@ namespace Kecaknoah
         }
 
         private KecaknoahFunctionResult Eval(KecaknoahContext ctx, KecaknoahObject self, KecaknoahObject[] args) => new KecaknoahContext(this).ExecuteExpressionIL(new KecaknoahPrecompiler().PrecompileExpression(new KecaknoahParser().ParseAsExpression(new KecaknoahLexer().AnalyzeFromSource(args[0].ToString())))).NoResume();
+
+        #region Do****
+        /// <summary>
+        /// ファイルを読み込み、内容を登録します。
+        /// </summary>
+        /// <param name="fileName">ファイル名</param>
+        public KecaknoahObject DoFile(string fileName) => DoFile(fileName, Encoding.Default);
+
+        /// <summary>
+        /// 指定したエンコードでファイルを読み込み、内容を登録します。
+        /// </summary>
+        /// <param name="fileName">ファイル名</param>
+        /// <param name="enc">読み込む際に利用する<see cref="Encoding"/></param>
+        public KecaknoahObject DoFile(string fileName, Encoding enc)
+        {
+            var fp = Path.GetFullPath(fileName);
+            var le = Environment.Lexer.AnalyzeFromFile(fileName, enc);
+            if (!le.Success) throw new KecaknoahParseException(le.Error);
+            var ast = Environment.Parser.Parse(le);
+            if (!ast.Success) throw new KecaknoahParseException(le.Error);
+            var src = Environment.Precompiler.PrecompileAll(ast);
+            RegisterSource(src);
+            if (this["main"] != KecaknoahNil.Instance)
+            {
+                return new KecaknoahContext(this).CallInstant(this["main"]);
+            }
+            else
+            {
+                return KecaknoahNil.Instance;
+            }
+        }
+
+        /// <summary>
+        /// 指定したソースコードを直接解析し、実行します。
+        /// </summary>
+        /// <param name="source">ソースコード</param>
+        public KecaknoahObject DoString(string source)
+        {
+            var le = Environment.Lexer.AnalyzeFromSource(source);
+            if (!le.Success) throw new KecaknoahParseException(le.Error);
+            var ast = Environment.Parser.Parse(le);
+            if (!ast.Success) throw new KecaknoahParseException(le.Error);
+            var src = Environment.Precompiler.PrecompileAll(ast);
+            RegisterSource(src);
+            if (this["main"] != KecaknoahNil.Instance)
+            {
+                return new KecaknoahContext(this).CallInstant(this["main"]);
+            }
+            else
+            {
+                return KecaknoahNil.Instance;
+            }
+        }
+
+        /// <summary>
+        /// 指定したソースコードを式として解析し、実行します。
+        /// </summary>
+        /// <param name="source">ソースコード</param>
+        public KecaknoahObject DoExpressionString(string source)
+        {
+            var le = Environment.Lexer.AnalyzeFromSource(source);
+            if (!le.Success) throw new KecaknoahParseException(le.Error);
+            var ast = Environment.Parser.ParseAsExpression(le);
+            if (!ast.Success) throw new KecaknoahParseException(le.Error);
+            var src = Environment.Precompiler.PrecompileExpression(ast);
+            return new KecaknoahContext(this).ExecuteExpressionIL(src);
+        }
+        #endregion
 
         #region Registerers
         /// <summary>
@@ -238,29 +307,6 @@ namespace Kecaknoah
             topMethods.Add(fo);
             methodReferences.Add(KecaknoahReference.Right(KecaknoahNil.Instance, wp));
         }
-        #endregion
-
-        #region Stdlib Register
-        /// <summary>
-        /// 標準ライブラリを登録します。
-        /// </summary>
-        public void RegisterStandardLibraries()
-        {
-            RegisterClass(KecaknoahString.Information);
-            RegisterClass(KecaknoahConvert.Information);
-            RegisterClass(KecaknoahList.Information);
-            RegisterClass(KecaknoahDictionary.Information);
-            RegisterClass(KecaknoahDirectory.Information);
-            RegisterClass(KecaknoahFile.Information);
-            RegisterClass(KecaknoahMath.Information);
-            RegisterClass(KecaknoahDynamicLibrary.Information);
-            RegisterClass(KecaknoahHash.Information);
-            RegisterClass(KecaknoahRegex.Information);
-            RegisterClass(KecaknoahExtensionLibrary.Information);
-            RegisterClass(KecaknoahDateTime.Information);
-            RegisterClass(KecaknoahTimeSpan.Information);
-        }
-        #endregion
 
         private void ProcessUseDirective(KecaknoahSource src)
         {
@@ -291,5 +337,28 @@ namespace Kecaknoah
                 }
             }
         }
+        #endregion
+
+        #region Stdlib Register
+        /// <summary>
+        /// 標準ライブラリを登録します。
+        /// </summary>
+        public void RegisterStandardLibraries()
+        {
+            RegisterClass(KecaknoahString.Information);
+            RegisterClass(KecaknoahConvert.Information);
+            RegisterClass(KecaknoahList.Information);
+            RegisterClass(KecaknoahDictionary.Information);
+            RegisterClass(KecaknoahDirectory.Information);
+            RegisterClass(KecaknoahFile.Information);
+            RegisterClass(KecaknoahMath.Information);
+            RegisterClass(KecaknoahDynamicLibrary.Information);
+            RegisterClass(KecaknoahHash.Information);
+            RegisterClass(KecaknoahRegex.Information);
+            RegisterClass(KecaknoahExtensionLibrary.Information);
+            RegisterClass(KecaknoahDateTime.Information);
+            RegisterClass(KecaknoahTimeSpan.Information);
+        }
+        #endregion
     }
 }

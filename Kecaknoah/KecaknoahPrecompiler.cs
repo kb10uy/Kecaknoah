@@ -540,8 +540,8 @@ namespace Kecaknoah
             switch (CheckLocalReference(exp, lma))
             {
                 case 0:
-                case 1:
                     return PrecompileClassLambda(il, lma);
+                case 1:
                 case 2:
                     return PrecompileLexicalLambda(il, lma);
                 default:

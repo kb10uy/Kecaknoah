@@ -109,14 +109,14 @@ namespace Kecaknoah.Analyze
         private static Regex OctadecimalNumberPattern = new Regex("0[oO][0-7]+");
         private static Regex HexadecimalNumberPattern = new Regex("0[xX][0-9a-fA-F]+");
         private static Regex HexatridecimalNumberPattern = new Regex("0[tT][0-9a-zA-Z]+");
-        private static Regex IdentiferPattern = new Regex("[_a-zA-Z][A-Za-z_0-9@]*");
+        private static Regex IdentiferPattern = new Regex("[\\p{Lu}\\p{Ll}\\p{Lt}\\p{Lm}\\p{Lo}\\p{Nl}][\\p{Lu}\\p{Ll}\\p{Lt}\\p{Lm}\\p{Lo}\\p{Nl}\\p{Mn}\\p{Mc}\\p{Pc}\\p{Nd}\\p{Cf}]*");
         private static List<Tuple<string, string>> MultilineCommentQuotations = new List<Tuple<string, string>> {
             new Tuple<string, string>("/*", "*/"),
             new Tuple<string, string>("#{", "#}"),
         };
         private static List<string> LineCommentStart = new List<string> { "//", "#" };
         private static List<string> StringQuotation = new List<string> { "\"", "'" };
-        private static Regex WhitespacePattern = new Regex("[ \t]+");
+        private static Regex WhitespacePattern = new Regex("[\\p{Zs}\\t]+");
         private static List<Tuple<string, string>> StringLiteralEscapes = new List<Tuple<string, string>>
         {
             new Tuple<string, string>("\\r", "\r"),

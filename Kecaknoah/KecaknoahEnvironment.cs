@@ -19,15 +19,37 @@ namespace Kecaknoah
         public KecaknoahModule this[string name] => modules[name];
 
         /// <summary>
-        /// 名前を指定して新しい<see cref="KecaknoahModule"/>のインスタンスを生成します。
+        /// 利用される<see cref="KecaknoahLexer"/>を取得します。
+        /// </summary>
+        public KecaknoahLexer Lexer { get; } = new KecaknoahLexer();
+
+        /// <summary>
+        /// 利用される<see cref="KecaknoahLexer"/>を取得します。
+        /// </summary>
+        public KecaknoahParser Parser { get; } = new KecaknoahParser();
+
+        /// <summary>
+        /// 利用される<see cref="KecaknoahPrecompiler"/>を取得します。
+        /// </summary>
+        public KecaknoahPrecompiler Precompiler { get; } = new KecaknoahPrecompiler();
+
+        /// <summary>
+        /// 現在の<see cref="KecaknoahModule"/>を取得します。
+        /// </summary>
+        public KecaknoahModule CurrentModule { get; private set; }
+        
+
+        /// <summary>
+        /// モジュールを作成し、<see cref="CurrentModule"/>に設定します。
         /// </summary>
         /// <param name="name">名前</param>
-        /// <returns>このインスタンスで定義される<see cref="KecaknoahModule"/></returns>
+        /// <returns>作成されたモジュール</returns>
         public KecaknoahModule CreateModule(string name)
         {
             var result = new KecaknoahModule(name);
             result.Environment = this;
             modules[name] = result;
+            CurrentModule = result;
 
             result.RegisterFunction(CreateArray, "array");
             result.RegisterFunction(ReadLine, "readln");
@@ -40,6 +62,7 @@ namespace Kecaknoah
             return result;
         }
 
+        #region 組み込み関数
         private static KecaknoahFunctionResult CreateArray(KecaknoahContext context, KecaknoahObject self, KecaknoahObject[] args)
         {
             if (args.Length == 0) throw new ArgumentException("次元数が不正です");
@@ -106,6 +129,7 @@ namespace Kecaknoah
             Environment.Exit(-1);
             return KecaknoahNil.Instance.NoResume();
         }
+        #endregion
     }
 
     /// <summary>

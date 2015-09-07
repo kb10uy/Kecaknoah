@@ -49,7 +49,6 @@
     <Compile Include="Analyze\AnalyzerExtensions.cs" />
     <Compile Include="Analyze\KecaknoahStructureNodes.cs" />
     <Compile Include="External\KecaknoahExternalClass.cs" />
-    <Compile Include="Kecaknoah.cs" />
     <Compile Include="Analyze\KecaknoahAst.cs" />
     <Compile Include="KecaknoahBytecode.cs" />
     <Compile Include="KecaknoahContext.cs" />
