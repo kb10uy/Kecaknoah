@@ -1,0 +1,12 @@
+func main
+  うんち = "大便"
+  ひねり出す = println
+  余韻にひたる = readln
+  ひねり出す(うんち)
+  プログラマを殺すメソッド()
+  余韻にひたる()
+endfunc
+
+func プログラマを殺すメソッド
+　println("若狭"　+　"悠里")
+endfunc

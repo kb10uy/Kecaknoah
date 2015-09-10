@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Kecaknoah</id>
+    <version>1.6.4</version>
+    <authors>kb10uy</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <language>Japanese</language>
+    <description>An Emmbeded Dynamic Scripting Language Library for .NET</description>
+    <copyright>(C)2015 kb10uy</copyright>
+    <projectUrl>https://github.com/kb10uy/Kecaknoah</projectUrl>
+    <licenseUrl>http://opensource.org/licenses/mit-license.php</licenseUrl>
+    <iconUrl>http://kecaknoah.kb10uy.org/godicon.png</iconUrl>
+  </metadata>
+  <files>
+    <file src="bin/Release/Kecaknoah.dll" target="lib/net45"/>
+    <file src="bin/Release/Kecaknoah.xml" target="lib/net45"/>
+    <file src="bin/Release/Kecaknoah.pdb" target="lib/net45"/>
+  </files>
+</package>

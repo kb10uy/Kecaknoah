@@ -100,12 +100,15 @@
     <Compile Include="Type\KecaknoahString.cs" />
     <Compile Include="Type\TypeExtensions.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Kecaknoah.nuspec" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>mkdir $(SolutionDir)releases\$(ConfigurationName)
 copy $(TargetPath) $(SolutionDir)releases\$(ConfigurationName)\$(TargetFileName)
-copy $(TargetDir)$(TargetName).xml $(SolutionDir)releases\$(ConfigurationName)\$(TargetName).xml</PostBuildEvent>
+copy $(TargetDir)$(TargetName).xml $(SolutionDir)releases\$(ConfigurationName)\$(TargetName).xml
+nuget pack $(ProjectDir)Kecaknoah.nuspec</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
