@@ -1092,9 +1092,9 @@ namespace Kecaknoah.Analyze
                 case KecaknoahTokenType.DecimalNumberLiteral:
                     if (t.TokenString.IndexOf('.') >= 0)
                     {
-                        lv = t.TokenString.Substring(0, t.TokenString.Length - 1);
+
                         var v = 0.0;
-                        var r = double.TryParse(lv, out v);
+                        var r = double.TryParse(t.TokenString, out v);
                         return new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.DoubleValue, DoubleValue = r ? v : double.MaxValue };
                     }
                     else
