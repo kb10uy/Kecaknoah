@@ -216,7 +216,130 @@ namespace Kecaknoah.Analyze
                         throw new KecaknoahParseException(nt.CreateErrorAt("クラス内にはメソッドかlocal宣言のみ記述出来ます。"));
                 }
             }
+            ReplaceClassAccess(result);
             return result;
+        }
+
+        private void ReplaceClassAccess(KecaknoahClassAstNode node)
+        {
+            var imn = node.Functions.Where(p => !p.StaticMethod).Select(p => p.Name).ToList();
+            var cmn = node.Functions.Where(p => p.StaticMethod).Select(p => p.Name).ToList();
+            var ln = node.Locals.Select(p => p.Name).ToList();
+            var cn = node.Name;
+            foreach (var i in node.Functions) ReplaceBlockClassAccess(i.Children.ToList(), i.StaticMethod, cn, imn, cmn, ln);
+        }
+
+        private void ReplaceBlockClassAccess(IList<KecaknoahAstNode> node, bool isStatic, string className, IList<string> instanceMethods, IList<string> staticMethods, IList<string> Locals)
+        {
+            Action<IList<KecaknoahAstNode>> curryblk = (p) => ReplaceBlockClassAccess(p, isStatic, className, instanceMethods, staticMethods, Locals);
+            Action<KecaknoahExpressionAstNode> curryexp = (p) => ReplaceExpressionClassAccess(p, isStatic, className, instanceMethods, staticMethods, Locals);
+            foreach (var i in node)
+            {
+                if (i is KecaknoahLocalAstNode)
+                {
+                    var e = ((KecaknoahLocalAstNode)i).InitialExpression;
+                    if (e != null) curryexp(e);
+                }
+                else if (i is KecaknoahReturnAstNode)
+                {
+                    var e = ((KecaknoahReturnAstNode)i).Value;
+                    if (e != null) curryexp(e);
+                }
+                else if (i is KecaknoahCoroutineDeclareAstNode)
+                {
+                    var ie = ((KecaknoahCoroutineDeclareAstNode)i).InitialExpression;
+                    var prm = ((KecaknoahCoroutineDeclareAstNode)i).ParameterExpressions;
+                    curryexp(ie);
+                    foreach (var j in prm) curryexp(j);
+                }
+                else if (i is KecaknoahIfAstNode)
+                {
+                    var ian = (KecaknoahIfAstNode)i;
+                    curryexp(ian.IfBlock.Condition);
+                    curryblk(ian.IfBlock.Children.ToList());
+                    foreach (var j in ian.ElifBlocks)
+                    {
+                        curryexp(j.Condition);
+                        curryblk(j.Children.ToList());
+                    }
+                    if (ian.ElseBlock != null) curryblk(ian.ElseBlock.Children.ToList());
+                }
+                else if (i is KecaknoahForAstNode)
+                {
+                    var fan = (KecaknoahForAstNode)i;
+                    foreach (var j in fan.InitializeExpressions) curryexp(j);
+                    curryexp(fan.Condition);
+                    foreach (var j in fan.CounterExpressions) curryexp(j);
+                    curryblk(fan.Children.ToList());
+                }
+                else if (i is KecaknoahForeachAstNode)
+                {
+                    var fean = (KecaknoahForeachAstNode)i;
+                    curryexp(fean.Source);
+                    curryblk(fean.Children.ToList());
+                    foreach (var j in fean.CoroutineArguments) curryexp(j);
+                }
+                else if (i is KecaknoahLoopAstNode)
+                {
+                    var lan = (KecaknoahLoopAstNode)i;
+                    curryexp(lan.Condition);
+                    curryblk(lan.Children.ToList());
+                }
+                else if (i is KecaknoahExpressionAstNode)
+                {
+                    curryexp(i as KecaknoahExpressionAstNode);
+                }
+            }
+        }
+
+        private void ReplaceExpressionClassAccess(KecaknoahExpressionAstNode node, bool isStatic, string className, IList<string> instanceMethods, IList<string> staticMethods, IList<string> Locals)
+        {
+            Action<KecaknoahExpressionAstNode> curry = (p) => ReplaceExpressionClassAccess(p, isStatic, className, instanceMethods, staticMethods, Locals);
+            if (node is KecaknoahBinaryExpressionAstNode)
+            {
+                var bn = (KecaknoahBinaryExpressionAstNode)node;
+                curry(bn.FirstNode);
+                curry(bn.SecondNode);
+            }
+            else if (node is KecaknoahFactorExpressionAstNode)
+            {
+                var f = (KecaknoahFactorExpressionAstNode)node;
+                if (f.FactorType == KecaknoahFactorType.Identifer)
+                {
+                    if (!isStatic && (instanceMethods.Contains(f.StringValue) || Locals.Contains(f.StringValue)))
+                    {
+                        var newfac = new KecaknoahMemberAccessExpressionAstNode();
+                        newfac.MemberName = f.StringValue;
+                        newfac.Target = new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.Identifer, StringValue = "self" };
+                        f.FactorType = KecaknoahFactorType.ParenExpression;
+                        f.ExpressionNode = newfac;
+                    }
+
+                    if (staticMethods.Contains(f.StringValue))
+                    {
+                        //サブクラスも含む、そのうちね
+                        var newfac = new KecaknoahMemberAccessExpressionAstNode();
+                        newfac.MemberName = f.StringValue;
+                        newfac.Target = new KecaknoahFactorExpressionAstNode { FactorType = KecaknoahFactorType.Identifer, StringValue = className };
+                        f.FactorType = KecaknoahFactorType.ParenExpression;
+                        f.ExpressionNode = newfac;
+                    }
+                }
+            }
+            else if (node is KecaknoahArgumentCallExpressionAstNode)
+            {
+                var ac = (KecaknoahArgumentCallExpressionAstNode)node;
+                curry(ac.Target);
+                foreach (var i in ac.Arguments) curry(i);
+            }
+            else if (node is KecaknoahPrimaryExpressionAstNode)
+            {
+                curry(((KecaknoahPrimaryExpressionAstNode)node).Target);
+            }
+            else if (node is KecaknoahUnaryExpressionAstNode)
+            {
+                curry(((KecaknoahUnaryExpressionAstNode)node).Target);
+            }
         }
 
         private KecaknoahFunctionAstNode ParseFunction(Queue<KecaknoahToken> tokens, bool top)
