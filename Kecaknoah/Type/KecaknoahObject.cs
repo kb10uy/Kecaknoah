@@ -83,7 +83,15 @@ namespace Kecaknoah.Type
         /// <returns></returns>
         protected internal virtual KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
-            throw new InvalidOperationException($"この{nameof(KecaknoahObject)}に対して式操作は出来ません。");
+            switch(op)
+            {
+                case KecaknoahILCodeType.Equal:
+                    return Equals(target).AsKecaknoahBoolean();
+                case KecaknoahILCodeType.NotEqual:
+                    return (!Equals(target)).AsKecaknoahBoolean();
+                default:
+                    throw new InvalidOperationException($"この{nameof(KecaknoahObject)}に対して式操作は出来ません。");
+            }
         }
 
         /// <summary>
