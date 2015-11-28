@@ -75,6 +75,7 @@
     <Compile Include="Standard\KecaknoahInteropClassBase.cs" />
     <Compile Include="Standard\KecaknoahMatch.cs" />
     <Compile Include="Standard\KecaknoahMath.cs" />
+    <Compile Include="Standard\KecaknoahRandom.cs" />
     <Compile Include="Standard\KecaknoahRegex.cs" />
     <Compile Include="Standard\KecaknoahSystem.cs" />
     <Compile Include="Standard\KecaknoahTimeSpan.cs" />
