@@ -394,5 +394,9 @@ namespace Kecaknoah.Analyze
         /// lambda
         /// </summary>
         Lambda,
+        /// <summary>
+        /// λ
+        /// </summary>
+        LambdaStart,
     }
 }

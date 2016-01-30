@@ -665,16 +665,26 @@ namespace Kecaknoah
                         return 0;
                 }
             }
+            else if (exp is KecaknoahArgumentCallExpressionAstNode)
+            {
+                //カッコつき呼び出しの引数も忘れずに処理しろ💢
+                var pean = exp as KecaknoahArgumentCallExpressionAstNode;
+                return Math.Max(pean.Arguments.Max(x => CheckLocalReference(x, args)),
+                    CheckLocalReference((exp as KecaknoahPrimaryExpressionAstNode).Target, args));
+            }
             else if (exp is KecaknoahPrimaryExpressionAstNode)
             {
+                //後置演算子
                 return CheckLocalReference((exp as KecaknoahPrimaryExpressionAstNode).Target, args);
             }
             else if (exp is KecaknoahUnaryExpressionAstNode)
             {
+                //前置演算子
                 return CheckLocalReference((exp as KecaknoahUnaryExpressionAstNode).Target, args);
             }
             else if (exp is KecaknoahBinaryExpressionAstNode)
             {
+                //二項演算子
                 var be = (KecaknoahBinaryExpressionAstNode)exp;
                 return Math.Max(CheckLocalReference(be.FirstNode, args), CheckLocalReference(be.SecondNode, args));
             }

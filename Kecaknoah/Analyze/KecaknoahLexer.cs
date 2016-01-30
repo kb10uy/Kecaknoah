@@ -93,6 +93,7 @@ namespace Kecaknoah.Analyze
             new Tuple<string, KecaknoahTokenType>(".", KecaknoahTokenType.Period),
             new Tuple<string, KecaknoahTokenType>("...", KecaknoahTokenType.VariableArguments),
             new Tuple<string, KecaknoahTokenType>("=>", KecaknoahTokenType.Lambda),
+            new Tuple<string, KecaknoahTokenType>("λ", KecaknoahTokenType.LambdaStart),
 
             //new Tuple<string, KecaknoahTokenType>(Environment.NewLine, KecaknoahTokenType.NewLine),
             new Tuple<string, KecaknoahTokenType>(";", KecaknoahTokenType.Semicolon),

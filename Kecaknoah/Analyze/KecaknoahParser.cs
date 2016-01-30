@@ -1156,6 +1156,7 @@ namespace Kecaknoah.Analyze
                     if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenEnd)) throw new KecaknoahParseException(t.CreateErrorAt("coresumeが不正です。"));
                     return result;
                 case KecaknoahTokenType.And:
+                case KecaknoahTokenType.LambdaStart:
                     var lambda = new KecaknoahFactorExpressionAstNode();
                     lambda.FactorType = KecaknoahFactorType.Lambda;
                     if (!tokens.CheckSkipToken(KecaknoahTokenType.ParenStart)) throw new KecaknoahParseException(t.CreateErrorAt("ラムダ式の&には引数リストを続けてください。"));
