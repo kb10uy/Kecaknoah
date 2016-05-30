@@ -183,6 +183,22 @@ namespace Kecaknoah.Analyze
         /// coresume
         /// </summary>
         CoresumeKeyword,
+        /// <summary>
+        /// try
+        /// </summary>
+        TryKeyword,
+        /// <summary>
+        /// catch
+        /// </summary>
+        CatchKeyword,
+        /// <summary>
+        /// finally
+        /// </summary>
+        FinallyKeyword,
+        /// <summary>
+        /// endtry
+        /// </summary>
+        EndTryKeyword,
 
         /// <summary>
         /// use

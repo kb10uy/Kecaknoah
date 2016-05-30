@@ -88,14 +88,14 @@ namespace Kecaknoah
         public bool Execute()
         {
             Reset();
-            return Resume();
+            return Resume() == KecaknoahFunctionResultType.CanResume;
         }
 
         /// <summary>
         /// 現在の状態で、現在のコードの実行を再開します。
         /// </summary>
         /// <returns></returns>
-        public bool Resume()
+        public KecaknoahFunctionResultType Resume()
         {
             KecaknoahObject v1, v2;
             KecaknoahReference rfr;
@@ -275,14 +275,14 @@ namespace Kecaknoah
                             //2引数
                             var vas = ReferenceStack.Pop();
                             vas.RawObject = cr.ReturningObject;
-                            ReferenceStack.Push(KecaknoahReference.Right(cr.CanResume.AsKecaknoahBoolean()));
+                            ReferenceStack.Push(KecaknoahReference.Right((cr.ResultState == KecaknoahFunctionResultType.CanResume).AsKecaknoahBoolean()));
                         }
                         else
                         {
                             //1引数
                             ReferenceStack.Push(KecaknoahReference.Right(cr.ReturningObject));
                         }
-                        if (!cr.CanResume)
+                        if (cr.ResultState != KecaknoahFunctionResultType.CanResume)
                         {
                             cors[c.StringValue] = null;
                         }
@@ -315,11 +315,11 @@ namespace Kecaknoah
                         break;
                     case KecaknoahILCodeType.Return:
                         ReturningObject = ReferenceStack.Pop().RawObject;
-                        return false;
+                        return KecaknoahFunctionResultType.NoResume;
                     case KecaknoahILCodeType.Yield:
                         ReturningObject = ReferenceStack.Pop().RawObject;
                         ProgramCounter++;
-                        return true;
+                        return KecaknoahFunctionResultType.CanResume;
                     case KecaknoahILCodeType.Call:
                         args = new Stack<KecaknoahObject>();
                         for (int i = 0; i < c.IntegerValue; i++) args.Push(ReferenceStack.Pop().RawObject);
@@ -359,7 +359,7 @@ namespace Kecaknoah
             }
             if (ReferenceStack.Count == 0) ReferenceStack.Push(KecaknoahNil.Reference);
             ReturningObject = ReferenceStack.Pop().RawObject;
-            return false;
+            return KecaknoahFunctionResultType.NoResume;
         }
 
         /// <summary>

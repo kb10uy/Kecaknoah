@@ -83,7 +83,7 @@ namespace Kecaknoah.Type
         /// <returns></returns>
         protected internal virtual KecaknoahObject ExpressionOperation(KecaknoahILCodeType op, KecaknoahObject target)
         {
-            switch(op)
+            switch (op)
             {
                 case KecaknoahILCodeType.Equal:
                     return Equals(target).AsKecaknoahBoolean();
@@ -163,6 +163,25 @@ namespace Kecaknoah.Type
     }
 
     /// <summary>
+    /// Kecaknoahのメソッドの実行結果の状態を列挙します。
+    /// </summary>
+    public enum KecaknoahFunctionResultType
+    {
+        /// <summary>
+        /// 継続なし
+        /// </summary>
+        NoResume,
+        /// <summary>
+        /// 継続あり。coresumeで続行可能
+        /// </summary>
+        CanResume,
+        /// <summary>
+        /// 例外発生。<see cref="KecaknoahFunctionResult.ReturningObject"/>は例外オブジェクトが格納されます。
+        /// </summary>
+        Exception,
+    }
+
+    /// <summary>
     /// Kecaknoahのメソッドの実行結果を定義します。
     /// </summary>
     public sealed class KecaknoahFunctionResult
@@ -170,7 +189,7 @@ namespace Kecaknoah.Type
         /// <summary>
         /// このメソッドを再開できるかどうかを取得します。
         /// </summary>
-        public bool CanResume { get; }
+        public KecaknoahFunctionResultType ResultState { get; }
         /// <summary>
         /// 今回のreturn/yieldに属する<see cref="KecaknoahObject"/>を取得します。
         /// </summary>
@@ -180,10 +199,10 @@ namespace Kecaknoah.Type
         /// 新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="obj">返却する<see cref="KecaknoahObject"/></param>
-        /// <param name="res">再開可能な場合はtrue</param>
-        public KecaknoahFunctionResult(KecaknoahObject obj, bool res)
+        /// <param name="res">実行状態に応じた値</param>
+        public KecaknoahFunctionResult(KecaknoahObject obj, KecaknoahFunctionResultType res)
         {
-            CanResume = res;
+            ResultState = res;
             ReturningObject = obj;
         }
 

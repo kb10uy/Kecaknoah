@@ -120,7 +120,8 @@ namespace Kecaknoah
         {
             var r = TargetObject.Call(this, IsResuming ? null : Arguments.ToArray());
             Current = r.ReturningObject;
-            return IsResuming = r.CanResume;
+            IsResuming = r.ResultState == KecaknoahFunctionResultType.CanResume;
+            return IsResuming;
         }
 
         /// <summary>

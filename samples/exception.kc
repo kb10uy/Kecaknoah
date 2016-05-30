@@ -1,0 +1,9 @@
+func main
+  try
+    throw("うんこ")
+  catch e
+    println(e.message)
+  finally
+    println("ちんこ")
+  endtry
+endfunc

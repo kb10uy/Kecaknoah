@@ -16,14 +16,21 @@ namespace Kecaknoah.Type
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static KecaknoahFunctionResult CanResume(this KecaknoahObject obj) => new KecaknoahFunctionResult(obj, true);
+        public static KecaknoahFunctionResult CanResume(this KecaknoahObject obj) => new KecaknoahFunctionResult(obj, KecaknoahFunctionResultType.CanResume);
 
         /// <summary>
         /// 再開不可能です。
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static KecaknoahFunctionResult NoResume(this KecaknoahObject obj) => new KecaknoahFunctionResult(obj, false);
+        public static KecaknoahFunctionResult NoResume(this KecaknoahObject obj) => new KecaknoahFunctionResult(obj, KecaknoahFunctionResultType.NoResume);
+
+        /// <summary>
+        /// 例外です。
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static KecaknoahFunctionResult Exception(this KecaknoahObject obj) => new KecaknoahFunctionResult(obj, KecaknoahFunctionResultType.Exception);
         #endregion
 
         #region .NETオブジェクト拡張

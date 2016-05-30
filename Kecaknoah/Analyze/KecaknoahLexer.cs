@@ -48,6 +48,10 @@ namespace Kecaknoah.Analyze
             new Tuple<string, KecaknoahTokenType>("yield", KecaknoahTokenType.YieldKeyword),
             new Tuple<string, KecaknoahTokenType>("coroutine", KecaknoahTokenType.CoroutineKeyword),
             new Tuple<string, KecaknoahTokenType>("coresume", KecaknoahTokenType.CoresumeKeyword),
+            new Tuple<string, KecaknoahTokenType>("try", KecaknoahTokenType.TryKeyword),
+            new Tuple<string, KecaknoahTokenType>("catch", KecaknoahTokenType.CatchKeyword),
+            new Tuple<string, KecaknoahTokenType>("finally", KecaknoahTokenType.FinallyKeyword),
+            new Tuple<string, KecaknoahTokenType>("endtry", KecaknoahTokenType.EndTryKeyword),
             new Tuple<string, KecaknoahTokenType>("use", KecaknoahTokenType.UseKeyword),
         }.OrderByDescending(p => p.Item1.Length).ThenBy(p => p.Item1);
 

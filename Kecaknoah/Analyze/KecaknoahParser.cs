@@ -396,7 +396,7 @@ namespace Kecaknoah.Analyze
                         }
 
                     }
-                EndArgsList:;
+                    EndArgsList:;
                     break;
             }
         }
@@ -431,6 +431,10 @@ namespace Kecaknoah.Analyze
                         tokens.Dequeue();
                         result.Add(ParseForeach(tokens, false));
                         break;
+                    case KecaknoahTokenType.TryKeyword:
+                        tokens.Dequeue();
+                        result.Add(ParseTry(tokens));
+                        break;
                     case KecaknoahTokenType.DoKeyword:
                         break;
                     case KecaknoahTokenType.ElifKeyword:
@@ -441,6 +445,9 @@ namespace Kecaknoah.Analyze
                     case KecaknoahTokenType.EndCaseKeyword:
                     case KecaknoahTokenType.EndFuncKeyword:
                     case KecaknoahTokenType.NextKeyword:
+                    case KecaknoahTokenType.CatchKeyword:
+                    case KecaknoahTokenType.FinallyKeyword:
+                    case KecaknoahTokenType.EndTryKeyword:
                         //呼ばれ元で終了判定するから飛ばさないでね
                         goto EndBlock;
                     default:
@@ -448,7 +455,7 @@ namespace Kecaknoah.Analyze
                         break;
                 }
             }
-        EndBlock: return result;
+            EndBlock: return result;
         }
 
         private IList<KecaknoahAstNode> ParseSingleLineStatement(Queue<KecaknoahToken> tokens)
@@ -910,6 +917,39 @@ namespace Kecaknoah.Analyze
                 if (!tokens.CheckSkipToken(KecaknoahTokenType.NextKeyword)) throw new KecaknoahParseException(tokens.Dequeue().CreateErrorAt("nextで終わっていません。"));
             }
             return result;
+        }
+
+        private KecaknoahTryAstNode ParseTry(Queue<KecaknoahToken> tokens)
+        {
+            var result = new KecaknoahTryAstNode();
+            tokens.SkipLogicalLineBreak();
+            result.AddNode(ParseBlock(tokens));
+            while (true)
+            {
+                var nt = tokens.Dequeue();
+                switch (nt.Type)
+                {
+                    case KecaknoahTokenType.CatchKeyword:
+                        nt = tokens.Dequeue();
+                        if (nt.Type != KecaknoahTokenType.Identifer) throw new KecaknoahParseException(nt.CreateErrorAt("catchブロックに変数名を指定してください。"));
+                        result.CatcherVariableName = nt.TokenString;
+                        tokens.SkipLogicalLineBreak();
+                        result.CatcherBlock.Clear();
+                        result.CatcherBlock = ParseBlock(tokens);
+                        break;
+                    case KecaknoahTokenType.FinallyKeyword:
+                        nt = tokens.Dequeue();
+                        tokens.SkipLogicalLineBreak();
+                        result.FinallyBlock.Clear();
+                        result.FinallyBlock = ParseBlock(tokens);
+                        break;
+                    case KecaknoahTokenType.EndTryKeyword:
+                        goto EndTry;
+                    default:
+                        throw new KecaknoahParseException(nt.CreateErrorAt("不正なtry文です。"));
+                }
+            }
+            EndTry: return result;
         }
 
         private KecaknoahExpressionAstNode ParseExpression(Queue<KecaknoahToken> tokens)

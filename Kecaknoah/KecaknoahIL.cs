@@ -391,6 +391,18 @@ namespace Kecaknoah
         /// arr
         /// </summary>
         MakeArray,
+        /// <summary>
+        /// puc
+        /// </summary>
+        PushCatch,
+        /// <summary>
+        /// poc
+        /// </summary>
+        PopCatch,
+        /// <summary>
+        /// jmc
+        /// </summary>
+        JumpCatch,
 
         /// <summary>
         /// ada

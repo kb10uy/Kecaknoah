@@ -419,6 +419,27 @@ namespace Kecaknoah.Analyze
     }
 
     /// <summary>
+    /// try文ですわ
+    /// </summary>
+    public class KecaknoahTryAstNode : KecaknoahAstNode
+    {
+        /// <summary>
+        /// catch部分のブロックを格納します。
+        /// </summary>
+        public IList<KecaknoahAstNode> CatcherBlock { get; protected internal set; } = new List<KecaknoahAstNode>();
+
+        /// <summary>
+        /// catchで使う変数名を格納します。
+        /// </summary>
+        public string CatcherVariableName { get; protected internal set; } = "";
+
+        /// <summary>
+        /// finally部分のブロックを格納します。
+        /// </summary>
+        public IList<KecaknoahAstNode> FinallyBlock { get; protected internal set; } = new List<KecaknoahAstNode>();
+    }
+
+    /// <summary>
     /// continue文
     /// </summary>
     public class KecaknoahContinueAstNode : KecaknoahAstNode

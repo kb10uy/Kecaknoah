@@ -269,6 +269,10 @@ namespace Kecaknoah
                 {
                     result.PushCodes(PrecompileWhile(i as KecaknoahLoopAstNode));
                 }
+                else if (i is KecaknoahTryAstNode)
+                {
+                    result.PushCodes(PrecompileTry(i as KecaknoahTryAstNode));
+                }
             }
             return result.Codes;
         }
@@ -298,6 +302,15 @@ namespace Kecaknoah
                 result.AddRange(PrecompileBlock(ifn.ElseBlock.Children, loopId));
             }
             result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"{id}-End" });
+            return result;
+        }
+
+        private IList<KecaknoahILCode> PrecompileTry(KecaknoahTryAstNode kecaknoahTryAstNode)
+        {
+            var id = Guid.NewGuid().ToString().Substring(0, 8);
+            var result = new List<KecaknoahILCode>();
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PushCatch, StringValue = $"{id}-Catch" });
+            //TODO:PushCatchに番地を埋め込む対応をする
             return result;
         }
 
