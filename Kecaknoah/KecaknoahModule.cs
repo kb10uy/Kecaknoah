@@ -107,7 +107,7 @@ namespace Kecaknoah
             var le = Environment.Lexer.AnalyzeFromFile(fileName, enc);
             if (!le.Success) throw new KecaknoahParseException(le.Error);
             var ast = Environment.Parser.Parse(le);
-            if (!ast.Success) throw new KecaknoahParseException(le.Error);
+            if (!ast.Success) throw new KecaknoahParseException(ast.Error);
             var src = Environment.Precompiler.PrecompileAll(ast);
             RegisterSource(src);
             if (this["main"] != KecaknoahNil.Instance)

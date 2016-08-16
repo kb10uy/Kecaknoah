@@ -271,7 +271,7 @@ namespace Kecaknoah
                 }
                 else if (i is KecaknoahTryAstNode)
                 {
-                    result.PushCodes(PrecompileTry(i as KecaknoahTryAstNode));
+                    //result.PushCodes(PrecompileTry(i as KecaknoahTryAstNode));
                 }
             }
             return result.Codes;
@@ -305,11 +305,20 @@ namespace Kecaknoah
             return result;
         }
 
-        private IList<KecaknoahILCode> PrecompileTry(KecaknoahTryAstNode kecaknoahTryAstNode)
+        private IList<KecaknoahILCode> PrecompileTry(KecaknoahTryAstNode trn, string loopId)
         {
             var id = Guid.NewGuid().ToString().Substring(0, 8);
             var result = new List<KecaknoahILCode>();
             result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PushCatch, StringValue = $"{id}-Catch" });
+            //tryブロック
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Jump, StringValue = $"{id}-Finally" });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"{id}-Catch" });
+            //catchブロック
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Jump, StringValue = $"{id}-Finally" });
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.Label, StringValue = $"{id}-Finally" });
+            //finallyブロック
+            result.AddRange(PrecompileBlock(trn.FinallyBlock.ToList(), loopId));
+            result.Add(new KecaknoahILCode { Type = KecaknoahILCodeType.PopCatch, StringValue = $"{id}-Catch" });
             //TODO:PushCatchに番地を埋め込む対応をする
             return result;
         }
