@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Kecaknoah")]
-[assembly: AssemblyCopyright("(C) 2015 Yuu Kobayashi (kb10uy)")]
+[assembly: AssemblyCopyright("(C) 2015-2016 Yuu Kobayashi (kb10uy)")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // すべての値を指定するか、下のように '*' を使ってビルドおよびリビジョン番号を 
 // 既定値にすることができます:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.6.6.1")]
-[assembly: AssemblyFileVersion("1.6.6.1")]
+[assembly: AssemblyVersion("1.6.6.2")]
+[assembly: AssemblyFileVersion("1.6.6.2")]

@@ -358,6 +358,8 @@ namespace Kecaknoah
             RegisterClass(KecaknoahExtensionLibrary.Information);
             RegisterClass(KecaknoahDateTime.Information);
             RegisterClass(KecaknoahTimeSpan.Information);
+            RegisterClass(KecaknoahRandom.Information);
+            RegisterClass(KecaknoahXorshift.Information);
         }
         #endregion
     }
